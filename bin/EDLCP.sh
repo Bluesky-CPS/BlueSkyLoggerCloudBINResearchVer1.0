@@ -1,5 +1,5 @@
 #!/bin/sh
-export LD_LIBRARY_PATH=SkyBlue/LCP/EDLoggingControl/LogDecompressor:${LD_LIBRARY_PATH} 
+export LD_LIBRARY_PATH=SkyBlue/LCP/EDLoggingControl/LogDecompressor:${LD_LIBRARY_PATH}
 
 #If do not pass a argument.
 if [ ! "$1" ]; then
