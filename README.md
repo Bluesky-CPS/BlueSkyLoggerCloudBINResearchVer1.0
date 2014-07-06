@@ -1,6 +1,6 @@
  Blue-sky Logger cloud binary execution file Ver1.0
 ===============================================================================================================
-    This is Blue-skyLogger server binary. We will release a source code version in nearly day. 
+    This is Blue-skyLogger server binary. I will release a server source code version in nearly day or if you request please contact me directly. 
     The server can execute by use "Httpd.sh"
 
 	$> ./Httpd.sh
@@ -17,5 +17,5 @@
 	$> make
 
 
-Author: Praween Amontamavut
+Author: Praween AMONTAMAVUT
 
