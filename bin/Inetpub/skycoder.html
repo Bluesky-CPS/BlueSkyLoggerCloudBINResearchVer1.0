@@ -1,0 +1,1116 @@
+<html>
+<head><title>=== SkyCoder framework Environment (Trial version) ===</title>
+
+<script src="ms-Dropdown/js/jquery/jquery-1.9.0.min.js"></script>
+
+<!-- <msdropdown> -->
+<link rel="stylesheet" type="text/css" href="ms-Dropdown/css/msdropdown/dd.css" />
+<link rel="stylesheet" type="text/css" href="ms-Dropdown/css/msdropdown/skin2.css" />
+<script src="ms-Dropdown/js/msdropdown/jquery.dd.min.js"></script>
+<script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
+<!-- </msdropdown> -->
+
+<script src="jquery/jquery-textext-master/src/js/textext.core.js"></script>
+<script src="jquery/jquery-textext-master/src/js/textext.plugin.prompt.js"></script>
+<script src="jquery/jquery-textext-master/src/js/textext.plugin.tags.js"></script>
+<script language="javascript">
+
+
+function downloadLog(type){
+	//alert(type);
+	var edIP = document.getElementById('ed_ip');
+	window.open("embeddedlog?instruction=DOWNLOADLOG&opt1=" + edIP.value + "&opt2=" + type );
+//window.open("etlog?instruction=DOWNLOADLOG&opt1=" + type + "&opt2=" + edIP.value );
+}
+function openxml(isMultipart){
+	var writeroot = document.getElementById('loaded'); 
+	var dateElement = document.getElementById('jsonDate');
+	var numElement = document.getElementById('jsonNum');
+	writeroot.innerHTML = "";
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+	var edIP = document.getElementById('ed_ip');
+	//window.open(edIP.value + ".xml");
+	if(!isMultipart){
+		window.open("embeddedlog?instruction=GETLOG&opt1=" + edIP.value + "&opt2=xml" );
+	}else{
+		window.open("embeddedlog?instruction=GETLOG&opt1=" + edIP.value + "&opt2=xml&opt3=" + dateElement.value + "&opt4=" +  numElement.value);
+	}
+	
+}
+function handleRequest2(req) {
+	var writeroot = document.getElementById('loaded');
+	writeroot.innerHTML = "Wait...";
+	writeroot.innerHTML = req.responseText;
+	//writeroot.innerXML = req.responseText;
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+}
+
+var isNoDevice = 0;
+var isLoggingByAnother = 0;
+var loggingState = "";
+function handleRequestStartAndStopLogging(req) {
+	var writeroot = document.getElementById('loaded'); 
+	var JSONtxt = req.responseText;
+	var JSONParse = JSON.parse(JSONtxt);
+	var resTXT = "";
+	//alert(JSONParse.ETLog.logging.state);
+	if(JSONParse.ETLog.logging.state == "started"){
+		resTXT = "Embedded device is logging to LCP.";
+		isNoDevice = 0;
+		isLoggingByAnother = 0;
+		speak("Logging now.");
+	}else if(JSONParse.ETLog.logging.state == "stopped"){
+		resTXT = "Embedded device has stopped logging data to LCP.";
+		isNoDevice = 0;
+		isLoggingByAnother = 0;
+		//speak("Stop logging now.");
+	}else if(JSONParse.ETLog.logging.state == "logging"){
+		resTXT = "Device has been logging by another. You can suddenly stop this session by [stoplogging API].";
+		isLoggingByAnother = 1;
+		//speak("Sorry, the target device has been logging. Please stop previous logging session before start it again.");
+	}else{
+		resTXT = "No Embedded device connection.";
+		isNoDevice = 1;
+	}
+	//alert(isNoDevice);
+	writeroot.innerHTML = resTXT;
+
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+
+
+}
+function handleRequestAnalysisContentPieces(req) {
+	var writeroot = document.getElementById('loaded');
+	var JSONtxt = req.responseText;
+	//alert(JSONtxt);
+	var JSONParse = JSON.parse(JSONtxt);
+	writeroot.innerHTML = JSONParse.ETLog.FileName + " is splited to " + JSONParse.ETLog.CONTENTPIECES + " piece(s)";
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+}
+/*function handleRequestConnectedStatementSkycoder(req) {
+	var writeroot = document.getElementById('loaded');
+	var selectBox = document.getElementById('ed_ip_view');
+	var JSONtxt = req.responseText;
+	//alert(JSONtxt);
+	var JSONParse = JSON.parse(JSONtxt);
+	var len = JSONParse.ETLog.EDConnStatement.length;
+	
+	var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+	
+	var selectLen = selectBox.length;
+	//alert(selectLen);
+	for(var i = 0; i < selectLen; i++){
+			selectBox.remove(0);
+	}
+	selectBox.refresh();
+	var tmp = "";
+	var selectedIndex = 0;
+	var statICN = "/image/offlineICN.gif";
+	for(var i = 0; i < len; i++){
+		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
+		
+		if(connstatus == "online"){
+			statICN = "/image/onlineICN.gif";
+		}else{
+			statICN = "/image/offlineICN.gif";
+		}
+		
+		var jsonOBJ = new Object();
+		jsonOBJ.text = edipdat + " (" + connstatus + ")";
+		jsonOBJ.value = edipdat;
+		jsonOBJ.description = 'Device type: ' + edtype;
+		jsonOBJ.image = statICN;
+		jsonOBJ.className = '';
+		jsonOBJ.title = '';
+		
+		selectBox.add(jsonOBJ);
+
+		if(connstatus == "online"){
+			selectedIndex = selectBox.length - 1;
+		}
+	}
+	selectBox.set("selectedIndex",selectedIndex);
+	//selectBox.options[selectedIndex].selected = true;
+	selectBox.refresh();
+}*/
+function handleRequestConnectedStatement(req) {
+	var writeroot = document.getElementById('loaded');
+	var selectBox = document.getElementById('ed_ip');
+	var JSONtxt = req.responseText;
+	//alert(JSONtxt);
+	var JSONParse = JSON.parse(JSONtxt);
+	var len = JSONParse.ETLog.EDConnStatement.length;
+	
+	var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+	
+	var selectLen = selectBox.length;
+	//alert(selectLen);
+	for(var i = 0; i < selectLen; i++){
+			selectBox.remove(0);
+	}
+	selectBox.refresh();
+	var tmp = "";
+	var selectedIndex = 0;
+	var statICN = "/image/offlineICN.gif";
+	for(var i = 0; i < len; i++){
+		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
+		
+		if(connstatus == "online"){
+			statICN = "/image/onlineICN.gif";
+		}else{
+			statICN = "/image/offlineICN.gif";
+		}
+		
+		var jsonOBJ = new Object();
+		jsonOBJ.text = edipdat + " (" + connstatus + ")";
+		jsonOBJ.value = edipdat;
+		jsonOBJ.description = 'Device type: ' + edtype;
+		jsonOBJ.image = statICN;
+		jsonOBJ.className = '';
+		jsonOBJ.title = '';
+		
+		selectBox.add(jsonOBJ);
+
+		if(connstatus == "online"){
+			selectedIndex = selectBox.length - 1;
+		}
+	}
+	selectBox.set("selectedIndex",selectedIndex);
+	//selectBox.options[selectedIndex].selected = true;
+	selectBox.refresh();
+}
+var isLogging = 0;
+function handleRequestGetBSFLogSize(req) {
+	var writeroot = document.getElementById('loaded');
+	var JSONtxt = req.responseText;
+	var describeTXT = "";
+	if(isNoDevice == 0){
+		if(isLogging == 1){
+			describeTXT = "Embedded device is logging to LCP. . . .";
+		}else{
+			
+			describeTXT = "Embedded device has stopped logging data to LCP";
+			//describeTXT += "<br>Logging time usage: " + ((stopLoggingTime - startLoggingTime)/1000) + " s<br>";
+		}
+		if(JSONtxt > 1024){
+			JSONtxt /= 1024;
+			JSONtxt = Math.round(JSONtxt*100);
+			JSONtxt /= 100;
+			JSONtxt += "KB"
+		}
+		describeTXT += "<br>BSF log file size on server: " + JSONtxt;
+		describeTXT += "<br>Logging time usage: " + (((new Date).getTime() - startLoggingTime)/1000) + " s<br>";
+	}else{
+		describeTXT = "No Embedded device connection.";
+	}
+
+	//var JSONParse = JSON.parse(JSONtxt);
+	//writeroot.innerHTML = JSONParse.ETLog.FileName + " is splited to " + JSONParse.ETLog.CONTENTPIECES + " piece(s)";
+	writeroot.innerHTML = describeTXT;
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+}
+
+function handleRequest(req) {
+	var writeroot = document.getElementById('loaded'); 
+	//alert("han1");
+	writeroot.innerHTML = req.responseText;
+	writeroot.style.display = 'block';
+	//	alert(write.style.display);
+	//alert("han2");
+
+}
+function handleDownload(req) {
+	var writeroot = document.getElementById('loaded');
+	
+	//writeroot.innerHTML = req.responseText;
+	writeroot.innerHTML = "iiiii";
+	writeroot.style.display = 'block';
+	//alert("LO");
+	var fd = fopen("~/JSON.json", 3);
+	if(fd != -1){
+		fwrite(fd, req.responseText);
+		fclose(fd);
+	}else{
+		alert("sss");
+	}
+alert("LOs");
+	writeroot.style.display = 'block';
+}
+function doExtract(doType){
+	var statusElement = document.getElementById('loaded');
+	statusElement.innerHTML = "<table border=0 style='border-collapse: collapse'><tr><td>Wait</td><td><img src='wait_dot.gif'></td></table>";
+	
+	if(doType == "xml"){
+		speak('System is extracting BSF log to xml log!');
+		sendRequest2('extractlog/xml',handleRequest2,'ETLOG');
+	}else if(doType == "json"){
+		speak('System is extracting BSF log to json log!');
+		sendRequest2('extractlog/json',handleRequest2,'ETLOG');
+	}else if(doType == "cts"){
+		speak('System is extracting BSF log to traditional context switch log!');
+		sendRequest2('extractlog/cts',handleRequest2,'ETLOG');
+	}else if(doType == "kcts"){
+		speak('System is extracting BSF log to lasted context switch log!');
+		sendRequest2('extractlog/kcts',handleRequest2,'ETLOG');
+	}
+}
+var cnt = 0;
+//var cntDate = new Date();
+var startLoggingTime = 0;
+var stopLoggingTime = 0;
+
+
+function sendRequestLogging(url,callback,postData){
+	if(url=="startlogging"){
+		startLoggingTime = (new Date()).getTime();
+	}
+	if(url=="stoplogging"){
+		stopLoggingTime = (new Date()).getTime();
+	}
+	cnt = 0;
+	sendRequest2(url,callback,postData);
+}
+//<!--sensornetwork/set/SignalType/PinNumber/OnOffDigitNumber-->
+function motor(onOff){
+	if(onOff == "on"){
+		//sensornetwork/set/SignalType[as]/NumberOfAllPins/dataEachPinBased10
+		sendRequest2('sensornetwork/set/as/8/0,255,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/1',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/1',handleRequest2,'ETLOG');
+	}else if(onOff == "off"){
+		sendRequest2('sensornetwork/set/as/8/0,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/0',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/0',handleRequest2,'ETLOG');
+	}else if(onOff == "right"){
+		sendRequest2('sensornetwork/set/as/8/255,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/1',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/1',handleRequest2,'ETLOG');
+	}else if(onOff == "left"){
+		sendRequest2('sensornetwork/set/as/8/0,255,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/1',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/0',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/2',handleRequest2,'ETLOG');
+	}
+
+}
+function API_Script_sendRequest(LE_domain, url, callback, postData) {
+//alert("1");
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var API_Script_edIP = document.getElementById('API_script_ed_ip');
+	//alert(API_Script_edIP.value);
+	var method = postData;
+	req.open(method, LE_domain + '' + API_Script_edIP.value + '/' + url,true);
+	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
+
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			alert('HTTP error ' + req.status);
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+
+	/*if(isNoDevice == 0){
+		if(url == "startlogging" || url == "stoplogging"){
+			loggingState = url;
+		}
+	}*/
+
+	//for(var i = 0; i < 100000000; i++){}
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(url == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(url == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+function sendRequest2(url,callback,postData) {
+//alert("1");
+	
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var edIP = document.getElementById('ed_ip');
+	//alert(edIP.value);
+	var method = postData;
+	req.open(method,edIP.value + '/' + url,true);
+	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
+//alert("11");
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			//alert('HTTP error ' + req.status);
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+
+	/*if(isNoDevice == 0){
+		if(url == "startlogging" || url == "stoplogging"){
+			loggingState = url;
+		}
+	}*/
+
+	//for(var i = 0; i < 100000000; i++){}
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(url == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(url == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+
+function sendRequest(url,callback,postData) {
+//alert("1");
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	req.open(method,url,true);
+	req.setRequestHeader('User-Agent','XMLHTTP/1.0');
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			alert('HTTP error ' + req.status);
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+	//alert("2");
+}
+
+var XMLHttpFactories = [
+	function () {return new XMLHttpRequest()},
+	function () {return new ActiveXObject("Msxml2.XMLHTTP")},
+	function () {return new ActiveXObject("Msxml3.XMLHTTP")},
+	function () {return new ActiveXObject("Microsoft.XMLHTTP")}
+];
+
+function createXMLHTTPObject() {
+	var xmlhttp = false;
+	for (var i=0;i<XMLHttpFactories.length;i++) {
+		try {
+			xmlhttp = XMLHttpFactories[i]();
+		}
+		catch (e) {
+			continue;
+		}
+		break;
+	}
+	return xmlhttp;
+}
+
+var getBSFLogSizeID = 0;
+var getBSFSizeCNT = 0;
+
+function startGetBSFLogSize(){
+	getBSFSizeCNT = 0;
+	isLogging =1;
+	for(var i = 0; i < 100000000; i++){}
+	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+	getBSFLogSizeID = setTimeout(getBSFLogSize, 0);
+	//alert("fffff");
+}
+function getBSFLogSize(){
+	getBSFSizeCNT++;
+	if(getBSFSizeCNT % 500 == 0){
+		sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+	}
+	getBSFLogSizeID = setTimeout(getBSFLogSize, 0);
+}
+function stopGetBSFLogSize(){
+	isLogging = 0;
+	clearTimeout(this.getBSFLogSizeID);
+	getBSFSizeCNT = 0;
+	for(var i = 0; i < 100000000; i++){}
+	//alert(i);
+	//nsWaitForDelay(10);
+	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+}
+function initOnload(){
+	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	/*dd = new Date();
+	var dDate = (dd.getDate() < 10)?("0" + dd.getDate()):(dd.getDate()+"");
+	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
+	var dDateOBJ = document.getElementById("jsonDate");
+	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
+}
+
+var isCameraShowing = 0;
+var lock = 0;
+var refCanvasID;
+var ctx = document.getElementById('cameraCanvas').getContext('2d');
+var img = new Image();
+function showCamera(srcDat){
+	while(lock == 1){}
+	var cameraContainer = document.getElementById("camera");
+	ctx = document.getElementById('cameraCanvas').getContext('2d');
+	img = new Image();
+	if(isCameraShowing == 0){
+		cameraContainer.style.display = 'block';
+		ctx.textAlign = 'right';
+		img.onload = function() {
+			ctx.drawImage(img, 0, 0);
+		};
+		img.src = srcDat;
+		refCanvasID = window.setInterval("refreshCanvas()", 10);
+		isCameraShowing = 1;
+	}else{
+		window.clearInterval(refCanvasID);
+		cameraContainer.style.display = 'none';
+		isCameraShowing = 0;
+	}
+}
+function refreshCanvas(){
+	ctx.drawImage(img, 0, 0);
+}
+</script>
+
+<style>
+#titleTXT {
+	text-shadow: 2px 2px 2px #3e63a2;
+	font-weight: bold;
+	color: #000;
+	font-size: 28px;
+	color:#FFF;
+	padding-top: 8px;
+	padding-bottom: 12px;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+#loaded_container {
+	position:absolute;
+	z-index: 3;
+	left: 571px;
+	right: 0;
+	top: 182px;
+	width: 400px;
+	height:240px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF;
+}
+#loaded_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+#codingtextdiv {
+	position:absolute;
+	z-index: 2;
+	left: 0;
+	right: 0;
+	top: 161px;
+	width: 100%;
+	height:100%;
+	margin-top: 0;
+	padding: 20;
+}
+#title1 {
+	position: fixed;
+	z-index: 3000;
+	left: 0;
+	right: 0;
+	top: 0;
+	width: 100%;
+	height:150px;
+	margin-top: 0;
+	background-color:#000;
+	background-image:url(title_sky_bg.jpg);
+	border-radius: 0px 0px 25px 25px / 0px 0px 25px 25px;
+	border-bottom: groove
+}
+#camera {
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 171;
+  height:160;
+  margin-top: 0;
+  text-align:right;
+}
+#cameraCanvas {
+  position: relative;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin-top: 0;
+  text-align:right;
+}
+tr#table_title {
+	color:#000;
+	font-family:"Times New Roman", Times, serif;
+	font-size:16px;
+}
+body {
+	background-color: #e3d6ee;
+	background-image:url(sky-bg.jpg);
+	background-repeat: no-repeat;
+	background-position: top center;
+	background-attachment: fixed
+}
+</style>
+<link href="down.css" rel="stylesheet" type="text/css" />
+<script src="cssmenu.htc" type="text/javascript"></script>
+
+<script>
+$(document).ready(function(e) {
+	$("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}); //rounded corner is off now
+	
+});
+</script> 
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+#ed_ip_view_container {
+	position:absolute;
+	z-index: 1;
+	left: 571px;
+	right: 0;
+	top: 289px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF
+}
+#ed_ip_view_container:hover {
+	position:absolute;
+	z-index: 1;
+	left: 571px;
+	right: 0;
+	top: 289px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF
+}
+#TabbedPanelsContentGroup {
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+#TabbedPanelsContentGroup:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+-->
+</style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload()">
+<!--<img src="1.gif">-->
+
+<div id="title1" align="center">
+
+<!--Begin menu-->
+<div align="center">
+<!--<font color="#FFFFFF">111</font>-->
+</div>
+<div id="titleTXT">
+SkyCoder framework example (Trail version)</div>
+<!--End Menu-->
+  <br><div align="center"><table border="0" cellpadding="0" cellspacing="0" width="640" align="center"><tr><td><table border="0" cellpadding="0" cellspacing="0" width="100%" align="center"><tr>
+  <td width="129" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
+  <td width="206" valign="middle">
+    <span style="vertical-align:middle">
+    <select id="ed_ip" name="ed_ip">
+      <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected>Device IP: 172.16.4.127 (Offline)</option>
+    </select>
+    
+   
+    </span> 
+    </td>
+    <td width="265" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">
+    <div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div>
+    </td>
+    </tr></table></tr></td></table></div>
+  
+</div><br>
+<div id="camera" align="right" style="display: none"><canvas id='cameraCanvas' width='320px' height='240px' align='right' style="border: #000000 1px solid"></canvas>
+	<div id="motionVal">0</div>
+	<input type="range" style="float:bottom; -webkit-transform: rotate(90); -webkit-appearance: slider-vertical" value="50" onChange="num(this.valueAsNumber)">
+    <input type="range" style="float:bottom;" value="50" onChange="num(this.valueAsNumber)">
+</div>
+<div id="audio"></div>
+<script language="javascript">
+function num(bar){
+	var datChk = bar - 50;
+	if(datChk > 0){
+		var motionAnalogVal = Math.floor(datChk*255/50);
+		document.getElementById("motionVal").innerText = "motion right: " + Math.floor(datChk*255/50);
+		sendRequest2('sensornetwork/set/as/8/'+motionAnalogVal+',0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}else if(datChk == 0){
+		document.getElementById("motionVal").innerText = 0;
+		sendRequest2('sensornetwork/set/as/8/0,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}else{
+		var motionAnalogVal = Math.floor(Math.abs(datChk)*255/50);
+		document.getElementById("motionVal").innerText = "motion left: " + Math.floor(Math.abs(datChk)*255/50);
+		sendRequest2('sensornetwork/set/as/8/0,'+motionAnalogVal+',0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}
+	//var motionR = (datChk)*255/100;
+	//document.getElementById("motorR").innerText = bar;
+}
+</script>
+
+<div id="loaded_container">
+  <div id="loaded_title" style=" border-bottom: #000000 1px dotted"><img src="image/dot_list.jpg"> Server response data viewer</div>
+  <span id="loaded">Environment has loaded</span>.</div>
+<!-- API scripts section-->
+
+<div id="codingtextdiv">
+    	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center;">
+    	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
+    	    <ul class="TabbedPanelsTabGroup">
+    	      <li class="TabbedPanelsTab" tabindex="0">: : SkyCoding : :</li>
+    	      <li class="TabbedPanelsTab" tabindex="0">Example code 1</li>
+              <li class="TabbedPanelsTab" tabindex="0">Example code 2</li>
+              <li class="TabbedPanelsTab" tabindex="0">Example code 3</li>
+  	      </ul>
+    	    <div id="TabbedPanelsContentGroup" class="TabbedPanelsContentGroup">
+    	      <div class="TabbedPanelsContent">
+
+<!--<textarea id="textarea" rows="1"></textarea>
+
+<script type="text/javascript">
+    $('#textarea').textext({ plugins : 'prompt tags' });
+</script>-->
+
+
+                <div id="codingtextTitleBar" align="center" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-weight:bold; width:100%; font-family:Verdana, Geneva, sans-serif; border-bottom: 0px;">
+                	: : SkyCoding : : 
+                </div>
+                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-style:italic; width:100%; border-top: 0px;">
+                    <label>
+                      <textarea name="codingtext" id="codingtext" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;"></textarea>
+                      <br>
+                    </label>
+                    <label>
+                    	<input type="submit" name="exec_btn" id="exec_btn" value="execute" onClick="APIExecute()">
+                  </label>
+                    <input type="submit" name="exec_btn2" id="instruct_clr" value="clear" onClick="document.getElementById('codingtext').value='';">
+                    <textarea name="APIscript_debug" id="APIscript_debug" cols="60" rows="5" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%; background-color:#009; color:#FFF; disabled: true;" data-role="none" disabled></textarea>
+                    
+                    
+                    <!--<div id="APIscript_debug" style="border:1px #FFF solid; background-color:#00F; font-family: Tahoma, Geneva, sans-serif; font-style:normal"> &nbsp;executed</div>-->
+                    
+                    <input type="hidden" id="API_script_ed_ip" value="">
+                </div>
+        </div>
+        	<div class="TabbedPanelsContent">
+            	#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetworks http://PUBLICHOST:8189 LOCAL_ED_IP set as 8 255,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,255,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 100<br>
+                sensornetworks http://PUBLICHOST:8189 LOCAL_ED_IP set d 3 0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+            </div>
+    	      <div class="TabbedPanelsContent">
+				#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 0<br>
+                sensornetwork LOCAL_ED_IP gpio set 27 0<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP gpio set 27 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP get a 3 0<br>
+                sleep 100<br>
+              </div>
+              <div class="TabbedPanelsContent">
+				#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 20,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 30,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 60,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 70,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 80,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 90,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 100,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 110,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 120,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 130,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 140,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 150,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 160,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 170,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 180,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 190,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 200,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 210,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 220,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 225,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 220,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 210,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 200,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 190,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 180,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 170,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 160,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 150,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 140,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 130,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 120,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 110,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 100,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 90,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 80,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 70,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 60,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 30,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 20,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+              </div>
+  	      </div>
+  	    </div>
+    	</div> 
+    	<div id="ed_ip_view_container">
+    	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static"><img src="image/dot_list.jpg"> Embedded devices connecting statement
+          </div>
+          <div style="position:static; border:0px; height: 218px;">
+    	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
+          </div>
+  </div>
+</div>
+
+
+<!--Begin Thread executor-->
+<!--<script type="text/javascript" src="http://aoihappa.up.seesaa.net/code/Concurrent.Thread.js"></script>-->
+<script type="text/javascript" src="Concurrent.Thread.js"></script>
+<br /><script type="text/javascript"><!--
+var MTRepetition = function(){
+  MTRepetition.prototype.start = function(initFunc, condFunc, nextFunc, mainFunc){
+    this.condFunc = condFunc;
+    this.nextFunc = nextFunc;
+    this.mainFunc = mainFunc;
+    initFunc();
+    MTRepetition.queue.push(this);
+    setTimeout(MTRepetition.repeat, 0);
+  };
+  MTRepetition.prototype.repeat = function(){
+    if(this.condFunc()){
+      this.mainFunc();
+      this.nextFunc();
+      MTRepetition.queue.push(this);
+      setTimeout(MTRepetition.repeat, 0);
+    }
+  }
+  MTRepetition.repeat = function(){
+    MTRepetition.queue.shift().repeat();
+  };
+};
+MTRepetition.queue = [];
+--></script>
+<!--End Thread executor-->
+<!--Begin API-->
+<script language="javascript">
+
+
+var threadtest = function (){
+  var thread1 = new MTRepetition();
+  thread1.start(
+    function(){thread1.i = 0;}, 
+    function(){return thread1.i<100;}, 
+    function(){thread1.i++;},
+    function(){
+      for(thread1.j=0;thread1.j<10000;thread1.j++){
+        document.getElementById("textB1").innerHTML = thread1.i;
+      }
+    });
+  var thread2 = new MTRepetition();
+  thread2.start(
+    function(){thread2.i = 0;}, 
+    function(){return thread2.i<100;}, 
+    function(){thread2.i++;},
+    function(){
+      for(thread2.j=0;thread2.j<10000;thread2.j++){
+        document.getElementById("textB2").innerHTML = thread2.i;
+      }
+    });
+}
+
+		var APIdebug = document.getElementById("APIscript_debug");
+		APIdebug.value = "";
+		var exec_instructs;
+		Array.prototype.clone = function() {
+			return this.slice(0);
+		};
+		var instruction_parser = function (){
+			var codingtext_var = document.getElementById("codingtext");
+			//alert(codingtext_var.value);
+			
+			var lines = codingtext_var.value.split("\n");
+			//alert(lines.length);
+			var exec_instruct_obj = new Array();
+			for(var i = 0; i < lines.length; i++){
+				var instruct_line = lines[i];
+				var instruct_elements = instruct_line.split(" ");
+				exec_instruct_obj.push(instruct_elements);
+//				APIdebug.innerHTML += instruct_line + "\n";
+			}
+			
+			exec_instructs = exec_instruct_obj.clone();
+				
+		}
+		
+
+		
+		var APIExecute = function (){
+			
+			/*var thread1 = new MTRepetition();
+			thread1.start(
+				function(){thread1.i = 0;}, 
+				function(){return thread1.i<100;}, 
+				function(){thread1.i++;},
+				function(){
+					for(thread1.j=0;thread1.j<10000;thread1.j++){
+						document.getElementById("textB1").innerHTML = thread1.i;
+					}
+				}
+			);*/
+			
+
+			Concurrent.Thread.create(
+				function(){
+					document.getElementById("exec_btn").disabled = true;
+					
+					//APIdebug.innerHTML = "";
+					APIdebug.value = "";
+					
+					instruction_parser();
+					var execTimeout;
+					var sleepTimeout;
+					
+					
+					for(var i = 0; i < exec_instructs.length; i++){
+						//var instruct_line = lines[i];
+						//var LE_domain = 
+						var Skyblue_exec_instruct="";
+						var instruct_type="";
+						var sleep_ms = 0;
+						var LE_domain = "";
+						
+						for(var j = 0; j < exec_instructs[i].length; j++){
+							
+							//APIdebug.innerHTML += exec_instructs[i][j] + " ";
+							APIdebug.value += exec_instructs[i][j] + " ";
+							if(exec_instructs[i][0]=="sensornetwork"){
+								if(j < 1){
+									Skyblue_exec_instruct += exec_instructs[i][0];
+									instruct_type = exec_instructs[i][0];
+								}else if(j<2){
+									document.getElementById("API_script_ed_ip").value = exec_instructs[i][j];
+								}else{
+									Skyblue_exec_instruct += "/" + exec_instructs[i][j];
+								}
+							}if(exec_instructs[i][0]=="sensornetworks"){
+								if(j < 1){
+									Skyblue_exec_instruct += "sensornetwork";
+									instruct_type = exec_instructs[i][0];
+								}else if(j<2){
+									LE_domain = exec_instructs[i][j] + "/";
+								}else if(j<3){
+									document.getElementById("API_script_ed_ip").value = exec_instructs[i][j];
+									//alert(document.getElementById("API_script_ed_ip").value);
+								}else{
+									Skyblue_exec_instruct += "/" + exec_instructs[i][j];
+								}
+							}else if(exec_instructs[i][0]=="sleep"){
+								if(j < 1){
+									instruct_type = exec_instructs[i][0];
+								}else if(j<2){
+									sleep_ms = parseInt(exec_instructs[i][1]);
+									//break;
+								}
+							}
+						}
+						//alert(Skyblue_exec_instruct);
+						//sleepTimeout = setTimeout(Sleep(sleep_ms),sleep_ms);
+						Sleep(sleep_ms);
+						if(instruct_type != "sleep"){
+							if(Skyblue_exec_instruct!=""){
+								//execTimeout = setTimeout(API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG'),0);
+								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG');
+							}
+						}
+						//sendRequest2('sensornetwork/set/as/8/0,'+motionAnalogVal+',0,0,0,0,0,0',handleRequest2,'ETLOG');
+						
+						//APIdebug.innerHTML += ";  <br>"
+						APIdebug.value += ";\r\n"
+						
+						//clearTimeout(execTimeout);
+						//clearTimeout(sleepTimeout);
+						var psconsole = $('#APIscript_debug');
+						psconsole.scrollTop(
+							psconsole[0].scrollHeight - psconsole.height()
+						);
+					}
+					document.getElementById("exec_btn").disabled = false;
+					
+					
+					//debugconsole.scrollHeight - 
+					/*var psconsole = $('#APIscript_debug');
+					psconsole.scrollTop(
+						psconsole[0].scrollHeight - psconsole.height()
+					);*/
+				}
+			);
+		}
+		
+		
+		var Sleep = function (ms) {
+			//getBSFLogSizeID = setTimeout(getBSFLogSize, ms);
+			
+			var d1 = new Date().getTime();
+			var d2 = new Date().getTime();
+			while( d2 < (d1 + ms) ) {
+				d2 = new Date().getTime();
+			}
+			return;
+		}
+var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+</script>
+ <!--End API-->   
+</body>
+</html>

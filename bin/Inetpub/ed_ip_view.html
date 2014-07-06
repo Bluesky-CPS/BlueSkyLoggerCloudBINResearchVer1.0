@@ -1,0 +1,159 @@
+<html>
+<head><title> </title>
+<style>
+.edElements {
+	border: #000 1px groove;
+	padding: 5px;
+	margin: 3px;
+	border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;
+}
+.edElements:hover {
+	border: #000 1px groove;
+	padding: 5px;
+	margin: 3px;
+	border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;
+	background-color:#999;
+}
+</style>
+<script language="javascript">
+
+function handleRequestConnectedStatementSkycoder(req) {
+	//var writeroot = document.getElementById('loaded');
+	var edviewContainer = document.getElementById('ed_ip_view');
+	var JSONtxt = req.responseText;
+	//alert(JSONtxt);
+	var JSONParse = JSON.parse(JSONtxt);
+	var len = JSONParse.ETLog.EDConnStatement.length;
+	//alert(JSONtxt);
+	//var edviewContainer = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+	
+	/*var selectLen = edviewContainer.length;
+	//alert(selectLen);
+	for(var i = 0; i < selectLen; i++){
+			edviewContainer.remove(0);
+	}*/
+	edviewContainer.innerHTML = "";
+	//edviewContainer.refresh();
+	var tmp = "";
+	var selectedIndex = 0;
+	var statICN = "/image/offlineICN.gif";
+	for(var i = 0; i < len; i++){
+		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
+		
+		if(connstatus == "online"){
+			statICN = "/image/onlineICN.gif";
+		}else{
+			statICN = "/image/offlineICN.gif";
+		}
+		//alert("edipdat");
+		/*var jsonOBJ = new Object();
+		jsonOBJ.text = edipdat + " (" + connstatus + ")";
+		jsonOBJ.value = edipdat;
+		jsonOBJ.description = 'Device type: ' + edtype;
+		jsonOBJ.image = statICN;
+		jsonOBJ.className = '';
+		jsonOBJ.title = '';*/
+		var jsonOBJ = '<div class="edElements" style="border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;"><img src=' + statICN + '>' + edipdat + ' (' + connstatus + ')<br>Device type: ' + edtype + '</div>'
+		
+		edviewContainer.innerHTML += jsonOBJ;
+
+		/*if(connstatus == "online"){
+			selectedIndex = edviewContainer.length - 1;
+		}*/
+	}
+	//edviewContainer.set("selectedIndex",selectedIndex);
+	//edviewContainer.options[selectedIndex].selected = true;
+	//edviewContainer.refresh();
+}
+function sendRequestViewEDip(url,callback,postData) {
+//alert("1");
+	
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	//var edIP = document.getElementById('ed_ip');
+	//alert(edIP.value);
+	var method = postData;
+	req.open(method,'noneFix/' + url,true);
+	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
+//alert("11");
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			document.getElementById("ed_ip_view").innerHTML = "Cannot access to server or something wrong with protocol.<br>error code: " + req.status;
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+
+	return;
+}
+
+var XMLHttpFactories = [
+	function () {return new XMLHttpRequest()},
+	function () {return new ActiveXObject("Msxml2.XMLHTTP")},
+	function () {return new ActiveXObject("Msxml3.XMLHTTP")},
+	function () {return new ActiveXObject("Microsoft.XMLHTTP")}
+];
+
+function createXMLHTTPObject() {
+	var xmlhttp = false;
+	for (var i=0;i<XMLHttpFactories.length;i++) {
+		try {
+			xmlhttp = XMLHttpFactories[i]();
+		}
+		catch (e) {
+			continue;
+		}
+		break;
+	}
+	return xmlhttp;
+}
+var refresh_timer
+function initOnload(){
+	refresh_timer = setInterval("sendRequestViewEDip('ls/edconnected',handleRequestConnectedStatementSkycoder,'ETLOG')",3000);
+	//sendRequestViewEDip('ls/edconnected',handleRequestConnectedStatementSkycoder,'ETLOG');
+	/*dd = new Date();
+	var dDate = (dd.getDate() < 10)?("0" + dd.getDate()):(dd.getDate()+"");
+	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
+	var dDateOBJ = document.getElementById("jsonDate");
+	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
+}
+
+</script>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+#ed_ip_view_container {
+	position:absolute;
+	z-index: 1;
+	left: 571px;
+	right: 0;
+	top: 289px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF
+}
+-->
+</style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload()">
+<!--<div style=" visibility:hidden; border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;">ssss</div>-->
+<div id="ed_ip_view">Connect to server . . .</div>
+</body>
+</html>
