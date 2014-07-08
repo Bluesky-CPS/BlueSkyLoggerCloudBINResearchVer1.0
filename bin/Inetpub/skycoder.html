@@ -965,7 +965,9 @@ MTRepetition.queue = [];
 								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG');
 							}
 						}
-						APIdebug.value += ";\r\n"
+						if(instruct_type != ""){
+							APIdebug.value += ";\r\n";
+						}
 						
 						var APIdebug_console = $('#APIscript_debug');
 						APIdebug_console.scrollTop(
