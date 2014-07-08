@@ -881,6 +881,9 @@ MTRepetition.queue = [];
 		Array.prototype.clone = function() {
 			return this.slice(0);
 		};
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g, "");
+		}
 		var instruction_parser = function (){
 			var codingtext_var = document.getElementById("codingtext");
 			
@@ -890,7 +893,14 @@ MTRepetition.queue = [];
 			for(var i = 0; i < lines.length; i++){
 				var instruct_line = lines[i];
 				var instruct_elements = instruct_line.split(" ");
-				exec_instruct_obj.push(instruct_elements);
+				var instruct_elements_Trim = new Array();
+				for(var i = 0; i < instruct_elements.length; i++){
+					var instEleTrim = instruct_elements[i].trim();
+					if(instEleTrim != ""){
+						instruct_elements_Trim.push(instEleTrim);
+					}
+				}
+				exec_instruct_obj.push(instruct_elements_Trim);
 			}
 			
 			exec_instructs = exec_instruct_obj.clone();
@@ -917,6 +927,7 @@ MTRepetition.queue = [];
 						var LE_domain = "";
 						
 						for(var j = 0; j < exec_instructs[i].length; j++){
+							//exec_instructs[i][j] = exec_instructs[i][j].trim()
 							APIdebug.value += exec_instructs[i][j] + " ";
 							if(exec_instructs[i][0]=="sensornetwork"){
 								if(j < 1){
