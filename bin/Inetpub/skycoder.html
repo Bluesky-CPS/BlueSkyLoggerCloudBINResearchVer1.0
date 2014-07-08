@@ -299,8 +299,7 @@ function sendRequest2(url,callback,postData) {
 		req.onreadystatechange = function () {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
-			
-			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation." + "loadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloaded";
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
 			return;
 		}
 		callback(req);
@@ -724,6 +723,14 @@ function num(bar){
                 sleep 200<br>
                 sensornetwork LOCAL_ED_IP get a 3 0<br>
                 sleep 100<br>
+                sensornetwork 172.16.4.222 gps global get GPGGA<br>
+                sleep 800<br>
+                sensornetwork 172.16.4.222 gps global get GPGSA<br>
+                sleep 800<br>
+                sensornetwork 172.16.4.222 gps global get GPRMC<br>
+                sleep 800<br>
+                sensornetwork 172.16.4.222 gps global get GPVTG<br>
+                sleep 800<br>
               </div>
               <div class="TabbedPanelsContent">
 				#For example: replace LOCAL_ED_IP with 172.16.4.222
