@@ -300,7 +300,7 @@ function sendRequest2(url,callback,postData) {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
 			
-			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation." + "loadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloadedloaded";
 			return;
 		}
 		callback(req);
@@ -453,11 +453,21 @@ function refreshCanvas(){
 	border:groove;
 	background-color:#FFF;
 	word-wrap:break-word;
+
 }
 #loaded_container:hover {
 	opacity: 1.0;
 	filter: alpha(opacity=100);
 }
+#loaded_container .loaded{
+		
+}
+#loaded_scroll{
+	height:218px;
+	overflow: auto;
+	width: 100%;
+}
+
 #codingtextdiv {
 	position:absolute;
 	z-index: 2;
@@ -625,8 +635,11 @@ function num(bar){
 </script>
 
 <div id="loaded_container">
-  <div id="loaded_title" style=" border-bottom: #000000 1px dotted"><img src="image/dot_list.jpg"> Server response data viewer</div>
-  <span id="loaded">Environment has loaded</span>.</div>
+  <div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
+  <div id="loaded_scroll" data-role="none">
+  	<span class="loaded" id="loaded">Environment has loaded.</span>
+  </div>
+</div>
 <!-- API scripts section-->
 
 <div id="codingtextdiv">
@@ -936,9 +949,9 @@ MTRepetition.queue = [];
 						}
 						APIdebug.value += ";\r\n"
 						
-						var psconsole = $('#APIscript_debug');
-						psconsole.scrollTop(
-							psconsole[0].scrollHeight - psconsole.height()
+						var APIdebug_console = $('#APIscript_debug');
+						APIdebug_console.scrollTop(
+							APIdebug_console[0].scrollHeight - APIdebug_console.height()
 						);
 					}
 					document.getElementById("exec_btn").disabled = false;
