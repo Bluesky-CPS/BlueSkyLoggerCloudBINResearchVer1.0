@@ -17,10 +17,8 @@
 
 
 function downloadLog(type){
-	//alert(type);
 	var edIP = document.getElementById('ed_ip');
 	window.open("embeddedlog?instruction=DOWNLOADLOG&opt1=" + edIP.value + "&opt2=" + type );
-//window.open("etlog?instruction=DOWNLOADLOG&opt1=" + type + "&opt2=" + edIP.value );
 }
 function openxml(isMultipart){
 	var writeroot = document.getElementById('loaded'); 
@@ -43,7 +41,6 @@ function handleRequest2(req) {
 	var writeroot = document.getElementById('loaded');
 	writeroot.innerHTML = "Wait...";
 	writeroot.innerHTML = req.responseText;
-	//writeroot.innerXML = req.responseText;
 	writeroot.style.display = 'block';
 	writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
@@ -58,7 +55,6 @@ function handleRequestStartAndStopLogging(req) {
 	var JSONtxt = req.responseText;
 	var JSONParse = JSON.parse(JSONtxt);
 	var resTXT = "";
-	//alert(JSONParse.ETLog.logging.state);
 	if(JSONParse.ETLog.logging.state == "started"){
 		resTXT = "Embedded device is logging to LCP.";
 		isNoDevice = 0;
@@ -68,7 +64,6 @@ function handleRequestStartAndStopLogging(req) {
 		resTXT = "Embedded device has stopped logging data to LCP.";
 		isNoDevice = 0;
 		isLoggingByAnother = 0;
-		//speak("Stop logging now.");
 	}else if(JSONParse.ETLog.logging.state == "logging"){
 		resTXT = "Device has been logging by another. You can suddenly stop this session by [stoplogging API].";
 		isLoggingByAnother = 1;
@@ -77,7 +72,6 @@ function handleRequestStartAndStopLogging(req) {
 		resTXT = "No Embedded device connection.";
 		isNoDevice = 1;
 	}
-	//alert(isNoDevice);
 	writeroot.innerHTML = resTXT;
 
 	writeroot.style.display = 'block';
@@ -90,7 +84,6 @@ function handleRequestStartAndStopLogging(req) {
 function handleRequestAnalysisContentPieces(req) {
 	var writeroot = document.getElementById('loaded');
 	var JSONtxt = req.responseText;
-	//alert(JSONtxt);
 	var JSONParse = JSON.parse(JSONtxt);
 	writeroot.innerHTML = JSONParse.ETLog.FileName + " is splited to " + JSONParse.ETLog.CONTENTPIECES + " piece(s)";
 	writeroot.style.display = 'block';
@@ -98,66 +91,15 @@ function handleRequestAnalysisContentPieces(req) {
 	writeroot.style.marginTop = '0';
 
 }
-/*function handleRequestConnectedStatementSkycoder(req) {
-	var writeroot = document.getElementById('loaded');
-	var selectBox = document.getElementById('ed_ip_view');
-	var JSONtxt = req.responseText;
-	//alert(JSONtxt);
-	var JSONParse = JSON.parse(JSONtxt);
-	var len = JSONParse.ETLog.EDConnStatement.length;
-	
-	var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
-	
-	var selectLen = selectBox.length;
-	//alert(selectLen);
-	for(var i = 0; i < selectLen; i++){
-			selectBox.remove(0);
-	}
-	selectBox.refresh();
-	var tmp = "";
-	var selectedIndex = 0;
-	var statICN = "/image/offlineICN.gif";
-	for(var i = 0; i < len; i++){
-		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
-		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
-		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
-		
-		if(connstatus == "online"){
-			statICN = "/image/onlineICN.gif";
-		}else{
-			statICN = "/image/offlineICN.gif";
-		}
-		
-		var jsonOBJ = new Object();
-		jsonOBJ.text = edipdat + " (" + connstatus + ")";
-		jsonOBJ.value = edipdat;
-		jsonOBJ.description = 'Device type: ' + edtype;
-		jsonOBJ.image = statICN;
-		jsonOBJ.className = '';
-		jsonOBJ.title = '';
-		
-		selectBox.add(jsonOBJ);
-
-		if(connstatus == "online"){
-			selectedIndex = selectBox.length - 1;
-		}
-	}
-	selectBox.set("selectedIndex",selectedIndex);
-	//selectBox.options[selectedIndex].selected = true;
-	selectBox.refresh();
-}*/
 function handleRequestConnectedStatement(req) {
 	var writeroot = document.getElementById('loaded');
 	var selectBox = document.getElementById('ed_ip');
 	var JSONtxt = req.responseText;
-	//alert(JSONtxt);
 	var JSONParse = JSON.parse(JSONtxt);
 	var len = JSONParse.ETLog.EDConnStatement.length;
-	
 	var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
-	
 	var selectLen = selectBox.length;
-	//alert(selectLen);
+	
 	for(var i = 0; i < selectLen; i++){
 			selectBox.remove(0);
 	}
@@ -219,8 +161,6 @@ function handleRequestGetBSFLogSize(req) {
 		describeTXT = "No Embedded device connection.";
 	}
 
-	//var JSONParse = JSON.parse(JSONtxt);
-	//writeroot.innerHTML = JSONParse.ETLog.FileName + " is splited to " + JSONParse.ETLog.CONTENTPIECES + " piece(s)";
 	writeroot.innerHTML = describeTXT;
 	writeroot.style.display = 'block';
 	writeroot.style.top = '191';
@@ -229,13 +169,9 @@ function handleRequestGetBSFLogSize(req) {
 }
 
 function handleRequest(req) {
-	var writeroot = document.getElementById('loaded'); 
-	//alert("han1");
+	var writeroot = document.getElementById('loaded');
 	writeroot.innerHTML = req.responseText;
 	writeroot.style.display = 'block';
-	//	alert(write.style.display);
-	//alert("han2");
-
 }
 function handleDownload(req) {
 	var writeroot = document.getElementById('loaded');
@@ -273,7 +209,6 @@ function doExtract(doType){
 	}
 }
 var cnt = 0;
-//var cntDate = new Date();
 var startLoggingTime = 0;
 var stopLoggingTime = 0;
 
@@ -341,13 +276,6 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 	if (req.readyState == 4) return;
 	req.send(postData);
 
-	/*if(isNoDevice == 0){
-		if(url == "startlogging" || url == "stoplogging"){
-			loggingState = url;
-		}
-	}*/
-
-	//for(var i = 0; i < 100000000; i++){}
 	cnt++;
 	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
 		if(url == "startlogging"){
@@ -359,22 +287,19 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 	return;
 }
 function sendRequest2(url,callback,postData) {
-//alert("1");
-	
 	var req = createXMLHTTPObject();
 	if (!req) return;
 	var edIP = document.getElementById('ed_ip');
-	//alert(edIP.value);
 	var method = postData;
 	req.open(method,edIP.value + '/' + url,true);
 	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
-//alert("11");
+
 	if (postData)
 		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 		req.onreadystatechange = function () {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
-			//alert('HTTP error ' + req.status);
+			
 			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
 			return;
 		}
@@ -383,13 +308,6 @@ function sendRequest2(url,callback,postData) {
 	if (req.readyState == 4) return;
 	req.send(postData);
 
-	/*if(isNoDevice == 0){
-		if(url == "startlogging" || url == "stoplogging"){
-			loggingState = url;
-		}
-	}*/
-
-	//for(var i = 0; i < 100000000; i++){}
 	cnt++;
 	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
 		if(url == "startlogging"){
@@ -402,7 +320,6 @@ function sendRequest2(url,callback,postData) {
 }
 
 function sendRequest(url,callback,postData) {
-//alert("1");
 	var req = createXMLHTTPObject();
 	if (!req) return;
 	var method = (postData) ? "POST" : "GET";
@@ -420,16 +337,13 @@ function sendRequest(url,callback,postData) {
 	}
 	if (req.readyState == 4) return;
 	req.send(postData);
-	//alert("2");
 }
-
 var XMLHttpFactories = [
 	function () {return new XMLHttpRequest()},
 	function () {return new ActiveXObject("Msxml2.XMLHTTP")},
 	function () {return new ActiveXObject("Msxml3.XMLHTTP")},
 	function () {return new ActiveXObject("Microsoft.XMLHTTP")}
 ];
-
 function createXMLHTTPObject() {
 	var xmlhttp = false;
 	for (var i=0;i<XMLHttpFactories.length;i++) {
@@ -538,6 +452,7 @@ function refreshCanvas(){
 	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
 	border:groove;
 	background-color:#FFF;
+	word-wrap:break-word;
 }
 #loaded_container:hover {
 	opacity: 1.0;
@@ -659,8 +574,6 @@ $(document).ready(function(e) {
 </style>
 </head>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload()">
-<!--<img src="1.gif">-->
-
 <div id="title1" align="center">
 
 <!--Begin menu-->
@@ -708,8 +621,6 @@ function num(bar){
 		document.getElementById("motionVal").innerText = "motion left: " + Math.floor(Math.abs(datChk)*255/50);
 		sendRequest2('sensornetwork/set/as/8/0,'+motionAnalogVal+',0,0,0,0,0,0',handleRequest2,'ETLOG');
 	}
-	//var motionR = (datChk)*255/100;
-	//document.getElementById("motorR").innerText = bar;
 }
 </script>
 
@@ -916,9 +827,8 @@ function num(bar){
 
 
 <!--Begin Thread executor-->
-<!--<script type="text/javascript" src="http://aoihappa.up.seesaa.net/code/Concurrent.Thread.js"></script>-->
 <script type="text/javascript" src="Concurrent.Thread.js"></script>
-<br /><script type="text/javascript"><!--
+<script type="text/javascript"><!--
 var MTRepetition = function(){
   MTRepetition.prototype.start = function(initFunc, condFunc, nextFunc, mainFunc){
     this.condFunc = condFunc;
@@ -943,33 +853,8 @@ var MTRepetition = function(){
 MTRepetition.queue = [];
 --></script>
 <!--End Thread executor-->
-<!--Begin API-->
+<!--Begin coder framework-->
 <script language="javascript">
-
-
-var threadtest = function (){
-  var thread1 = new MTRepetition();
-  thread1.start(
-    function(){thread1.i = 0;}, 
-    function(){return thread1.i<100;}, 
-    function(){thread1.i++;},
-    function(){
-      for(thread1.j=0;thread1.j<10000;thread1.j++){
-        document.getElementById("textB1").innerHTML = thread1.i;
-      }
-    });
-  var thread2 = new MTRepetition();
-  thread2.start(
-    function(){thread2.i = 0;}, 
-    function(){return thread2.i<100;}, 
-    function(){thread2.i++;},
-    function(){
-      for(thread2.j=0;thread2.j<10000;thread2.j++){
-        document.getElementById("textB2").innerHTML = thread2.i;
-      }
-    });
-}
-
 		var APIdebug = document.getElementById("APIscript_debug");
 		APIdebug.value = "";
 		var exec_instructs;
@@ -978,16 +863,14 @@ var threadtest = function (){
 		};
 		var instruction_parser = function (){
 			var codingtext_var = document.getElementById("codingtext");
-			//alert(codingtext_var.value);
 			
 			var lines = codingtext_var.value.split("\n");
-			//alert(lines.length);
+			
 			var exec_instruct_obj = new Array();
 			for(var i = 0; i < lines.length; i++){
 				var instruct_line = lines[i];
 				var instruct_elements = instruct_line.split(" ");
 				exec_instruct_obj.push(instruct_elements);
-//				APIdebug.innerHTML += instruct_line + "\n";
 			}
 			
 			exec_instructs = exec_instruct_obj.clone();
@@ -997,25 +880,9 @@ var threadtest = function (){
 
 		
 		var APIExecute = function (){
-			
-			/*var thread1 = new MTRepetition();
-			thread1.start(
-				function(){thread1.i = 0;}, 
-				function(){return thread1.i<100;}, 
-				function(){thread1.i++;},
-				function(){
-					for(thread1.j=0;thread1.j<10000;thread1.j++){
-						document.getElementById("textB1").innerHTML = thread1.i;
-					}
-				}
-			);*/
-			
-
 			Concurrent.Thread.create(
 				function(){
 					document.getElementById("exec_btn").disabled = true;
-					
-					//APIdebug.innerHTML = "";
 					APIdebug.value = "";
 					
 					instruction_parser();
@@ -1024,16 +891,12 @@ var threadtest = function (){
 					
 					
 					for(var i = 0; i < exec_instructs.length; i++){
-						//var instruct_line = lines[i];
-						//var LE_domain = 
 						var Skyblue_exec_instruct="";
 						var instruct_type="";
 						var sleep_ms = 0;
 						var LE_domain = "";
 						
 						for(var j = 0; j < exec_instructs[i].length; j++){
-							
-							//APIdebug.innerHTML += exec_instructs[i][j] + " ";
 							APIdebug.value += exec_instructs[i][j] + " ";
 							if(exec_instructs[i][0]=="sensornetwork"){
 								if(j < 1){
@@ -1065,35 +928,20 @@ var threadtest = function (){
 								}
 							}
 						}
-						//alert(Skyblue_exec_instruct);
-						//sleepTimeout = setTimeout(Sleep(sleep_ms),sleep_ms);
 						Sleep(sleep_ms);
 						if(instruct_type != "sleep"){
 							if(Skyblue_exec_instruct!=""){
-								//execTimeout = setTimeout(API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG'),0);
 								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG');
 							}
 						}
-						//sendRequest2('sensornetwork/set/as/8/0,'+motionAnalogVal+',0,0,0,0,0,0',handleRequest2,'ETLOG');
-						
-						//APIdebug.innerHTML += ";  <br>"
 						APIdebug.value += ";\r\n"
 						
-						//clearTimeout(execTimeout);
-						//clearTimeout(sleepTimeout);
 						var psconsole = $('#APIscript_debug');
 						psconsole.scrollTop(
 							psconsole[0].scrollHeight - psconsole.height()
 						);
 					}
 					document.getElementById("exec_btn").disabled = false;
-					
-					
-					//debugconsole.scrollHeight - 
-					/*var psconsole = $('#APIscript_debug');
-					psconsole.scrollTop(
-						psconsole[0].scrollHeight - psconsole.height()
-					);*/
 				}
 			);
 		}
@@ -1111,6 +959,6 @@ var threadtest = function (){
 		}
 var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
 </script>
- <!--End API-->   
+ <!--End coder framework-->   
 </body>
 </html>
