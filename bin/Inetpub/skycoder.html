@@ -268,7 +268,7 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 	req.onreadystatechange = function () {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
-			alert('HTTP error ' + req.status);
+			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
 			return;
 		}
 		callback(req);
@@ -894,8 +894,8 @@ MTRepetition.queue = [];
 				var instruct_line = lines[i];
 				var instruct_elements = instruct_line.split(" ");
 				var instruct_elements_Trim = new Array();
-				for(var i = 0; i < instruct_elements.length; i++){
-					var instEleTrim = instruct_elements[i].trim();
+				for(var j = 0; j < instruct_elements.length; j++){
+					var instEleTrim = instruct_elements[j].trim();
 					if(instEleTrim != ""){
 						instruct_elements_Trim.push(instEleTrim);
 					}
