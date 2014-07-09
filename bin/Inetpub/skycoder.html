@@ -643,7 +643,7 @@ function num(bar){
 }
 </script>
 
-<div id="loaded_container" draggable="true">
+<div id="loaded_container" draggable="true" onMouseDown="document.getElementById('loaded_container').style.opacity=0.5;" onMouseUp="document.getElementById('loaded_container').style.opacity=1;" onMouseOut="document.getElementById('loaded_container').style.opacity=0.5;" onMouseOver="document.getElementById('loaded_container').style.opacity=1;">
   <div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
   <div id="loaded_scroll" data-role="none">
   	<span class="loaded" id="loaded">Environment has loaded.</span>
@@ -846,7 +846,7 @@ function num(bar){
   	      </div>
   	    </div>
     	</div> 
-    	<div id="ed_ip_view_container">
+    	<div id="ed_ip_view_container" onMouseDown="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseUp="document.getElementById('ed_ip_view_container').style.opacity=1;" onMouseOut="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseOver="document.getElementById('ed_ip_view_container').style.opacity=1;">
     	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> Embedded devices connecting statement
           </div>
           <div style="position:static; border:0px; height: 218px;">
