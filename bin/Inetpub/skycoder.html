@@ -13,7 +13,14 @@
 <script src="jquery/jquery-textext-master/src/js/textext.core.js"></script>
 <script src="jquery/jquery-textext-master/src/js/textext.plugin.prompt.js"></script>
 <script src="jquery/jquery-textext-master/src/js/textext.plugin.tags.js"></script>
+
+<script src="jquery-ui.js"></script>
 <script language="javascript">
+$(function() {
+    $( "#loaded_container" ).draggable();
+	$( "#ed_ip_view_container" ).draggable();
+})
+
 
 
 function downloadLog(type){
@@ -424,6 +431,9 @@ function refreshCanvas(){
 </script>
 
 <style>
+[draggable=true] {
+    cursor: move;
+}
 #titleTXT {
 	text-shadow: 2px 2px 2px #3e63a2;
 	font-weight: bold;
@@ -633,7 +643,7 @@ function num(bar){
 }
 </script>
 
-<div id="loaded_container">
+<div id="loaded_container" draggable="true">
   <div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
   <div id="loaded_scroll" data-role="none">
   	<span class="loaded" id="loaded">Environment has loaded.</span>
@@ -837,7 +847,7 @@ function num(bar){
   	    </div>
     	</div> 
     	<div id="ed_ip_view_container">
-    	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static"><img src="image/dot_list.jpg"> Embedded devices connecting statement
+    	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> Embedded devices connecting statement
           </div>
           <div style="position:static; border:0px; height: 218px;">
     	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
