@@ -16,9 +16,12 @@
 
 <script src="jquery-ui.js"></script>
 <script language="javascript">
+
+
 $(function() {
     $( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
+	$( "#animation_container" ).draggable();
 })
 
 
@@ -52,7 +55,29 @@ function handleRequest2(req) {
 	writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
 
+
 }
+function handleRequestAPI_Script(req) {
+	var writeroot = document.getElementById('loaded');
+	writeroot.innerHTML = "Wait...";
+	writeroot.innerHTML = req.responseText;
+	
+	writeroot.style.display = 'block';
+	//writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+	
+	var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
+	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
+	var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
+	var stepBehaviors = document.getElementById("animation_area");
+	stepBehaviors.innerHTML += showStepBehavior;
+/*var titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
+								var descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
+								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;*/
+}
+
+
 
 var isNoDevice = 0;
 var isLoggingByAnother = 0;
@@ -275,6 +300,13 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 	req.onreadystatechange = function () {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
+			//----------------stepBehaviors section.----------------
+			var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
+			var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + "Error:" + req.status + "</div>";
+			var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
+			var stepBehaviors = document.getElementById("animation_area");
+			stepBehaviors.innerHTML += showStepBehavior;
+			//----------------Show data in data viewer section.----------------
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
 			return;
 		}
@@ -453,7 +485,7 @@ function refreshCanvas(){
 	right: 0;
 	top: 182px;
 	width: 400px;
-	height:240px;
+	height:140px;
 	margin-top: 0;
 	padding: 10;
 	opacity: 0.6;
@@ -472,11 +504,10 @@ function refreshCanvas(){
 		
 }
 #loaded_scroll{
-	height:218px;
+	height:118px;
 	overflow: auto;
 	width: 100%;
 }
-
 #codingtextdiv {
 	position:absolute;
 	z-index: 2;
@@ -486,7 +517,10 @@ function refreshCanvas(){
 	width: 100%;
 	height:100%;
 	margin-top: 0;
-	padding: 20;
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	padding: 0;
 }
 #title1 {
 	position: fixed;
@@ -549,12 +583,62 @@ $(document).ready(function(e) {
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
 <style type="text/css">
 <!--
+.titleSendInstTimestamp{
+	background-color: #3f67a9;
+	color:#FFF;
+	padding: 3px;
+}
+.descriptSendInstTimestamp{
+	background-color: #c3e2e7;
+	color:#000;
+	padding: 5px;
+	padding-left: 10px;
+	word-wrap:break-word;
+}
+.titleReceivedResTimestamp{
+	background-color: #a93f3f;
+	color:#FFF;
+	padding: 3px;
+}
+.descriptReceivedResTimestamp{
+	background-color: #e7c3c3;
+	color:#000;
+	padding: 5px;
+	padding-left: 10px;
+	word-wrap:break-word;
+}
+#animation_container {
+	position:absolute;
+	z-index: 3;
+	left: 572px;
+	right: 0;
+	top: 195px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF
+}
+#animation_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+#animation_area_container_scroll{
+	height:218px;
+	overflow-y: auto;
+	overflow-x: none;
+	width: 100%;
+}
 #ed_ip_view_container {
 	position:absolute;
 	z-index: 1;
 	left: 571px;
 	right: 0;
-	top: 289px;
+	top: 473px;
 	width: 400px;
 	height:247px;
 	margin-top: 0;
@@ -566,20 +650,8 @@ $(document).ready(function(e) {
 	background-color:#FFF
 }
 #ed_ip_view_container:hover {
-	position:absolute;
-	z-index: 1;
-	left: 571px;
-	right: 0;
-	top: 289px;
-	width: 400px;
-	height:247px;
-	margin-top: 0;
-	padding: 10;
 	opacity: 1.0;
 	filter: alpha(opacity=100);
-	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
-	border:groove;
-	background-color:#FFF
 }
 #TabbedPanelsContentGroup {
 	opacity: 0.6;
@@ -652,7 +724,7 @@ function num(bar){
 <!-- API scripts section-->
 
 <div id="codingtextdiv">
-    	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center;">
+    	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center; padding: 20px">
     	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
     	    <ul class="TabbedPanelsTabGroup">
     	      <li class="TabbedPanelsTab" tabindex="0">: : SkyCoding : :</li>
@@ -853,6 +925,13 @@ function num(bar){
     	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
           </div>
   </div>
+  
+  <div id="animation_container" onMouseDown="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseUp="document.getElementById('ed_ip_view_container').style.opacity=1;" onMouseOut="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseOver="document.getElementById('ed_ip_view_container').style.opacity=1;">
+    	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> CPS communicating behavior steping tracer</div>
+          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
+    	    <span id="animation_area" class="animation_area">&nbsp;</span>
+          </div>
+  </div>
 </div>
 
 
@@ -886,6 +965,7 @@ MTRepetition.queue = [];
 <!--Begin coder framework-->
 <script language="javascript">
 		var APIdebug = document.getElementById("APIscript_debug");
+		var stepBehavior = document.getElementById("animation_area");
 		APIdebug.value = "";
 		var exec_instructs;
 		Array.prototype.clone = function() {
@@ -917,17 +997,37 @@ MTRepetition.queue = [];
 				
 		}
 		
-
+		function getLocalTimestamp(){
+			var d = new Date();
+			var year  = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day   = d.getDate();
+			
+			var hour = d.getHours();
+			var min = d.getMinutes();
+			var sec = d.getSeconds();
+			var msec = d.getMilliseconds();
+			
+			hour  = ( hour   < 10 ) ? '0' + hour   : hour;
+			min   = ( min < 10 ) ? '0' + min : min;
+			sec   = ( sec < 10 ) ? '0' + sec : sec;
+			msec   = ( msec < 10 )? ('00' + msec):((msec < 100)? ('0' + msec):msec);
+			
+			var ret = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
+			return ret;
+		}
 		
 		var APIExecute = function (){
 			Concurrent.Thread.create(
 				function(){
 					document.getElementById("exec_btn").disabled = true;
 					APIdebug.value = "";
+					stepBehavior.innerHTML = "";
 					
 					instruction_parser();
 					var execTimeout;
 					var sleepTimeout;
+					
 					
 					
 					for(var i = 0; i < exec_instructs.length; i++){
@@ -972,7 +1072,11 @@ MTRepetition.queue = [];
 						Sleep(sleep_ms);
 						if(instruct_type != "sleep"){
 							if(Skyblue_exec_instruct!=""){
-								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequest2,'ETLOG');
+								var titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
+								var descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
+								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;
+								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+								
 							}
 						}
 						if(instruct_type != ""){
@@ -982,6 +1086,10 @@ MTRepetition.queue = [];
 						var APIdebug_console = $('#APIscript_debug');
 						APIdebug_console.scrollTop(
 							APIdebug_console[0].scrollHeight - APIdebug_console.height()
+						);
+						var animation_area_container_console = $('#animation_area_container_scroll');
+						animation_area_container_console.scrollTop(
+							animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
 						);
 					}
 					document.getElementById("exec_btn").disabled = false;
