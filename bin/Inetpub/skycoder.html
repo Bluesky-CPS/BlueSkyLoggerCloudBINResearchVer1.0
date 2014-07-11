@@ -1033,13 +1033,19 @@ MTRepetition.queue = [];
 					var execTimeout;
 					var sleepTimeout;
 					
+					var Skyblue_exec_instruct="";
+					var instruct_type="";
+					var sleep_ms = 0;
+					var LE_domain = "";
 					
+					var titleSendInstTimestamp = "";
+					var descriptSendInstTimestamp = "";
 					
 					for(var i = 0; i < exec_instructs.length; i++){
-						var Skyblue_exec_instruct="";
-						var instruct_type="";
-						var sleep_ms = 0;
-						var LE_domain = "";
+						Skyblue_exec_instruct="";
+						instruct_type="";
+						sleep_ms = 0;
+						LE_domain = "";
 						
 						for(var j = 0; j < exec_instructs[i].length; j++){
 							//exec_instructs[i][j] = exec_instructs[i][j].trim()
@@ -1077,8 +1083,8 @@ MTRepetition.queue = [];
 						Sleep(sleep_ms);
 						if(instruct_type != "sleep"){
 							if(Skyblue_exec_instruct!=""){
-								var titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
-								var descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
+								titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
+								descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
 								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;
 								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 								
