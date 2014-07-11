@@ -59,8 +59,9 @@ function handleRequest2(req) {
 }
 function handleRequestAPI_Script(req) {
 	var writeroot = document.getElementById('loaded');
+	var res = req.responseText;
 	writeroot.innerHTML = "Wait...";
-	writeroot.innerHTML = req.responseText;
+	writeroot.innerHTML = res;
 	
 	writeroot.style.display = 'block';
 	//writeroot.style.top = '191';
@@ -68,10 +69,14 @@ function handleRequestAPI_Script(req) {
 
 	
 	var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
-	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
+	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + res + "</div>";
 	var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
 	var stepBehaviors = document.getElementById("animation_area");
 	stepBehaviors.innerHTML += showStepBehavior;
+	var animation_area_container_console = $('#animation_area_container_scroll');
+	animation_area_container_console.scrollTop(
+		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+	);
 }
 
 
@@ -303,6 +308,10 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 			var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
 			var stepBehaviors = document.getElementById("animation_area");
 			stepBehaviors.innerHTML += showStepBehavior;
+			var animation_area_container_console = $('#animation_area_container_scroll');
+			animation_area_container_console.scrollTop(
+				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+			);
 			//----------------Show data in data viewer section.----------------
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
 			return;
