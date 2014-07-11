@@ -19,11 +19,11 @@
 
 
 $(function() {
-    $( "#loaded_container" ).draggable();
+	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
 	$( "#animation_container" ).draggable();
 })
-
+var animation_area_container_console = $('#animation_area_container_scroll');
 
 
 function downloadLog(type){
@@ -59,9 +59,9 @@ function handleRequest2(req) {
 }
 function handleRequestAPI_Script(req) {
 	var writeroot = document.getElementById('loaded');
-	var res = req.responseText;
+	//var res = req.responseText;
 	writeroot.innerHTML = "Wait...";
-	writeroot.innerHTML = res;
+	writeroot.innerHTML = req.responseText;
 	
 	writeroot.style.display = 'block';
 	//writeroot.style.top = '191';
@@ -69,11 +69,11 @@ function handleRequestAPI_Script(req) {
 
 	
 	var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
-	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + res + "</div>";
-	var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
-	var stepBehaviors = document.getElementById("animation_area");
-	stepBehaviors.innerHTML += showStepBehavior;
-	var animation_area_container_console = $('#animation_area_container_scroll');
+	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
+	//var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
+	
+	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;
+	//var animation_area_container_console = $('#animation_area_container_scroll');
 	animation_area_container_console.scrollTop(
 		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
 	);
@@ -306,9 +306,9 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 			var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
 			var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + "Error:" + req.status + "</div>";
 			var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
-			var stepBehaviors = document.getElementById("animation_area");
-			stepBehaviors.innerHTML += showStepBehavior;
-			var animation_area_container_console = $('#animation_area_container_scroll');
+			//var stepBehaviors = document.getElementById("animation_area");
+			document.getElementById("animation_area").innerHTML += showStepBehavior;
+			//var animation_area_container_console = $('#animation_area_container_scroll');
 			animation_area_container_console.scrollTop(
 				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
 			);
@@ -1019,8 +1019,7 @@ MTRepetition.queue = [];
 			sec   = ( sec < 10 ) ? '0' + sec : sec;
 			msec   = ( msec < 10 )? ('00' + msec):((msec < 100)? ('0' + msec):msec);
 			
-			var ret = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
-			return ret;
+			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
 		
 		var APIExecute = function (){
