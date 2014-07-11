@@ -73,7 +73,7 @@ function handleRequestAPI_Script(req) {
 	//var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
 	
 	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;
-	//var animation_area_container_console = $('#animation_area_container_scroll');
+	var animation_area_container_console = $('#animation_area_container_scroll');
 	animation_area_container_console.scrollTop(
 		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
 	);
