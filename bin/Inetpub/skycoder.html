@@ -295,7 +295,7 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 	//alert(API_Script_edIP.value);
 	var method = postData;
 	req.open(method, LE_domain + '' + API_Script_edIP.value + '/' + url,true);
-	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
+	
 
 	if (postData)
 		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
@@ -337,7 +337,7 @@ function sendRequest2(url,callback,postData) {
 	var edIP = document.getElementById('ed_ip');
 	var method = postData;
 	req.open(method,edIP.value + '/' + url,true);
-	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
+
 
 	if (postData)
 		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
@@ -1083,11 +1083,33 @@ MTRepetition.queue = [];
 						Sleep(sleep_ms);
 						if(instruct_type != "sleep"){
 							if(Skyblue_exec_instruct!=""){
+																
+								/*var newTag = new Element();
+								newTag.tagName = "div";
+								newTag.className = "stepTimestampContainer";
+								
+								var newTitle = new Element();
+								newTag.tagName = "div";
+								newTag.className = "titleSendInstTimestamp";
+								newTag.innerHTML = "TX@{"+ getLocalTimestamp() +"}"
+								
+								var newDescript = new Element();
+								newTag.tagName = "div";
+								newTag.className = "descriptSendInstTimestamp";
+								newTag.innerHTML = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>"
+								
+								newTag.add(newTitle);
+								newTag.add(newDescript);
+								stepBehavior.add(newTag);*/
+								
 								titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
 								descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
 								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;
+								
 								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 								
+								
+
 							}
 						}
 						if(instruct_type != ""){

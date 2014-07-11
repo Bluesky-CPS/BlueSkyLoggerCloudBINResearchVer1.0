@@ -76,7 +76,6 @@ function sendRequestViewEDip(url,callback,postData) {
 	//alert(edIP.value);
 	var method = postData;
 	req.open(method,'noneFix/' + url,true);
-	req.setRequestHeader('User-Agent','EBLHTTP/1.0');
 //alert("11");
 	if (postData)
 		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
