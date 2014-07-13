@@ -68,6 +68,7 @@ function handleRequestAPI_Script(req) {
 	writeroot.style.marginTop = '0';
 
 	var newContentContainer = document.createElement("div");
+	newContentContainer.className = "stepContentContainer";
 	var newTag = document.createElement("div");
 	newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
 	newTag.className = "titleReceivedResTimestamp";
@@ -318,6 +319,7 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 			document.getElementById("animation_area").innerHTML += showStepBehavior;*/
 			
 			var newContentContainer = document.createElement("div");
+			newContentContainer.className = "stepContentContainer";
 			var newTag = document.createElement("div");
 			newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
 			newTag.className = "titleReceivedResTimestamp";
@@ -609,6 +611,12 @@ $(document).ready(function(e) {
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
 <style type="text/css">
 <!--
+.stepContentContainer{
+	border: 0px;
+}
+.stepContentContainer:hover{
+	border: #000 1px solid;
+}
 .titleSendInstTimestamp{
 	background-color: #3f67a9;
 	color:#FFF;
@@ -1122,7 +1130,7 @@ MTRepetition.queue = [];
 								newTag.add(newDescript);
 								stepBehavior.add(newTag);*/
 								var newContentContainer = document.createElement("div");
-								
+								newContentContainer.className = "stepContentContainer";
 								var newTag = document.createElement("div");
 								newTag.textContent="TX@{"+ getLocalTimestamp() +"}";
 								newTag.className = "titleSendInstTimestamp";
