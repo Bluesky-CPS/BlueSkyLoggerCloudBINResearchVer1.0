@@ -67,12 +67,21 @@ function handleRequestAPI_Script(req) {
 	//writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
 
+	var newContentContainer = document.createElement("div");
+	var newTag = document.createElement("div");
+	newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
+	newTag.className = "titleReceivedResTimestamp";
+	var newTag2 = document.createElement("div");
+	newTag2.className = "descriptReceivedResTimestamp";
+	newTag2.textContent = req.responseText;
+	newContentContainer.appendChild(newTag);
+	newContentContainer.appendChild(newTag2);
+	document.getElementById("animation_area").appendChild(newContentContainer);
 	
-	var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
+	/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
 	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
-	//var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
+	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;*/
 	
-	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;
 	var animation_area_container_console = $('#animation_area_container_scroll');
 	animation_area_container_console.scrollTop(
 		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
@@ -303,11 +312,21 @@ function API_Script_sendRequest(LE_domain, url, callback, postData) {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
-			var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
+			/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
 			var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + "Error:" + req.status + "</div>";
 			var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
-			//var stepBehaviors = document.getElementById("animation_area");
-			document.getElementById("animation_area").innerHTML += showStepBehavior;
+			document.getElementById("animation_area").innerHTML += showStepBehavior;*/
+			
+			var newContentContainer = document.createElement("div");
+			var newTag = document.createElement("div");
+			newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
+			newTag.className = "titleReceivedResTimestamp";
+			var newTag2 = document.createElement("div");
+			newTag2.className = "descriptReceivedResTimestamp";
+			newTag2.textContent = "Error:" + req.status;
+			newContentContainer.appendChild(newTag);
+			newContentContainer.appendChild(newTag2);
+			document.getElementById("animation_area").appendChild(newContentContainer);
 			//var animation_area_container_console = $('#animation_area_container_scroll');
 			animation_area_container_console.scrollTop(
 				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
@@ -569,6 +588,7 @@ tr#table_title {
 body {
 	background-color: #e3d6ee;
 	background-image:url(sky-bg.jpg);
+	background-repeat:repeat;
 	background-repeat: no-repeat;
 	background-position: top center;
 	background-attachment: fixed
@@ -1101,10 +1121,25 @@ MTRepetition.queue = [];
 								newTag.add(newTitle);
 								newTag.add(newDescript);
 								stepBehavior.add(newTag);*/
+								var newContentContainer = document.createElement("div");
 								
-								titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
+								var newTag = document.createElement("div");
+								newTag.textContent="TX@{"+ getLocalTimestamp() +"}";
+								newTag.className = "titleSendInstTimestamp";
+								var newTag2 = document.createElement("div");
+								newTag2.className = "descriptSendInstTimestamp";
+								//newTag2.textContent = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>";
+								newTag2.innerHTML = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>";
+								
+								newContentContainer.appendChild(newTag);
+								newContentContainer.appendChild(newTag2);
+								stepBehavior.appendChild(newContentContainer);
+								
+								
+								/*titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
 								descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
-								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;
+								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;*/
+								
 								
 								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 								
