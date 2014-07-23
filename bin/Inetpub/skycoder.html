@@ -17,7 +17,6 @@
 <script src="jquery-ui.js"></script>
 <script language="javascript">
 
-
 $(function() {
 	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
@@ -67,7 +66,7 @@ function handleRequestAPI_Script(req) {
 	//writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
 
-	var newContentContainer = document.createElement("div");
+	/*var newContentContainer = document.createElement("div");
 	newContentContainer.className = "stepContentContainer";
 	var newTag = document.createElement("div");
 	newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
@@ -77,16 +76,18 @@ function handleRequestAPI_Script(req) {
 	newTag2.textContent = req.responseText;
 	newContentContainer.appendChild(newTag);
 	newContentContainer.appendChild(newTag2);
-	document.getElementById("animation_area").appendChild(newContentContainer);
+	document.getElementById("animation_area").appendChild(newContentContainer);*/
+	
+	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
 	
 	/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
 	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
 	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;*/
 	
-	var animation_area_container_console = $('#animation_area_container_scroll');
+	/*var animation_area_container_console = $('#animation_area_container_scroll');
 	animation_area_container_console.scrollTop(
 		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
-	);
+	);*/
 }
 
 
@@ -297,17 +298,26 @@ function motor(onOff){
 	}
 
 }
-function API_Script_sendRequest(LE_domain, instruction, callback, postData) {
-//alert("1");
+function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod) {
 	var req = createXMLHTTPObject();
 	if (!req) return;
-	var API_Script_edIP = document.getElementById('API_script_ed_ip');
+	//var API_Script_edIP = document.getElementById('API_script_ed_ip');
+	var API_Script_edIP = edIP;
 	//alert(API_Script_edIP.value);
-	var method = postData;
-	req.open(method, LE_domain + '' + API_Script_edIP.value + '/' + instruction,true);
+	var method = httpMethod;
 	
+	//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
+	communicationTxID++;
+	var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+	
+	req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
+	req.timeStamp = timeStamp;
+	req.id = communicationTxID;
+	req.instruction = instruction;
+	req.LE_domain = LE_domain;
+	req.edIP = API_Script_edIP;
 
-	if (postData){
+	if (httpMethod){
 		req.getRequestHeader = function(){
 			var ret = method + " " + LE_domain + instruction + " HTTP/1.1\r\n" + "Host: " + document.URL + "\r\n";
 			ret += "Content-type" + ": " + "application/x-www-form-urlencoded";
@@ -321,26 +331,11 @@ function API_Script_sendRequest(LE_domain, instruction, callback, postData) {
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
-			/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
-			var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + "Error:" + req.status + "</div>";
-			var showStepBehavior = titleReceivedResTimestamp + descriptSendInstTimestamp;
-			document.getElementById("animation_area").innerHTML += showStepBehavior;*/
-			
-			var newContentContainer = document.createElement("div");
-			newContentContainer.className = "stepContentContainer";
-			var newTag = document.createElement("div");
-			newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
-			newTag.className = "titleReceivedResTimestamp";
-			var newTag2 = document.createElement("div");
-			newTag2.className = "descriptReceivedResTimestamp";
-			newTag2.textContent = "Error:" + req.status;
-			newContentContainer.appendChild(newTag);
-			newContentContainer.appendChild(newTag2);
-			document.getElementById("animation_area").appendChild(newContentContainer);
+			addCommunicationTraceDivElement("rx", "Error:" + req.status, req.id, req);
 			//var animation_area_container_console = $('#animation_area_container_scroll');
-			animation_area_container_console.scrollTop(
+			/*animation_area_container_console.scrollTop(
 				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
-			);
+			);*/
 			//----------------Show data in data viewer section.----------------
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
 			return;
@@ -348,7 +343,7 @@ function API_Script_sendRequest(LE_domain, instruction, callback, postData) {
 		callback(req);
 	}
 	if (req.readyState == 4) return;
-	req.send(postData);
+	req.send(httpMethod);
 
 	cnt++;
 	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
@@ -1044,6 +1039,7 @@ MTRepetition.queue = [];
 			var year  = d.getFullYear();
 			var month = d.getMonth() + 1;
 			var day   = d.getDate();
+			//var test = d.getTime();
 			
 			var hour = d.getHours();
 			var min = d.getMinutes();
@@ -1058,12 +1054,49 @@ MTRepetition.queue = [];
 			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
 		
+		var communicationTableIDs = new Array();
+		var communicationTxID = 0;
+		
+		var addCommunicationTraceDivElement = function (commuDirection, description, id, txCallback){
+			var timeStamp = getLocalTimestamp();
+			var newContentContainer = document.createElement("div");
+			newContentContainer.className = "stepContentContainer";
+			var newTag = document.createElement("div");
+			var newTag2 = document.createElement("div");
+			
+			if(commuDirection == 'tx'){
+				newContentContainer.id="tx_" + id;
+				newTag.textContent="TX-" + id + "@{"+ timeStamp +"}";
+				newTag.className = "titleSendInstTimestamp";
+				newTag2.className = "descriptSendInstTimestamp";
+				newTag2.innerHTML = description;
+			}else if(commuDirection == 'rx'){
+				newTag.textContent="RX-" + id + "@{"+ timeStamp +"}";
+				newTag.className = "titleReceivedResTimestamp";
+				newTag2.className = "descriptReceivedResTimestamp";
+				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				newTag2.innerHTML = "Responsed data:<br>" + tab + description + "<br>Back track:<br>" + tab + "TX-"+id+"@" + txCallback.timeStamp + "<br>" + tab + tab + txCallback.instruction + "<br>" + tab + "RX-"+id+"@" + timeStamp;
+			}
+			
+			newContentContainer.appendChild(newTag);
+			newContentContainer.appendChild(newTag2);
+			stepBehavior.appendChild(newContentContainer);
+			
+			var animation_area_container_console = $('#animation_area_container_scroll');
+			animation_area_container_console.scrollTop(
+				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+			);
+			return timeStamp;
+		}
+		
 		var APIExecute = function (){
 			Concurrent.Thread.create(
 				function(){
 					document.getElementById("exec_btn").disabled = true;
 					APIdebug.value = "";
 					stepBehavior.innerHTML = "";
+					communicationTableIDs = new Array();
+					communicationTxID = 0;
 					
 					instruction_parser();
 					var execTimeout;
@@ -1116,51 +1149,11 @@ MTRepetition.queue = [];
 								}
 							}
 						}
-						Sleep(sleep_ms);
+						var sl = Sleep(sleep_ms);
 						if(instruct_type != "sleep"){
 							if(Skyblue_exec_instruct!=""){
-																
-								/*var newTag = new Element();
-								newTag.tagName = "div";
-								newTag.className = "stepTimestampContainer";
-								
-								var newTitle = new Element();
-								newTag.tagName = "div";
-								newTag.className = "titleSendInstTimestamp";
-								newTag.innerHTML = "TX@{"+ getLocalTimestamp() +"}"
-								
-								var newDescript = new Element();
-								newTag.tagName = "div";
-								newTag.className = "descriptSendInstTimestamp";
-								newTag.innerHTML = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>"
-								
-								newTag.add(newTitle);
-								newTag.add(newDescript);
-								stepBehavior.add(newTag);*/
-								var newContentContainer = document.createElement("div");
-								newContentContainer.className = "stepContentContainer";
-								var newTag = document.createElement("div");
-								newTag.textContent="TX@{"+ getLocalTimestamp() +"}";
-								newTag.className = "titleSendInstTimestamp";
-								var newTag2 = document.createElement("div");
-								newTag2.className = "descriptSendInstTimestamp";
-								//newTag2.textContent = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>";
-								newTag2.innerHTML = "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>";
-								
-								newContentContainer.appendChild(newTag);
-								newContentContainer.appendChild(newTag2);
-								stepBehavior.appendChild(newContentContainer);
-								
-								
-								/*titleSendInstTimestamp = "<div class='titleSendInstTimestamp'>TX@{"+ getLocalTimestamp() +"}</div>";
-								descriptSendInstTimestamp = "<div class='descriptSendInstTimestamp'>Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br></div>";
-								stepBehavior.innerHTML += titleSendInstTimestamp + " " + descriptSendInstTimestamp;*/
-								
-								
-								API_Script_sendRequest(LE_domain, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-								
-								
-
+								//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
+								API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 							}
 						}
 						if(instruct_type != ""){
@@ -1171,17 +1164,15 @@ MTRepetition.queue = [];
 						APIdebug_console.scrollTop(
 							APIdebug_console[0].scrollHeight - APIdebug_console.height()
 						);
-						var animation_area_container_console = $('#animation_area_container_scroll');
+						/*var animation_area_container_console = $('#animation_area_container_scroll');
 						animation_area_container_console.scrollTop(
 							animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
-						);
+						);*/
 					}
 					document.getElementById("exec_btn").disabled = false;
 				}
 			);
 		}
-		
-		
 		var Sleep = function (ms) {
 			//getBSFLogSizeID = setTimeout(getBSFLogSize, ms);
 			
@@ -1192,6 +1183,8 @@ MTRepetition.queue = [];
 			}
 			return;
 		}
+		
+
 var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
 </script>
  <!--End coder framework-->   
