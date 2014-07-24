@@ -77,7 +77,7 @@ function handleRequestAPI_Script(req) {
 	newContentContainer.appendChild(newTag);
 	newContentContainer.appendChild(newTag2);
 	document.getElementById("animation_area").appendChild(newContentContainer);*/
-	
+	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
 	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
 	
 	/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
@@ -322,9 +322,11 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			var ret = method + " " + LE_domain + instruction + " HTTP/1.1\r\n" + "Host: " + document.URL + "\r\n";
 			ret += "Content-type" + ": " + "application/x-www-form-urlencoded";
 			req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+			if(LE_domain!=""){
+				//req.setRequestHeader('Host', 'LE_domain');
+			}
 			return ret;
 		}
-		//req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 	}
 	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
 	req.onreadystatechange = function () {
@@ -1053,6 +1055,25 @@ MTRepetition.queue = [];
 			
 			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
+		function convertMilliToTimestamp(millisecond){
+			var d = new Date(millisecond);
+			var year  = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day   = d.getDate();
+			//var test = d.getTime();
+			
+			var hour = d.getHours();
+			var min = d.getMinutes();
+			var sec = d.getSeconds();
+			var msec = d.getMilliseconds();
+			
+			hour  = ( hour   < 10 ) ? '0' + hour   : hour;
+			min   = ( min < 10 ) ? '0' + min : min;
+			sec   = ( sec < 10 ) ? '0' + sec : sec;
+			msec   = ( msec < 10 )? ('00' + msec):((msec < 100)? ('0' + msec):msec);
+			
+			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
+		}
 		
 		var communicationTableIDs = new Array();
 		var communicationTxID = 0;
@@ -1070,16 +1091,32 @@ MTRepetition.queue = [];
 				newTag.className = "titleSendInstTimestamp";
 				newTag2.className = "descriptSendInstTimestamp";
 				newTag2.innerHTML = description;
+				
+				newContentContainer.appendChild(newTag);
+				newContentContainer.appendChild(newTag2);
 			}else if(commuDirection == 'rx'){
+				newContentContainer.id="rx_" + id;
 				newTag.textContent="RX-" + id + "@{"+ timeStamp +"}";
 				newTag.className = "titleReceivedResTimestamp";
 				newTag2.className = "descriptReceivedResTimestamp";
+				
+				var serverToEtTimeStampMilli = parseInt(txCallback.getResponseHeader("Server-Et-Timestamp"));
+				var etToServerTimeStampMilli = parseInt(txCallback.getResponseHeader("Et-Server-Timestamp"));
+				
+				var serverToEtTimeStamp = convertMilliToTimestamp(serverToEtTimeStampMilli);
+				var etToServerTimeStamp = convertMilliToTimestamp(etToServerTimeStampMilli);
+				
+				
+				console.log(serverToEtTimeStampMilli + "  " + etToServerTimeStampMilli);
+				
 				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-				newTag2.innerHTML = "Responsed data:<br>" + tab + description + "<br>Back track:<br>" + tab + "TX-"+id+"@" + txCallback.timeStamp + "<br>" + tab + tab + txCallback.instruction + "<br>" + tab + "RX-"+id+"@" + timeStamp;
+				newTag2.innerHTML = "Responsed data:<br>" + tab + description + "<br>Back track:<br>" + tab + "TX-"+id+"@skycoderTime{" + txCallback.timeStamp + "}<br>" + tab + tab + "Send[" + txCallback.instruction + "] to server<br>" + tab + "TX-" + id + "@serverTime{" + serverToEtTimeStamp + "}<br>" + tab + tab + "Send instruction to [" + txCallback.edIP + "]<br>" + tab + "RX-" + id + "@serverTime{" + etToServerTimeStamp + "}<br>" + tab + tab + "Received data from device<br>" + tab + "RX-"+id+"@skycoderTime{" + timeStamp + "}";
+				var newTagBackTrack1 = document.createElement("div");
+				
+				newContentContainer.appendChild(newTag);
+				newContentContainer.appendChild(newTag2);
 			}
 			
-			newContentContainer.appendChild(newTag);
-			newContentContainer.appendChild(newTag2);
 			stepBehavior.appendChild(newContentContainer);
 			
 			var animation_area_container_console = $('#animation_area_container_scroll');
