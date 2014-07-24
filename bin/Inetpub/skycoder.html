@@ -17,10 +17,14 @@
 <script src="jquery-ui.js"></script>
 <script language="javascript">
 
+
 $(function() {
 	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
 	$( "#animation_container" ).draggable();
+	$("#animation_container").resize(function(){ 
+		console.log( $("#animation_container").height() + " sss\r\n" ); 
+	}); 
 })
 var animation_area_container_console = $('#animation_area_container_scroll');
 
@@ -660,7 +664,13 @@ $(document).ready(function(e) {
 	filter: alpha(opacity=60);
 	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
 	border:groove;
-	background-color:#FFF
+	background-color:#FFF;
+	resize: vertical;
+	min-width: 400px;
+    min-height: 247px;
+    max-width: 401px;
+    max-height: 900px;
+	overflow: hidden;
 }
 #animation_container:hover {
 	opacity: 1.0;
@@ -671,6 +681,7 @@ $(document).ready(function(e) {
 	overflow-y: auto;
 	overflow-x: none;
 	width: 100%;
+	resize: none;
 }
 #ed_ip_view_container {
 	position:absolute;
@@ -965,8 +976,8 @@ function num(bar){
           </div>
   </div>
   
-  <div id="animation_container" onMouseDown="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1;">
-    	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
+  <div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" style="height:247px;">
+    	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
           <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
     	    <span id="animation_area" class="animation_area">&nbsp;</span>
           </div>
