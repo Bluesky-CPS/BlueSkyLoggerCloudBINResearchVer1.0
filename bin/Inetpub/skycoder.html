@@ -1,5 +1,6 @@
 <html>
 <head><title>=== SkyCoder framework Environment (Trial version) ===</title>
+<link rel="stylesheet" type="text/css" media="screen" href="css/stylesheet.css" />
 
 <script src="ms-Dropdown/js/jquery/jquery-1.9.0.min.js"></script>
 
@@ -83,6 +84,8 @@ function handleRequestAPI_Script(req) {
 	document.getElementById("animation_area").appendChild(newContentContainer);*/
 	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
 	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
+
+	
 	
 	/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
 	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
@@ -334,6 +337,8 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	}
 	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
 	req.onreadystatechange = function () {
+		
+		
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
@@ -346,6 +351,9 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
 			return;
 		}
+		/*self.onComplete = function(req){
+			console.log("self.onComplete()\r\n");
+		};*/
 		callback(req);
 	}
 	if (req.readyState == 4) return;
@@ -503,23 +511,46 @@ function refreshCanvas(){
     cursor: move;
 }
 #titleTXT {
-	text-shadow: 2px 2px 2px #3e63a2;
+	text-shadow: 1px 1px 1px #16366c;
 	font-weight: bold;
-	color: #000;
-	font-size: 28px;
-	color:#FFF;
-	padding-top: 8px;
-	padding-bottom: 12px;
-	padding-left: 0px;
+	font-size: 19px;
+	color: #fefedb;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
 	padding-right: 0px;
 	font-family:Verdana, Geneva, sans-serif;
+}
+#titleTXT2 {
+	text-shadow: 2px 2px 2px #16366c;
+	font-weight: bold;
+	color: #000;
+	font-size: 8px;
+	color: #FFFFFF;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	padding-right: 0px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+#menuBar {
+	margin: 0px;
+	height: 30px;
+	border: #000000 1px solid;
+	vertical-align: middle;
+	padding: 0px;
+	text-align:left;
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:15px;
+	background-color:#ffffff;
+	box-shadow: 10px 2px 3px 0px rgba(0,0,0,0.5);
 }
 #loaded_container {
 	position:absolute;
 	z-index: 3;
 	left: 571px;
 	right: 0;
-	top: 182px;
+	top: 18px;
 	width: 400px;
 	height:140px;
 	margin-top: 0;
@@ -530,7 +561,6 @@ function refreshCanvas(){
 	border:groove;
 	background-color:#FFF;
 	word-wrap:break-word;
-
 }
 #loaded_container:hover {
 	opacity: 1.0;
@@ -549,7 +579,7 @@ function refreshCanvas(){
 	z-index: 2;
 	left: 0;
 	right: 0;
-	top: 161px;
+	top: 61px;
 	width: 100%;
 	height:100%;
 	margin-top: 0;
@@ -565,12 +595,13 @@ function refreshCanvas(){
 	right: 0;
 	top: 0;
 	width: 100%;
-	height:150px;
+	height:50px;
 	margin-top: 0;
 	background-color:#000;
-	background-image:url(title_sky_bg.jpg);
+	border-bottom: groove;
+	/*background-image:url(title_sky_bg.jpg);
 	border-radius: 0px 0px 25px 25px / 0px 0px 25px 25px;
-	border-bottom: groove
+	border-bottom: groove;*/
 }
 #camera {
   position: fixed;
@@ -711,35 +742,60 @@ $(document).ready(function(e) {
 	opacity: 1.0;
 	filter: alpha(opacity=100);
 }
+/*about menuBar*/
+#menuElement{
+	list-style: none;
+	
+}
 -->
 </style>
 </head>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload()">
 <div id="title1" align="center">
 
-<!--Begin menu-->
-<div align="center">
+<!--Begin header & menu-->
+<div align="center" style=" background-color:#e9e9eb">
 <!--<font color="#FFFFFF">111</font>-->
+<div align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+      <td width="190" bgcolor="#88c0d7"><div id="titleTXT">SkyCoder</div>
+      <div id="titleTXT2">A CPS coding framework (Trial)</div></td>
+      <td width="10" bgcolor="#b4ced9">&nbsp;</td>
+      <td width="10" bgcolor="#cfdce1">&nbsp;</td>
+      <td align="right"><div align="right">
+      <table border="0" cellpadding="0" cellspacing="0" width="815" align="right">
+        <tr>
+          <td>
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+            <tr>
+            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar();">Main menu</div></td>
+              <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
+              <td width="210" valign="middle"><span style="vertical-align:middle">
+                <select id="ed_ip" name="ed_ip">
+                  <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected> Device IP: 172.16.4.127 (Offline) </option>
+                </select>
+              </span></td>
+              <td width="279" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div></td>
+            </tr>
+          </table></td>
+        </tr>
+      </table></div></td>
+    </tr>
+</table>
 </div>
-<div id="titleTXT">
-SkyCoder framework example (Trail version)</div>
+<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar();">
+
+<ul class="menu" onMouseMove="showMenuBar()" onMouseOut="hiddenMenuBar();">
+  <li><a href="#" class="active"><span>Data viewer</span></a></li>
+  <li><a href="#"><span>Communication tracer</span></a></li>
+  <li><a href="#"><span>ED statement</span></a></li>
+</ul>
+
+</div>
+</div>
 <!--End Menu-->
-  <br><div align="center"><table border="0" cellpadding="0" cellspacing="0" width="640" align="center"><tr><td><table border="0" cellpadding="0" cellspacing="0" width="100%" align="center"><tr>
-  <td width="129" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
-  <td width="206" valign="middle">
-    <span style="vertical-align:middle">
-    <select id="ed_ip" name="ed_ip">
-      <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected>Device IP: 172.16.4.127 (Offline)</option>
-    </select>
-    
-   
-    </span> 
-    </td>
-    <td width="265" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">
-    <div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div>
-    </td>
-    </tr></table></tr></td></table></div>
-  
+  <br>
 </div><br>
 <div id="camera" align="right" style="display: none"><canvas id='cameraCanvas' width='320px' height='240px' align='right' style="border: #000000 1px solid"></canvas>
 	<div id="motionVal">0</div>
@@ -765,15 +821,10 @@ function num(bar){
 }
 </script>
 
-<div id="loaded_container" draggable="true" onMouseDown="document.getElementById('loaded_container').style.opacity=0.5;" onMouseUp="document.getElementById('loaded_container').style.opacity=1;" onMouseOut="document.getElementById('loaded_container').style.opacity=0.5;" onMouseOver="document.getElementById('loaded_container').style.opacity=1;">
-  <div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
-  <div id="loaded_scroll" data-role="none">
-  	<span class="loaded" id="loaded">Environment has loaded.</span>
-  </div>
-</div>
+
 <!-- API scripts section-->
 
-<div id="codingtextdiv">
+<div id="codingtextdiv" style=" top: 61px">
     	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center; padding: 20px">
     	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
     	    <ul class="TabbedPanelsTabGroup">
@@ -976,6 +1027,13 @@ function num(bar){
           </div>
   </div>
   
+  <div id="loaded_container" draggable="true" onMouseDown="document.getElementById('loaded_container').style.opacity=0.5;" onMouseUp="document.getElementById('loaded_container').style.opacity=1;" onMouseOut="document.getElementById('loaded_container').style.opacity=0.5;" onMouseOver="document.getElementById('loaded_container').style.opacity=1;">
+  <div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
+  <div id="loaded_scroll" data-role="none">
+  	<span class="loaded" id="loaded">Environment has loaded.</span>
+  </div>
+</div>
+
   <div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" style="height:247px;">
     	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
           <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
@@ -1012,6 +1070,33 @@ var MTRepetition = function(){
 MTRepetition.queue = [];
 --></script>
 <!--End Thread executor-->
+<!--Begin menu bar controll-->
+<script language="javascript">
+	var isShowFlag = false;
+	var isHiddenFlag = true;
+		var showMenuBar = function(){
+			document.getElementById('menuBar').style.display='block';
+			if(!isShowFlag){
+				moveElement(20);
+				isHiddenFlag = false;
+			}
+			isShowFlag = true;
+		} 
+		var hiddenMenuBar = function(){
+			document.getElementById('menuBar').style.display='none';
+			if(!isHiddenFlag){
+				moveElement(-20);
+				isShowFlag = false;
+			}
+			isHiddenFlag = true;
+		} 
+		var moveElement = function(vertical){
+			var ele_pos = parseInt(document.getElementById("codingtextdiv").style.top);
+			document.getElementById("codingtextdiv").style.top = (ele_pos + vertical) + "px";
+			//console.log(ele_pos + " + " + vertical + " = " + document.getElementById("codingtextdiv").style.top + "\r\n");
+		}
+</script>
+<!--End menu bar controll-->
 <!--Begin coder framework-->
 <script language="javascript">
 		var APIdebug = document.getElementById("APIscript_debug");
@@ -1024,6 +1109,7 @@ MTRepetition.queue = [];
 		String.prototype.trim = function() {
 			return this.replace(/^\s+|\s+$/g, "");
 		}
+
 		var instruction_parser = function (){
 			var codingtext_var = document.getElementById("codingtext");
 			
