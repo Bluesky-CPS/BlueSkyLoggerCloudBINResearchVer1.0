@@ -1112,12 +1112,26 @@ MTRepetition.queue = [];
 		if(document.getElementById(containerID).clickStatus == "no"){
 			document.getElementById(containerID).style.display = "none";
 			document.getElementById(containerID).clickStatus = "yes";
-			document.getElementById(btnID).clickStatus = "yes";
+			var btnObj = document.getElementById(btnID);
+			console.log(btnObj.length);
+			btnObj.clickStatus = "yes";
+			var attr = '0% -90px';
+			var attr_a = '0% -90px';
+			var attr_span = '100% -90px';
+			console.log(btnObj.style.background + "\r\n" + btnObj.firstChild.style.background + "\r\n" + btnObj.firstChild.firstChild.style.background + "\r\n");
+			btnObj.style.backgroundPosition = attr;
+			btnObj.firstChild.style.backgroundPosition = attr_a;
+			btnObj.firstChild.firstChild.style.backgroundPosition = attr_span;
 			document.getElementById("menuDescription").innerHTML = "Off " + containerTitle;
 		}else if(document.getElementById(containerID).clickStatus == "yes"){
 			document.getElementById(containerID).style.display = "block";
 			document.getElementById(containerID).clickStatus = "no";
-			document.getElementById(btnID).clickStatus = "no";
+			var btnObj = document.getElementById(btnID);
+			btnObj.clickStatus = "no";
+			var attr = '';
+			btnObj.style.backgroundPosition = attr;
+			btnObj.firstChild.style.backgroundPosition = attr;
+			btnObj.firstChild.firstChild.style.backgroundPosition = attr;
 			document.getElementById("menuDescription").innerHTML = "On " + containerTitle;
 		}
 	}
