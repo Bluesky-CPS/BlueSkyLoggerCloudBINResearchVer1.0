@@ -772,7 +772,7 @@ $(document).ready(function(e) {
           <td>
           <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
             <tr>
-            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar();">Main menu</div></td>
+            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar();" onMouseOver="showMenuBar();" onMouseOut="">Main menu</div></td>
               <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
               <td width="210" valign="middle"><span style="vertical-align:middle">
                 <select id="ed_ip" name="ed_ip">
@@ -787,9 +787,9 @@ $(document).ready(function(e) {
     </tr>
 </table>
 </div>
-<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar();">
+<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar();" onMouseMove="showMenuBar();" onMouseOver="showMenuBar();">
 
-<ul class="menu" onMouseMove="showMenuBar()" onMouseOut="hiddenMenuBar();">
+<ul class="menu" onMouseMove="showMenuBar();" onMouseOut="" onMouseOver="showMenuBar();">
   <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
   <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>Communication tracer</span></a></li>
   <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
@@ -1078,8 +1078,9 @@ MTRepetition.queue = [];
 	var isShowFlag = false;
 	var isHiddenFlag = true;
 	var showMenuBar = function(){
-		document.getElementById('menuBar').style.display='block';
+		
 		if(!isShowFlag){
+			document.getElementById('menuBar').style.display='block';
 			document.getElementById("menuDescription").innerHTML = "";
 			moveElement(20);
 			isHiddenFlag = false;
@@ -1087,8 +1088,9 @@ MTRepetition.queue = [];
 		isShowFlag = true;
 	} 
 	var hiddenMenuBar = function(){
-		document.getElementById('menuBar').style.display='none';
+		
 		if(!isHiddenFlag){
+			document.getElementById('menuBar').style.display='none';
 			moveElement(-20);
 			isShowFlag = false;
 		}
