@@ -561,6 +561,7 @@ function refreshCanvas(){
 	border:groove;
 	background-color:#FFF;
 	word-wrap:break-word;
+	display: block;
 }
 #loaded_container:hover {
 	opacity: 1.0;
@@ -702,6 +703,7 @@ $(document).ready(function(e) {
     max-width: 401px;
     max-height: 900px;
 	overflow: hidden;
+	display: block;
 }
 #animation_container:hover {
 	opacity: 1.0;
@@ -728,7 +730,8 @@ $(document).ready(function(e) {
 	filter: alpha(opacity=60);
 	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
 	border:groove;
-	background-color:#FFF
+	background-color:#FFF;
+	display: block;
 }
 #ed_ip_view_container:hover {
 	opacity: 1.0;
@@ -787,11 +790,11 @@ $(document).ready(function(e) {
 <div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar();">
 
 <ul class="menu" onMouseMove="showMenuBar()" onMouseOut="hiddenMenuBar();">
-  <li><a href="#" class="active"><span>Data viewer</span></a></li>
-  <li><a href="#"><span>Communication tracer</span></a></li>
-  <li><a href="#"><span>ED statement</span></a></li>
+  <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
+  <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>Communication tracer</span></a></li>
+  <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
+  <div id="menuDescription">&nbsp;</div>
 </ul>
-
 </div>
 </div>
 <!--End Menu-->
@@ -1074,27 +1077,59 @@ MTRepetition.queue = [];
 <script language="javascript">
 	var isShowFlag = false;
 	var isHiddenFlag = true;
-		var showMenuBar = function(){
-			document.getElementById('menuBar').style.display='block';
-			if(!isShowFlag){
-				moveElement(20);
-				isHiddenFlag = false;
-			}
-			isShowFlag = true;
-		} 
-		var hiddenMenuBar = function(){
-			document.getElementById('menuBar').style.display='none';
-			if(!isHiddenFlag){
-				moveElement(-20);
-				isShowFlag = false;
-			}
-			isHiddenFlag = true;
-		} 
-		var moveElement = function(vertical){
-			var ele_pos = parseInt(document.getElementById("codingtextdiv").style.top);
-			document.getElementById("codingtextdiv").style.top = (ele_pos + vertical) + "px";
-			//console.log(ele_pos + " + " + vertical + " = " + document.getElementById("codingtextdiv").style.top + "\r\n");
+	var showMenuBar = function(){
+		document.getElementById('menuBar').style.display='block';
+		if(!isShowFlag){
+			document.getElementById("menuDescription").innerHTML = "";
+			moveElement(20);
+			isHiddenFlag = false;
 		}
+		isShowFlag = true;
+	} 
+	var hiddenMenuBar = function(){
+		document.getElementById('menuBar').style.display='none';
+		if(!isHiddenFlag){
+			moveElement(-20);
+			isShowFlag = false;
+		}
+		isHiddenFlag = true;
+	} 
+	var moveElement = function(vertical){
+		var ele_pos = parseInt(document.getElementById("codingtextdiv").style.top);
+		document.getElementById("codingtextdiv").style.top = (ele_pos + vertical) + "px";
+		//console.log(ele_pos + " + " + vertical + " = " + document.getElementById("codingtextdiv").style.top + "\r\n");
+	}
+	
+	var swapContainer = function(btnID, containerID, containerTitle) {
+		//console.log(containerID);
+		if(!document.getElementById(containerID).clickStatus || document.getElementById(containerID).clickStatus == null){
+			document.getElementById(containerID).clickStatus = "no";
+			document.getElementById(btnID).clickStatus = "no";
+			//console.log("null");
+		}
+		if(document.getElementById(containerID).clickStatus == "no"){
+			document.getElementById(containerID).style.display = "none";
+			document.getElementById(containerID).clickStatus = "yes";
+			document.getElementById(btnID).clickStatus = "yes";
+			document.getElementById("menuDescription").innerHTML = "Off " + containerTitle;
+		}else if(document.getElementById(containerID).clickStatus == "yes"){
+			document.getElementById(containerID).style.display = "block";
+			document.getElementById(containerID).clickStatus = "no";
+			document.getElementById(btnID).clickStatus = "no";
+			document.getElementById("menuDescription").innerHTML = "On " + containerTitle;
+		}
+	}
+	var showDescriptionOf = function(btnID, containerTitle) {
+		if(!document.getElementById(btnID).clickStatus || document.getElementById(btnID).clickStatus == null){
+			document.getElementById(btnID).clickStatus = "no";
+		}
+		
+		if(document.getElementById(btnID).clickStatus == "no"){
+			document.getElementById("menuDescription").innerHTML = "Click to <b>hide</b> '" + containerTitle + "' box.";
+		}else if(document.getElementById(btnID).clickStatus == "yes"){
+			document.getElementById("menuDescription").innerHTML = "Click to <b>show</b> '" + containerTitle + "' box.";
+		}
+	}
 </script>
 <!--End menu bar controll-->
 <!--Begin coder framework-->
