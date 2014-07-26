@@ -716,6 +716,12 @@ $(document).ready(function(e) {
 	width: 100%;
 	resize: none;
 }
+#div_x_scroll_container{
+	overflow-y: none;
+	overflow-x: auto;
+	width: 100%;
+	resize: none;
+}
 #ed_ip_view_container {
 	position:absolute;
 	z-index: 1;
@@ -750,10 +756,22 @@ $(document).ready(function(e) {
 	list-style: none;
 	
 }
+/*about skyCoderDetail*/
+#skyCoderDetail{
+	border-bottom:groove;
+	border-top: 0px;
+	background-color: #88c0d7;
+	padding: 3px;
+	border-top: #000000 1px dotted;
+}
+.loginTD {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+}
 -->
 </style>
 </head>
-<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload()">
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload(); document.getElementById('skyCoderDetail').style.display='none';">
 <div id="title1" align="center">
 
 <!--Begin header & menu-->
@@ -762,7 +780,7 @@ $(document).ready(function(e) {
 <div align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td width="190" bgcolor="#88c0d7"><div id="titleTXT">SkyCoder</div>
+      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail');" onMouseOver="showMenuBar('skyCoderDetail');" onMouseOut="">SkyCoder</div>
       <div id="titleTXT2">A CPS coding framework (Trial)</div></td>
       <td width="10" bgcolor="#b4ced9">&nbsp;</td>
       <td width="10" bgcolor="#cfdce1">&nbsp;</td>
@@ -772,7 +790,7 @@ $(document).ready(function(e) {
           <td>
           <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
             <tr>
-            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar();" onMouseOver="showMenuBar();" onMouseOut="">Main menu</div></td>
+            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar('menuBar');" onMouseOver="showMenuBar('menuBar');" onMouseOut="">Main menu</div></td>
               <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
               <td width="210" valign="middle"><span style="vertical-align:middle">
                 <select id="ed_ip" name="ed_ip">
@@ -787,15 +805,42 @@ $(document).ready(function(e) {
     </tr>
 </table>
 </div>
-<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar();" onMouseMove="showMenuBar();" onMouseOver="showMenuBar();">
-
-<ul class="menu" onMouseMove="showMenuBar();" onMouseOut="" onMouseOver="showMenuBar();">
-  <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
-  <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>Communication tracer</span></a></li>
-  <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
-  <div id="menuDescription">&nbsp;</div>
-</ul>
+<!--This is a skyCoder explaination area-->
+<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail');" onMouseMove="showMenuBar('skyCoderDetail');" onMouseOver="showMenuBar('skyCoderDetail');" align="left">
+  <from action="login.ins" method="post">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+   <tr>
+     <td width="67" class="loginTD">
+       &nbsp;&nbsp;&nbsp;Username:&nbsp; </td>
+     <td width="60" class="loginTD">
+       <input name="user" type="text" id="user" size="10" value="guest">
+     </td>
+     <td width="67" class="loginTD">&nbsp;&nbsp;Password:&nbsp;</td>
+     <td width="67" class="loginTD">
+       <input name="pass" type="password" id="pass" size="10" value="guest">
+     </td>
+     <td width="62" class="loginTD">
+       <input type="submit" name="login_btn" id="login_btn" value="signin" disabled>
+     </td>
+     <td class="loginTD">
+     	<div id="div_x_scroll_container"><span>
+     	SkyCoder is a Cyber-Physical system virtual coding framework with communication tracer. It allows you to program the instruction to control multiple sensors and actuators interact together across a bridge cloud environment.</span></div>
+     </td>
+   </tr>
+      
+</table></from>
 </div>
+<!--End skyCoder explaination area-->
+<!--This is a skyCoder menubar container-->
+<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar('menuBar');" onMouseMove="showMenuBar('menuBar');" onMouseOver="showMenuBar('menuBar');">
+    <ul class="menu" onMouseMove="showMenuBar('menuBar');" onMouseOut="" onMouseOver="showMenuBar('menuBar');">
+      <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
+      <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>Communication tracer</span></a></li>
+      <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
+      <div id="menuDescription">&nbsp;</div>
+    </ul>
+</div>
+<!--End skyCoder menubar container-->
 </div>
 <!--End Menu-->
   <br>
@@ -1077,20 +1122,27 @@ MTRepetition.queue = [];
 <script language="javascript">
 	var isShowFlag = false;
 	var isHiddenFlag = true;
-	var showMenuBar = function(){
-		
+	var showMenuBar = function(menuContainer, menuDescription){
+		if(!menuContainer){
+	                menuContainer = "menuBar";
+	        }
+	        if(!menuDescription){
+                	menuDescription = "menuDescription";
+	        }
 		if(!isShowFlag){
-			document.getElementById('menuBar').style.display='block';
-			document.getElementById("menuDescription").innerHTML = "";
+			document.getElementById(menuContainer).style.display='block';
+			document.getElementById(menuDescription).innerHTML = "";
 			moveElement(20);
 			isHiddenFlag = false;
 		}
 		isShowFlag = true;
 	} 
-	var hiddenMenuBar = function(){
-		
+	var hiddenMenuBar = function(menuContainer){
+		if(!menuContainer){
+	                menuContainer = "menuBar";
+	        }
 		if(!isHiddenFlag){
-			document.getElementById('menuBar').style.display='none';
+			document.getElementById(menuContainer).style.display='none';
 			moveElement(-20);
 			isShowFlag = false;
 		}
