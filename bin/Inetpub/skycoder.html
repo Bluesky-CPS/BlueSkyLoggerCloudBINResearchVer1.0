@@ -767,6 +767,7 @@ $(document).ready(function(e) {
 .loginTD {
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 11px;
+	height: 30px;
 }
 -->
 </style>
@@ -780,7 +781,7 @@ $(document).ready(function(e) {
 <div align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail');" onMouseOver="showMenuBar('skyCoderDetail');" onMouseOut="">SkyCoder</div>
+      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail','',40);" onMouseOver="showMenuBar('skyCoderDetail','',40); document.getElementById('user').focus(); document.getElementById('user').select()" onMouseOut="">SkyCoder</div>
       <div id="titleTXT2">A CPS coding framework (Trial)</div></td>
       <td width="10" bgcolor="#b4ced9">&nbsp;</td>
       <td width="10" bgcolor="#cfdce1">&nbsp;</td>
@@ -806,7 +807,7 @@ $(document).ready(function(e) {
 </table>
 </div>
 <!--This is a skyCoder explaination area-->
-<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail');" onMouseMove="showMenuBar('skyCoderDetail');" onMouseOver="showMenuBar('skyCoderDetail');" align="left">
+<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -40);" onMouseMove="showMenuBar('skyCoderDetail','',40);" onMouseOver="showMenuBar('skyCoderDetail','',40);" align="left">
   <from action="login.ins" method="post">
   <table border="0" cellpadding="0" cellspacing="0" width="100%">
    <tr>
@@ -1122,28 +1123,35 @@ MTRepetition.queue = [];
 <script language="javascript">
 	var isShowFlag = false;
 	var isHiddenFlag = true;
-	var showMenuBar = function(menuContainer, menuDescription){
+	var showMenuBar = function(menuContainer, menuDescription, sliceYPos){
 		if(!menuContainer){
-	                menuContainer = "menuBar";
-	        }
-	        if(!menuDescription){
-                	menuDescription = "menuDescription";
-	        }
+			menuContainer = "menuBar";
+	    }
+		if(!menuDescription){
+			menuDescription = "menuDescription";
+		}
+		if(!sliceYPos){
+			sliceYPos = 20;
+		}
+		
 		if(!isShowFlag){
 			document.getElementById(menuContainer).style.display='block';
 			document.getElementById(menuDescription).innerHTML = "";
-			moveElement(20);
+			moveElement(sliceYPos);
 			isHiddenFlag = false;
 		}
 		isShowFlag = true;
 	} 
-	var hiddenMenuBar = function(menuContainer){
+	var hiddenMenuBar = function(menuContainer, sliceYPos){
 		if(!menuContainer){
-	                menuContainer = "menuBar";
-	        }
+			menuContainer = "menuBar";
+		}
+		if(!sliceYPos){
+			sliceYPos = -20;
+		}
 		if(!isHiddenFlag){
 			document.getElementById(menuContainer).style.display='none';
-			moveElement(-20);
+			moveElement(sliceYPos);
 			isShowFlag = false;
 		}
 		isHiddenFlag = true;
