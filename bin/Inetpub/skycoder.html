@@ -510,6 +510,21 @@ function refreshCanvas(){
 [draggable=true] {
     cursor: move;
 }
+#headerContainer {
+	z-index: 3000;
+}
+#headerContainer {
+	position: fixed;
+	z-index: 3000;
+	left: 0;
+	right: 0;
+	top: 0;
+	width: 100%;
+	height:50px;
+	margin-top: 0;
+	background-color:#000;
+	border-bottom: groove;
+}
 #titleTXT {
 	text-shadow: 1px 1px 1px #16366c;
 	font-weight: bold;
@@ -588,21 +603,7 @@ function refreshCanvas(){
 	margin-bottom: 0;
 	padding: 0;
 }
-#title1 {
-	position: fixed;
-	z-index: 3000;
-	left: 0;
-	right: 0;
-	top: 0;
-	width: 100%;
-	height:50px;
-	margin-top: 0;
-	background-color:#000;
-	border-bottom: groove;
-	/*background-image:url(title_sky_bg.jpg);
-	border-radius: 0px 0px 25px 25px / 0px 0px 25px 25px;
-	border-bottom: groove;*/
-}
+
 #camera {
   position: fixed;
   z-index: 2;
@@ -721,6 +722,12 @@ $(document).ready(function(e) {
 	width: 100%;
 	resize: none;
 }
+#div_y_scroll_container{
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: none;
+	resize: none;
+}
 #ed_ip_view_container {
 	position:absolute;
 	z-index: 1;
@@ -757,34 +764,51 @@ $(document).ready(function(e) {
 }
 /*about skyCoderDetail*/
 #skyCoderDetail{
+	z-index: 100;
 	border-bottom:groove;
 	border-top: 0px;
 	background-color: #88c0d7;
 	padding: 3px;
 	border-top: #000000 1px dotted;
+	word-wrap:break-word;
+	height: 80px;
 }
 .loginTD {
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 11px;
 	height: 30px;
+	word-wrap:break-word;
 }
-.loginTitleTxt{
+.loginTitleTxt {
 	text-shadow: 1px 1px 1px #16366c;
 	color: #FFF;
+}
+.loginOptionalTxtContainer {
+	padding-left: 10px;
+	padding-bottom: 4px;
+}
+.loginLink {
+	text-decoration: underline;
+	color:#FFF;
+	text-shadow: 1px 1px 1px #000000;
+}
+.loginLink:hover {
+	text-decoration: none;
+	color:#FF0;
+	text-shadow: 1px 1px 1px #000000;
 }
 -->
 </style>
 </head>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload(); document.getElementById('skyCoderDetail').style.display='none';">
-<div id="title1" align="center">
-
 <!--Begin header & menu-->
+<div id="headerContainer" align="center">
 <div align="center" style=" background-color:#e9e9eb">
 <!--<font color="#FFFFFF">111</font>-->
 <div align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail','',40);" onMouseOver="showMenuBar('skyCoderDetail','',40); document.getElementById('user').focus(); document.getElementById('user').select()" onMouseOut="">SkyCoder</div>
+      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOver="showMenuBar('skyCoderDetail','',80); document.getElementById('user').focus(); document.getElementById('user').select()" onMouseOut="">SkyCoder</div>
       <div id="titleTXT2">A CPS coding framework (Trial)</div></td>
       <td width="10" bgcolor="#b4ced9">&nbsp;</td>
       <td width="10" bgcolor="#cfdce1">&nbsp;</td>
@@ -810,41 +834,35 @@ $(document).ready(function(e) {
 </table>
 </div>
 <!--This is a skyCoder explaination area-->
-<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -40);" onMouseMove="showMenuBar('skyCoderDetail','',40);" onMouseOver="showMenuBar('skyCoderDetail','',40);" align="left">
-  <from action="login.ins" method="post">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%">
-   <tr>
-     <td width="60" class="loginTD">
-        <div class="loginTitleTxt">
-        	&nbsp;&nbsp;Username
-        </div>
-        <div>
-        	<input name="user" type="text" id="user" size="10" value="guest">
-        </div>
-     </td>
-     <td width="67" class="loginTD">
-        <div class="loginTitleTxt">
-  	        &nbsp;&nbsp;Password
-        </div>
-        <div>
-        	<input name="pass" type="password" id="pass" size="10" value="guest">
-        </div>
-     </td>
-     <td width="62" class="loginTD">
-        <div class="loginTitleTxt">
-  	        &nbsp;&nbsp;
-        </div>
-        <div>
-        	<input type="submit" name="login_btn" id="login_btn" value="Sign In" disabled>
-        </div>
-     </td>
-     <td class="loginTD">
-     	<div id="div_x_scroll_container"><span>
-     	SkyCoder is a Cyber-Physical system virtual coding framework with communication tracer. It allows you to program the instruction to control multiple sensors and actuators interact together across a bridge cloud environment.</span></div>
-     </td>
-   </tr>
-      
-</table></from>
+<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOver="showMenuBar('skyCoderDetail','',80);" align="left">
+  <form action="skycoder.html" method="post">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td width="60" class="loginTD" valign="top"><div class="loginTitleTxt"> &nbsp;&nbsp;Username </div>
+          <div>
+            <input name="user" type="text" id="user" size="10" value="guest">
+          </div></td>
+        <td width="67" class="loginTD" valign="top"><div class="loginTitleTxt"> &nbsp;&nbsp;Password </div>
+          <div>
+            <input name="pass" type="password" id="pass" size="10" value="guest">
+          </div></td>
+        <td width="62" class="loginTD" valign="top"><div class="loginTitleTxt"> &nbsp;&nbsp; </div>
+          <div>
+            <input onMouseOver="showMenuBar('skyCoderDetail','',80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOut="" type="submit" name="login_btn" id="login_btn" value="Sign In">
+          </div></td>
+        <td width="100%" rowspan="2" align="right" valign="top" class="loginTD"><div id="div_y_scroll_container" style="word-wrap:break-word; width:400px; padding-left: 10px;; height:80px; border-left: #b4ced9 4px dotted" onMouseOver="showMenuBar('skyCoderDetail','',80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOut="" align="left"> <span style="text-align:left;">
+          <div class="loginTitleTxt">What is SkyCoder?</div>
+          <div> SkyCoder is a Cyber-Physical System (CPS) virtual framework that provides coding environment with communication tracer tool. It allows you to learn the CPS with a simple CPS virtual instruction code. The framework is operated on across cloud environment by CPS administrators. You can program CPS virtual instruction code to control multiple sensors and actuators interact together across a bridge cloud environment. </div>
+        </span> </div></td>
+      </tr>
+      <tr>
+        <td class="loginTD" valign="top" colspan="3">
+            <div class="loginOptionalTxtContainer"><a class="loginLink" href="#">Do you forgot the account?</a></div>
+            <div class="loginOptionalTxtContainer"><a class="loginLink" href="#">How can I get the account?</a></div>
+        </td>
+        </tr>
+    </table>
+  </form>
 </div>
 <!--End skyCoder explaination area-->
 <!--This is a skyCoder menubar container-->
