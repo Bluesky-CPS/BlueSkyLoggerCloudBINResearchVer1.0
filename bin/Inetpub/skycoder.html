@@ -782,6 +782,7 @@ $(document).ready(function(e) {
 .loginTitleTxt {
 	text-shadow: 1px 1px 1px #16366c;
 	color: #FFF;
+	padding-bottom: 4px;
 }
 .loginOptionalTxtContainer {
 	padding-left: 10px;
@@ -850,9 +851,10 @@ $(document).ready(function(e) {
           <div>
             <input onMouseOver="showMenuBar('skyCoderDetail','',80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOut="" type="submit" name="login_btn" id="login_btn" value="Sign In">
           </div></td>
-        <td width="100%" rowspan="2" align="right" valign="top" class="loginTD"><div id="div_y_scroll_container" style="word-wrap:break-word; width:400px; padding-left: 10px;; height:80px; border-left: #b4ced9 4px dotted" onMouseOver="showMenuBar('skyCoderDetail','',80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOut="" align="left"> <span style="text-align:left;">
-          <div class="loginTitleTxt">What is SkyCoder?</div>
-          <div> SkyCoder is a Cyber-Physical System (CPS) virtual framework that provides coding environment with communication tracer tool. It allows you to learn the CPS with a simple CPS virtual instruction code. The framework is operated on across cloud environment by CPS administrators. You can program CPS virtual instruction code to control multiple sensors and actuators interact together across a bridge cloud environment. </div>
+        <td width="100%" rowspan="2" align="right" valign="top" class="loginTD"><div id="div_y_scroll_container" style="word-wrap:break-word; width:400px; padding-left: 10px; padding-right: 8px; height:80px; border-left: #b4ced9 4px dotted;" onMouseOver="showMenuBar('skyCoderDetail','',80);" onMouseMove="showMenuBar('skyCoderDetail','',80);" onMouseOut="" align="left">
+        <span style="text-align:left;">
+          <div class="loginTitleTxt" style=" border-bottom: #b4ced9 1px dotted;">What is SkyCoder?</div>
+          <div style="padding-top: 4px; color: #000; text-shadow: 1px 0px 1px rgba(255,255,255,0.7);"><u><i>SkyCoder</i></u> is a Cyber-Physical System (CPS) virtual framework that provides coding environment with communication tracer tool. It allows you to learn the CPS with a simple CPS virtual instruction code. The framework is operated on across cloud environment by CPS administrators. You can program CPS virtual instruction code to control multiple sensors and actuators interact together across a bridge cloud environment. </div>
         </span> </div></td>
       </tr>
       <tr>
@@ -869,7 +871,7 @@ $(document).ready(function(e) {
 <div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar('menuBar');" onMouseMove="showMenuBar('menuBar');" onMouseOver="showMenuBar('menuBar');">
     <ul class="menu" onMouseMove="showMenuBar('menuBar');" onMouseOut="" onMouseOver="showMenuBar('menuBar');">
       <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
-      <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>Communication tracer</span></a></li>
+      <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>CPS network communication tracer</span></a></li>
       <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
       <div id="menuDescription">&nbsp;</div>
     </ul>
