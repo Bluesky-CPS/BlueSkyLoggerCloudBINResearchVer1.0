@@ -49,7 +49,6 @@ function openxml(isMultipart){
 	}else{
 		window.open("embeddedlog?instruction=GETLOG&opt1=" + edIP.value + "&opt2=xml&opt3=" + dateElement.value + "&opt4=" +  numElement.value);
 	}
-	
 }
 function handleRequest2(req) {
 	var writeroot = document.getElementById('loaded');
@@ -58,8 +57,6 @@ function handleRequest2(req) {
 	writeroot.style.display = 'block';
 	writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
-
-
 }
 function handleRequestAPI_Script(req) {
 	var writeroot = document.getElementById('loaded');
@@ -70,31 +67,9 @@ function handleRequestAPI_Script(req) {
 	writeroot.style.display = 'block';
 	//writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
-
-	/*var newContentContainer = document.createElement("div");
-	newContentContainer.className = "stepContentContainer";
-	var newTag = document.createElement("div");
-	newTag.textContent="RX@{"+ getLocalTimestamp() +"}";
-	newTag.className = "titleReceivedResTimestamp";
-	var newTag2 = document.createElement("div");
-	newTag2.className = "descriptReceivedResTimestamp";
-	newTag2.textContent = req.responseText;
-	newContentContainer.appendChild(newTag);
-	newContentContainer.appendChild(newTag2);
-	document.getElementById("animation_area").appendChild(newContentContainer);*/
+	
 	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
 	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
-
-	
-	
-	/*var titleReceivedResTimestamp = "<div class='titleReceivedResTimestamp'>RX@{"+ getLocalTimestamp() +"}</div>";
-	var descriptSendInstTimestamp = "<div class='descriptReceivedResTimestamp'>" + req.responseText + "</div>";
-	document.getElementById("animation_area").innerHTML += titleReceivedResTimestamp + descriptSendInstTimestamp;*/
-	
-	/*var animation_area_container_console = $('#animation_area_container_scroll');
-	animation_area_container_console.scrollTop(
-		animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
-	);*/
 }
 
 
@@ -217,7 +192,6 @@ function handleRequestGetBSFLogSize(req) {
 	writeroot.style.display = 'block';
 	writeroot.style.top = '191';
 	writeroot.style.marginTop = '0';
-
 }
 
 function handleRequest(req) {
@@ -305,7 +279,8 @@ function motor(onOff){
 	}
 
 }
-function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod) {
+
+function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod, username, password) {
 	var req = createXMLHTTPObject();
 	if (!req) return;
 	//var API_Script_edIP = document.getElementById('API_script_ed_ip');
@@ -329,6 +304,7 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			var ret = method + " " + LE_domain + instruction + " HTTP/1.1\r\n" + "Host: " + document.URL + "\r\n";
 			ret += "Content-type" + ": " + "application/x-www-form-urlencoded";
 			req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+			
 			if(LE_domain!=""){
 				//req.setRequestHeader('Host', 'LE_domain');
 			}
@@ -337,8 +313,6 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	}
 	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
 	req.onreadystatechange = function () {
-		
-		
 		if (req.readyState != 4) return;
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
@@ -399,6 +373,56 @@ function sendRequest2(url,callback,postData) {
 		}
 	}
 	return;
+}
+function doSigninRequest(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	req.open(method,url,true);
+	
+	if (postData){
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.send(postData);
+	}
+		
+	console.log("send: " + postData);
+	req.onreadystatechange = function () {
+		console.log('onreadystatechenge===================\r\n');
+		if (req.readyState == 1){//unsent
+			console.log('unsent state\r\n');
+			return;
+		}
+		if (req.readyState == 2){//opened
+			console.log('opened state\r\n');
+			if(postData){
+				req.send(postData);
+			}
+			return;
+		}
+		if (req.readyState == 3){//header received
+			console.log('header received state\r\n');
+			return;
+		}
+		if (req.readyState == 4){//done
+			console.log('done state\r\n');
+			if (req.status != 200 && req.status != 304) {
+				console.log('HTTP error ' + req.status);
+				return;
+			}
+			callback(req);
+			return;
+		}
+		//if (req.readyState != 4) return;
+		
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
+function handleSignin(req) {
+	
+	var writeroot = document.getElementById("loaded");
+	writeroot.innerHTML = "";
+	writeroot.innerHTML += req.responseText;
 }
 
 function sendRequest(url,callback,postData) {
@@ -838,7 +862,7 @@ $(document).ready(function(e) {
 <div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOver="showMenuBar('skyCoderDetail','',90);" align="left">
   
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr><form action="skycoder.html" method="post">
+      <tr><form action="skycoder.html" method="post" id="singinform">
         <td width="60" class="loginTD" valign="top"><div class="loginTitleTxt" style=" padding-left: 4px;">&nbsp;Username </div>
           <div style="padding-right: 4px; padding-left: 4px;">
             <input name="user" type="text" id="user" size="10" value="guest">
@@ -849,8 +873,8 @@ $(document).ready(function(e) {
           </div></td>
         <td width="62" class="loginTD" valign="top" style="padding-right: 8px;"><div class="loginTitleTxt"> &nbsp;&nbsp; </div>
           <div>
-            <input onMouseOver="showMenuBar('skyCoderDetail','',90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOut="" type="submit" name="login_btn" id="login_btn" value="Sign In">
-            <input type="hidden" name="mode" value="signin">
+            <input onMouseOver="showMenuBar('skyCoderDetail','',90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOut="" type="button" name="login_btn" id="login_btn" value="Sign In" onClick="doSignin('user', 'pass', 'mode');">
+            <input type="hidden" name="mode" value="signin" id="mode">
           </div>
         </td>
         <td width="300" class="loginTD" valign="top" style="word" rowspan="2">
@@ -1113,7 +1137,7 @@ function num(bar){
     	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> Embedded devices connecting statement
           </div>
           <div style="position:static; border:0px; height: 218px;">
-    	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
+    	    <!--<iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>-->
           </div>
   </div>
   
@@ -1284,6 +1308,21 @@ MTRepetition.queue = [];
 			exec_instructs = exec_instruct_obj.clone();
 				
 		}
+		
+		var doSignin = function(username, password, mode){
+			var usernameElement = document.getElementById(username);
+			var passwordElement = document.getElementById(password);
+			var modeElement = document.getElementById(mode);
+			
+			console.log(usernameElement.value + "\r\n");
+			console.log(passwordElement.value + "\r\n");
+			console.log(modeElement.value + "\r\n");
+			
+			var loginQuery = "username=" + usernameElement.value + "&password=" + passwordElement.value + "&mode=" +modeElement.value
+			
+			doSigninRequest("/doLogin.ins",handleSignin,loginQuery);
+		}
+			
 		
 		function getLocalTimestamp(){
 			var d = new Date();
