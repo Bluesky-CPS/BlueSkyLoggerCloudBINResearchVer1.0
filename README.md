@@ -10,7 +10,7 @@
 	For deamon executing.
 
     You can extract redis source code included in this package for using with the Blue-skyLogger server. 
-    The detail of redis is on [redis](http://redis.io/) 
+    The detail of redis is on http://redis.io/ 
 	
 	$> tar -xvfz redis-2.6.9.tar.gz
 	$> cd redis-2.6.9
