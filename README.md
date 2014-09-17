@@ -11,6 +11,7 @@ Getting Started
  `$> cd BlueSkyLoggerCloudBINResearchVer1.0`
  
 * Edit the configure
+
  `$> pwd`
 
   Copy above path. 
