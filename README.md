@@ -1,6 +1,6 @@
  Blue-sky Logger cloud binary execution file Ver1.0
-===============================================================================================================
-    This is Blue-skyLogger server binary. I will release a server source code version in nearly day or if you request please contact me directly. [Bluesky-CPS site](http://www.bluesky-cps.org)
+===================================================
+This is Blue-skyLogger server binary. I will release a server source code version in nearly day or if you request please contact me directly. [Bluesky-CPS site](http://www.bluesky-cps.org)
     The server can execute by use "Httpd.sh"
 
 	$> ./Httpd.sh
@@ -9,8 +9,7 @@
 	$> ./HttpAsDeamon.sh &
 	For deamon executing.
 
-    You can extract redis source code included in this package for using with the Blue-skyLogger server. 
-    The detail of redis is on http://redis.io/ 
+You can extract redis source code included in this package for using with the Blue-skyLogger server. You can learn the detail of redis on here http://redis.io/ 
 	
 	$> tar -xvfz redis-2.6.9.tar.gz
 	$> cd redis-2.6.9
@@ -18,4 +17,3 @@
 
 
 Author: Praween AMONTAMAVUT
-
