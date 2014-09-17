@@ -9,7 +9,7 @@ This is Blue-skyLogger server binary. I will release a server source code versio
 	$> ./HttpAsDeamon.sh &
 	For deamon executing.
 
-You can extract redis source code included in this package for using with the Blue-skyLogger server. You can learn the detail of redis on here [Redis](http://redis.io/) 
+You can extract redis source code included in this package for using with the Blue-skyLogger server. You can learn the detail of redis on [here](http://redis.io/). 
 	
 	$> tar -xvfz redis-2.6.9.tar.gz
 	$> cd redis-2.6.9
