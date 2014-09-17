@@ -2,7 +2,7 @@
 ===================================================
 This is [Blue-sky](http://www.bluesky-cps.org) server binary files. I will release a server source code version in nearly day or if you request please contact me directly. 
 
-The server can execute by use "Httpd.sh"
+The server can be executed by use "Httpd.sh" shell script.
 
 	$> ./Httpd.sh
 	For normaly executing.
