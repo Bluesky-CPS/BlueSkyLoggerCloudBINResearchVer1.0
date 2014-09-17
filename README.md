@@ -18,7 +18,7 @@ Getting Started
   
  `$> vim Httpd.cfg`
  
-  Replace `WWWROOT_PATH = ${REPOSITORY_ABSOLUTE_PATH}/Inetpub` to be `{To be paste the copied path}/Inetpub`
+  Replace "`WWWROOT_PATH = ${REPOSITORY_ABSOLUTE_PATH}/Inetpub`" to be "`{To be paste the copied path}/Inetpub`"
   
 * Execute the server by use "Httpd.sh"
 
