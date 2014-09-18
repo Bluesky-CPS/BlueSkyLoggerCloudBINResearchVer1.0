@@ -426,11 +426,11 @@ function handleSignin(req) {
 	writeroot.innerHTML = serverResponse;
 	
 	var JSONParse = JSON.parse(serverResponse);
-	console.log(JSONParse.ETLog.login.username + "<br>" + JSONParse.ETLog.login.yourIP + "<br>"  + JSONParse.ETLog.login.yourCanocialIP + "\r\n");
+	console.log(JSONParse.ETLog.login.username + "<br>" + JSONParse.ETLog.login.yourIP + "<br>"  + JSONParse.ETLog.login.yourCNAME + "\r\n");
 	var loginResult = JSONParse.ETLog.login.result;
 	if(loginResult == "true"){
 		//var len = JSONParse.ETLog.EDConnStatement.length;
-		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCanocialIP + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
+		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCNAME + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
 	}else{
 		
 	}
