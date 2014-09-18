@@ -12,13 +12,11 @@ Getting Started
  
 * Edit the configure
 
- `$> pwd`
-
-  Copy above path. 
-  
- `$> vim Httpd.cfg`
+ `$> curr=$(pwd)`
  
-  Replace "`WWWROOT_PATH = ${REPOSITORY_ABSOLUTE_PATH}/Inetpub`" with "`{To be paste the copied path}/Inetpub`"
+ `$> echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg`
+ 
+ `$>  sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg`
   
 * Execute the server by use "Httpd.sh"
 
