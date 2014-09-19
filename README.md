@@ -13,10 +13,10 @@ Getting Started
 - Edit the configure
 
  `$> curr=$(pwd)`
- 
+
  `$> echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg`
  
- `$>  sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg`
+ `$> sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg`
   
 - Execute the Bluesky server
 
