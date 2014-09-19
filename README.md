@@ -35,13 +35,15 @@ If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com
 * About the redis
 
 You can extract redis source code included in this package for using with the Bluesky server. You can learn the detail of redis on [here](http://redis.io/). The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically off the Key-Value store database accessing.
+
+	$> tar -xvfz redis-2.6.9.tar.gz
 	
-	`$> tar -xvfz redis-2.6.9.tar.gz`
-	`$> cd redis-2.6.9`
-	`$> make`
+	$> cd redis-2.6.9
+	
+	$> make
 
 Then, start the redis.
 	
-	`$> ./startRedis.sh`
+	$> ./startRedis.sh
 
 Author: Praween AMONTAMAVUT
