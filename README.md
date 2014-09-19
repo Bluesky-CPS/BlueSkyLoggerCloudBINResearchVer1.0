@@ -6,27 +6,27 @@ Getting Started
 ---------------
 - Clone the git
 
- ```$> git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git```
+  ```$> git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git```
 
- ```$> cd BlueSkyLoggerCloudBINResearchVer1.0/bin```
+  ```$> cd BlueSkyLoggerCloudBINResearchVer1.0/bin```
  
 - Edit the configure
 
- ```$> curr=$(pwd)```
+  ```$> curr=$(pwd)```
 
- ```$> echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg```
+  ```$> echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg```
  
- ```$> sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg```
+  ```$> sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg```
   
 - Execute the Bluesky server
 
   For normaly executing shell.
 	
-```	$> ./Httpd.sh```
+  ```	$> ./Httpd.sh```
 
   For deamon executing shell.
 	
-```	$> ./HttpAsDeamon.sh &```
+  ```	$> ./HttpAsDeamon.sh &```
 	
 - Enjoy the environment
 
