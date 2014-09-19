@@ -40,7 +40,9 @@ The redis should be running before invoke the Bluesky server. If the redis has n
 	
 	$> cd redis-2.6.9
 	
-	$> make
+	$> make -j4
+	
+	$> cd ..
 
 Then, start the redis.
 	
