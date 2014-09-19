@@ -8,7 +8,7 @@ Getting Started
 
  `$> git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git`
 
- `$> cd BlueSkyLoggerCloudBINResearchVer1.0`
+ `$> cd BlueSkyLoggerCloudBINResearchVer1.0/bin`
  
 - Edit the configure
 
