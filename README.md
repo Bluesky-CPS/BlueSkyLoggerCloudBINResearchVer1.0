@@ -30,7 +30,7 @@ Getting Started
 	
 - Enjoy the environment
 
-  If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial)), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
+  If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial),etc.), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
 
 - About the redis
 
