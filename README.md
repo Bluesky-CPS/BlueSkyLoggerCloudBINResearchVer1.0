@@ -27,12 +27,21 @@ Getting Started
 	$> ./HttpAsDeamon.sh &
 	
 	For deamon executing.
+	
+* Enjoy the environment
 
-You can extract redis source code included in this package for using with the Blue-skyLogger server. You can learn the detail of redis on [here](http://redis.io/). 
+If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial)), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
+
+* About the redis
+
+You can extract redis source code included in this package for using with the Bluesky server. You can learn the detail of redis on [here](http://redis.io/). The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically off the Key-Value store database accessing.
 	
 	$> tar -xvfz redis-2.6.9.tar.gz
 	$> cd redis-2.6.9
 	$> make
 
+Then, start the redis.
+	
+	$> ./startRedis.sh
 
 Author: Praween AMONTAMAVUT
