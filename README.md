@@ -48,5 +48,5 @@ Getting Started
 	
 	$> ./startRedis.sh
 
-Author: Praween AMONTAMAVUT
+***Author***: *Praween AMONTAMAVUT*
 
