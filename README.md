@@ -18,7 +18,7 @@ Getting Started
  
  `$>  sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg`
   
-- Execute the server by use "Httpd.sh"
+- Execute the Bluesky server
 
   For normaly executing shell.
 	
