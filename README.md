@@ -48,13 +48,4 @@ Getting Started
 	
   ```	$> ./startRedis.sh```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-Author: Praween AMONTAMAVUT
-=======
 ***Author***: *Praween AMONTAMAVUT*
->>>>>>> Bluesky-CPS-master
-
-=======
-***Author:*** *Praween AMONTAMAVUT*
->>>>>>> 6a0d76b4083d14396a2466ff8e4cfd31e8bc9450
