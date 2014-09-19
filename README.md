@@ -1,6 +1,6 @@
 Blue-sky Logger cloud binary execution file Ver1.0
 ===================================================
-This is [Blue-sky](http://www.bluesky-cps.org) server binary files repository. The source code will be provided when you have a request.
+This is [Blue-sky](http://www.bluesky-cps.org) server binary files repository. Here is non-profit repository. The source code will be provided anytime when you have a request.
 
 Getting Started
 ---------------
