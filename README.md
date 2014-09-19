@@ -36,16 +36,16 @@ Getting Started
 
   The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically off the Key-Value Store database accessing feature. You can extract redis source code included in this package for using with the Bluesky server following method. You can learn more about the detail of redis [here](http://redis.io/). 
 
-```	$> tar -xvfz redis-2.6.9.tar.gz```
+  ```	$> tar -xvfz redis-2.6.9.tar.gz```
 	
-```	$> cd redis-2.6.9```
+  ```	$> cd redis-2.6.9```
 	
-```	$> make -j4```
+  ```	$> make -j4```
 	
-```	$> cd ..```
+  ```	$> cd ..```
 
   Then, start the redis.
 	
-```	$> ./startRedis.sh```
+  ```	$> ./startRedis.sh```
 
 ***Author:*** *Praween AMONTAMAVUT*
