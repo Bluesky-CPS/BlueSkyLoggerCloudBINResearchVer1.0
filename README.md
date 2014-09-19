@@ -20,11 +20,11 @@ Getting Started
   
 - Execute the server by use "Httpd.sh"
 
--- For normaly executing shell.
+  For normaly executing shell.
 	
 	$> ./Httpd.sh
 
--- For deamon executing shell.
+  For deamon executing shell.
 	
 	$> ./HttpAsDeamon.sh &
 	
