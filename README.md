@@ -49,7 +49,11 @@ Getting Started
   ```	$> ./startRedis.sh```
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Author: Praween AMONTAMAVUT
+=======
+***Author***: *Praween AMONTAMAVUT*
+>>>>>>> Bluesky-CPS-master
 
 =======
 ***Author:*** *Praween AMONTAMAVUT*
