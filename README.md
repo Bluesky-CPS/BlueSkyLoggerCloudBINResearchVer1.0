@@ -34,11 +34,11 @@ Getting Started
 
 - Web API table
 
-  @see here [Web API Demo version1.0](www.bluesky-cps.org/Blue-skyLogger)
+  @see here [Web API (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger)
 
 - Java API documents
 
-  @see here [Java API documents](www.bluesky-cps.org/Blue-skyLogger/DemoVer1-APIDoc)
+  @see here [Java API documents (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger/DemoVer1-APIDoc)
 
 - About the redis
 
