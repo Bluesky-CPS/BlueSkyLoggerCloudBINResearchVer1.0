@@ -34,7 +34,7 @@ Getting Started
 
 - **Web API table**
 
-  @see [Web API (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger)
+  @see [Web HTTP API (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger)
 
 - **Java API documents**
 
