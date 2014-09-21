@@ -56,7 +56,7 @@ function handleRequestConnectedStatementSkycoder(req) {
 		jsonOBJ.image = statICN;
 		jsonOBJ.className = '';
 		jsonOBJ.title = '';*/
-		var jsonOBJ = '<div alt="' + edcname + '" class="edElements" style="border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;"><img src=' + statICN + '>' + edipdat + ' (' + connstatus + ')<br>Device type: ' + edtype + '</div>'
+		var jsonOBJ = '<div alt="' + edcname + '" class="edElements" style="border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;"><img src=' + statICN + '>' + edipdat + ' (' + connstatus + ')<br>'+ edcname +' (Device type: ' + edtype + ')</div>'
 		
 		edviewContainer.innerHTML += jsonOBJ;
 
