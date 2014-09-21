@@ -4,13 +4,13 @@ This is [Blue-sky](http://www.bluesky-cps.org) server binary files repository. H
 
 Getting Started
 ---------------
-- Clone the git
+- **Clone the git**
 
   ```$> git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git```
 
   ```$> cd BlueSkyLoggerCloudBINResearchVer1.0/bin```
  
-- Edit the configure
+- **Edit the configure**
 
   ```$> curr=$(pwd)```
 
@@ -18,21 +18,29 @@ Getting Started
  
   ```$> sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg```
   
-- Execute the Bluesky server
+- **Execute the Bluesky server**
 
-  For normaly executing shell.
+  *For normaly executing shell.*
 	
   ```	$> ./Httpd.sh```
 
-  For deamon executing shell.
+  *For deamon executing shell.*
 	
   ```	$> ./HttpAsDeamon.sh &```
 	
-- Enjoy the environment
+- **Enjoy the environment**
 
   If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial),etc.), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
 
-- About the redis
+- **Web API table**
+
+  @see [Web HTTP API (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger)
+
+- **Java API documents**
+
+  @see [Java API documents (Demo version1.0)](www.bluesky-cps.org/Blue-skyLogger/DemoVer1-APIDoc)
+
+- **About the redis**
 
   The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically off the Key-Value Store database accessing feature. You can extract redis source code included in this package for using with the Bluesky server following method. You can learn more about the detail of redis [here](http://redis.io/). 
 
