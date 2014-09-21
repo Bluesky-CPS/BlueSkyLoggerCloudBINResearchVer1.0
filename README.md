@@ -32,6 +32,9 @@ Getting Started
 
   If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial),etc.), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
 
+The others references
+---------------------
+
 - **Web API table**
 
   @see [Web HTTP API (Demo version1.0)](http://www.bluesky-cps.org/Blue-skyLogger)
