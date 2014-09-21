@@ -32,6 +32,14 @@ Getting Started
 
   If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial),etc.), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
 
+- Web API table
+
+  @see here [Web API Demo version1.0](www.bluesky-cps.org/Blue-skyLogger)
+
+- Java API documents
+
+  @see here [Java API documents](www.bluesky-cps.org/Blue-skyLogger/DemoVer1-APIDoc)
+
 - About the redis
 
   The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically off the Key-Value Store database accessing feature. You can extract redis source code included in this package for using with the Bluesky server following method. You can learn more about the detail of redis [here](http://redis.io/). 
