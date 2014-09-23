@@ -8,6 +8,6 @@ else
 	if [ ! -f "$1" ]; then 
 	    sudo sh -c "nohup java -cp .:lib/sqlite-jdbc-3.7.2.jar -classpath Httpd.jar:lib/sqlite-jdbc-3.7.2.jar SkyBlue.LCP.Httpd.core.Httpd >> /dev/null 2>&1 &"
 	else
-	    sudo su -c "sudo nohup java -cp .:lib/sqlite-jdbc-3.7.2.jar -classpath Httpd.jar:lib/sqlite-jdbc-3.7.2.jar SkyBlue.LCP.Httpd.core.Httpd -conf $1 >> /dev/null 2>&1 &"
+	    sudo su -c "nohup java -cp .:lib/sqlite-jdbc-3.7.2.jar -classpath Httpd.jar:lib/sqlite-jdbc-3.7.2.jar SkyBlue.LCP.Httpd.core.Httpd -conf $1 >> /dev/null 2>&1 &"
 	fi
 fi
