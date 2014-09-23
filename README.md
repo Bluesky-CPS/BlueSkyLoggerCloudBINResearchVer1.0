@@ -26,7 +26,7 @@ Getting Started
 
   *For deamon executing shell.*
   ```shell
-     ./HttpAsDeamon.sh &
+     ./HttpAsDeamon.sh
   ```
 	
 - **Enjoy the environment**
