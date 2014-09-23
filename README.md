@@ -28,6 +28,11 @@ Getting Started
   ```shell
      ./HttpAsDeamon.sh
   ```
+  
+  *For stop all running servers.*
+  ```shell
+     ./stopAllAerver.sh
+  ```
 	
 - **Enjoy the environment**
 
