@@ -6,32 +6,32 @@ Getting Started
 ---------------
 - **Clone the git**
   ```shell
-     git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git
-     cd BlueSkyLoggerCloudBINResearchVer1.0/bin
-     ```
+  git clone https://github.com/not001praween001/BlueSkyLoggerCloudBINResearchVer1.0.git
+  cd BlueSkyLoggerCloudBINResearchVer1.0/bin
+  ```
  
 - **Edit the configure**
   ```shell
-     curr=$(pwd)
-     echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg
-     sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg
-     ```
+  curr=$(pwd)
+  echo "WWWROOT_PATH = $curr/Inetpub" >> Httpd.cfg
+  sed -i -e 's/WWWROOT_PATH\ =\ ${REPOSITORY_ABSOLUTE_PATH}\/Inetpub/\ /g' Httpd.cfg
+  ```
   
 - **Execute the Bluesky server**
 
   *For normaly executing shell.*
   ```shell
-     ./Httpd.sh
-     ```
+  ./Httpd.sh
+  ```
 
   *For deamon executing shell.*
   ```shell
-     ./HttpAsDeamon.sh
+  ./HttpAsDeamon.sh
   ```
   
   *For stop all running servers.*
   ```shell
-     ./stopAllAerver.sh
+  ./stopAllAerver.sh
   ```
 	
 - **Enjoy the environment**
@@ -53,11 +53,11 @@ The others references
 
   The redis should be running before invoke the Bluesky server. If the redis has not been started, the Bluesky server will be automatically turn the Key-Value Store database accessing feature off. You can extract redis source code included in this package for using with the Bluesky server following method. You can learn more about the detail of redis [here](http://redis.io/). 
   ```shell
-     tar -xvfz redis-2.6.9.tar.gz
-     cd redis-2.6.9
-     make -j4
-     cd ..
-     ```
+  tar -xvfz redis-2.6.9.tar.gz
+  cd redis-2.6.9
+  make -j4
+  cd ..
+  ```
   Then, start the redis.
   ```shell
   ./startRedis.sh
