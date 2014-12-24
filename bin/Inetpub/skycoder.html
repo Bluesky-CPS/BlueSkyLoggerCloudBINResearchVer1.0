@@ -23,7 +23,7 @@ $(function() {
 	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
 	$( "#animation_container" ).draggable();
-	$("#animation_container").resize(function(){ 
+	$( "#animation_container" ).resize(function(){ 
 		console.log( $("#animation_container").height() + " sss\r\n" ); 
 	}); 
 })
@@ -200,7 +200,7 @@ function handleRequest(req) {
 	writeroot.style.display = 'block';
 }
 function handleDownload(req) {
-	var writeroot = document.getElementById('loaded');
+/*	var writeroot = document.getElementById('loaded');
 	
 	//writeroot.innerHTML = req.responseText;
 	writeroot.innerHTML = "iiiii";
@@ -214,7 +214,7 @@ function handleDownload(req) {
 		alert("sss");
 	}
 alert("LOs");
-	writeroot.style.display = 'block';
+	writeroot.style.display = 'block';*/
 }
 function doExtract(doType){
 	var statusElement = document.getElementById('loaded');
@@ -374,6 +374,35 @@ function sendRequest2(url,callback,postData) {
 	}
 	return;
 }
+
+function getJSONCallback(getURL, callback){
+	/*Wait until Done state of the AJAX.*/
+	$.getJSON( getURL ).done(
+		function(returndat){
+			callback(returndat);
+		}
+	)
+}
+var getBrowserServerTimeDifference = function(serverURL) {
+	var def = $.Deferred();
+	
+	//var a;
+	
+	$.getJSON( serverURL )
+	.done(function(etlogJSON){
+	//getJSONCallback(serverURL, function(etlogJSON){
+		var browserTime = new Date();
+		var browserNanoTime = browserTime.getTime();
+		//Get the differece time.
+		document.difftime = ((browserNanoTime) - (etlogJSON.ETLog.server.time));
+		//console.log("document.difftime: " + document.difftime);
+		def.resolve(JSON.parse(etlogJSON));
+		
+	});
+	return def;
+	//});
+}
+
 function doSigninoutRequest(url,callback,postData,noticeContainer) {
 	var req = createXMLHTTPObject();
 	if (!req) return;
@@ -452,6 +481,17 @@ function handleSignout(req) {
 	}
 }
 
+function handleDiffTime(req){
+	var browserTime = new Date(now);
+	console.log("browserTime.getTime(): " + browserTime.getTime());
+	console.log("browserTime.getMilliseconds(): " + browserTime.getMilliseconds());
+	var serverResponse = req.responseText;
+	var JSONParse = JSON.parse(serverResponse);
+	var serverTime = JSONParse.server.time;
+	
+	req.timeDifference = serverTime;
+}
+
 function sendRequest(url,callback,postData) {
 	var req = createXMLHTTPObject();
 	if (!req) return;
@@ -519,7 +559,11 @@ function stopGetBSFLogSize(){
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 }
 function initOnload(){
+	
+	
 	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	//The difference time will be store in "document.difftime"
+	var timeDifference = getBrowserServerTimeDifference("/ETLog?instruction=time&opt1=this");
 	/*dd = new Date();
 	var dDate = (dd.getDate() < 10)?("0" + dd.getDate()):(dd.getDate()+"");
 	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
@@ -694,7 +738,6 @@ body {
 <script>
 $(document).ready(function(e) {
 	$("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}); //rounded corner is off now
-	
 });
 </script> 
 
@@ -1447,7 +1490,13 @@ MTRepetition.queue = [];
 				var serverToEtTimeStamp = convertMilliToTimestamp(serverToEtTimeStampMilli);
 				var etToServerTimeStamp = convertMilliToTimestamp(etToServerTimeStampMilli);
 				
+				console.log("document.difftime: " + document.difftime);
 				
+				var serverToEtTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Server-Et-Timestamp")) + parseInt(document.difftime));
+				var etToServerTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Et-Server-Timestamp")) + parseInt(document.difftime));
+				console.log("serverToEtTimeStamp_BasedOnSkyCoder: " + serverToEtTimeStamp_BasedOnSkyCoder);
+				console.log("etToServerTimeStamp_BasedOnSkyCoder: " + etToServerTimeStamp_BasedOnSkyCoder);
+							
 				console.log(serverToEtTimeStampMilli + "  " + etToServerTimeStampMilli);
 				
 				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
