@@ -1133,6 +1133,20 @@ function num(bar){
                 sleep 800<br>
                 sensornetwork LOCAL_ED_IP gps global get GPVTG<br>
                 sleep 800<br>
+                loop 10<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 0<br>
+sensornetwork LOCAL_ED_IP gpio set 27 0<br>
+sensornetwork LOCAL_ED_IP gpio set 23 0<br>
+sleep 500 <br>
+sensornetwork LOCAL_ED_IP gpio set 27 1<br>
+sleep 200<br>
+sensornetwork LOCAL_ED_IP gpio set 22 1<br>
+sleep 200<br>
+sensornetwork LOCAL_ED_IP gpio set 23 1<br>
+sleep 200<br>
+end
+<br>
+                <br>
             </div>
             <div class="TabbedPanelsContent">
 				#For example: replace LOCAL_ED_IP with 172.16.4.222
@@ -1572,73 +1586,160 @@ MTRepetition.queue = [];
 					var titleSendInstTimestamp = "";
 					var descriptSendInstTimestamp = "";
 					var APIdebugMes = "";
-					for(var i = 0; i < exec_instructs.length; i++){
+					
+					/*
+					 * loopState: The state of loop execution.
+					 * 0: noLoop now 
+					 * 1: Read the loop instruction
+					 * 2: loop execution now
+					 */
+					var loopState = 0;
+					var loopNum = 0;
+					var loopBeginIdxFlag = 0;
+					var loopEndIdxFlag = 0;
+					
+
+					/*var loopInstructionSet = new Array();*/
+					var r = 0;
+					while(r < exec_instructs.length){
+						console.log("begin r: " + r + "\r\n");
+					//for(var i = 0; i < exec_instructs.length; i++){
+						/* Reset all basical instruction data */
 						Skyblue_exec_instruct="";
 						instruct_type="";
 						sleep_ms = 0;
 						LE_domain = "";
 						APIdebugMes = "";
+						console.log("before doloop\r\n");
 						
-						for(var j = 0; j < exec_instructs[i].length; j++){
-							//exec_instructs[i][j] = exec_instructs[i][j].trim()
-							/*APIdebug.value += exec_instructs[i][j] + " ";*/
-							APIdebugMes += exec_instructs[i][j] + " ";
+						
+						/*doloop_instruct:*/ while(1){
+							for(var j = 0; j < exec_instructs[r].length; j++){
+								//exec_instructs[r][j] = exec_instructs[r][j].trim()
+								/*APIdebug.value += exec_instructs[r][j] + " ";*/
+								APIdebugMes += exec_instructs[r][j] + " ";
+								
+								if(exec_instructs[r][0]=="sensornetwork"){
+									if(j < 1){
+										Skyblue_exec_instruct += exec_instructs[r][0];
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										document.getElementById("API_script_ed_ip").value = exec_instructs[r][j];
+									}else{
+										Skyblue_exec_instruct += "/" + exec_instructs[r][j];
+									}
+								}
+								/*Need check! why it has not "else"*/
+								if(exec_instructs[r][0]=="sensornetworks"){
+									if(j < 1){
+										Skyblue_exec_instruct += "sensornetwork";
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										LE_domain = exec_instructs[r][j] + "/";
+									}else if(j < 3){
+										document.getElementById("API_script_ed_ip").value = exec_instructs[r][j];
+										//alert(document.getElementById("API_script_ed_ip").value);
+									}else{
+										Skyblue_exec_instruct += "/" + exec_instructs[r][j];
+									}
+								}else if(exec_instructs[r][0]=="sleep"){
+									if(j < 1){
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										sleep_ms = parseInt(exec_instructs[r][1]);
+										//break;
+									}
+								}else if(exec_instructs[r][0]=="loop"){
+									if(loopState == 0){
+										if(j < 1){
+											instruct_type = exec_instructs[r][0];
+										}else if(j < 2){
+											loopnum = parseInt(exec_instructs[r][1]) - 1;
+											loopState = 1;
+											loopBeginIdxFlag = r;
+										}
+									}
+									console.log("loop instruct..\r\n");
+								}else if(exec_instructs[r][0]=="end"){
+									
+									if(loopState == 1){
+										instruct_type = exec_instructs[r][0];
+										/* Switch to loop execution mode */
+										loopState = 2;
+										loopEndIdxFlag = r - 1;
+										r = loopBeginIdxFlag;
+										console.log("exec end: r = " + r);
+										console.log("loopEndIdxFlag: " + loopEndIdxFlag);
+									}	
+								}
+								
+							}
+							var sl = Sleep(sleep_ms);
+							if(instruct_type != "sleep"){
+								if(Skyblue_exec_instruct != ""){
+									//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
+									API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+								}
+							}
+							if(instruct_type != ""){
+								/*APIdebug.value += ";\r\n";*/
+								addDebugMessageLineElement(APIdebugMes + ";<br>", debugAreaID);
+							}
 							
-							if(exec_instructs[i][0]=="sensornetwork"){
-								if(j < 1){
-									Skyblue_exec_instruct += exec_instructs[i][0];
-									instruct_type = exec_instructs[i][0];
-								}else if(j<2){
-									document.getElementById("API_script_ed_ip").value = exec_instructs[i][j];
+							/*var APIdebug_console = $('#APIscript_debug');
+							APIdebug_console.scrollTop(
+								APIdebug_console[0].scrollHeight - APIdebug_console.height()
+							);*/
+							
+							var APIdebug_console2 = $('#APIscript_debug_scroll');
+							APIdebug_console2.scrollTop(
+								APIdebug_console2[0].scrollHeight - APIdebug_console2.height()
+							);
+							/*var animation_area_container_console = $('#animation_area_container_scroll');
+							animation_area_container_console.scrollTop(
+								animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+							);*/
+							
+							if(loopState == 2){
+								/*Each element in the loop*/
+								if(r < loopEndIdxFlag){
+								/*In a present loop*/
+									r = r + 1;
 								}else{
-									Skyblue_exec_instruct += "/" + exec_instructs[i][j];
+								/*In a next loop*/
+									r = loopBeginIdxFlag;
+									loopnum = loopnum - 1;
 								}
-							}if(exec_instructs[i][0]=="sensornetworks"){
-								if(j < 1){
-									Skyblue_exec_instruct += "sensornetwork";
-									instruct_type = exec_instructs[i][0];
-								}else if(j<2){
-									LE_domain = exec_instructs[i][j] + "/";
-								}else if(j<3){
-									document.getElementById("API_script_ed_ip").value = exec_instructs[i][j];
-									//alert(document.getElementById("API_script_ed_ip").value);
+								
+								/* Reset all basical instruction data */
+								Skyblue_exec_instruct = "";
+								instruct_type = "";
+								sleep_ms = 0;
+								LE_domain = "";
+								APIdebugMes = "";
+									
+								if(loopnum <= 0){
+									console.log("loopnum <= 0: loopEndIdxFlag: " + loopEndIdxFlag + "\r\n");
+									r = loopEndIdxFlag + 1;
+									console.log("r: " + r);
+									/* Reset loop instruction data */
+									loopstate = 0;
+									loopNum = 0;
+									
+									break;
 								}else{
-									Skyblue_exec_instruct += "/" + exec_instructs[i][j];
-								}
-							}else if(exec_instructs[i][0]=="sleep"){
-								if(j < 1){
-									instruct_type = exec_instructs[i][0];
-								}else if(j<2){
-									sleep_ms = parseInt(exec_instructs[i][1]);
-									//break;
+									continue;
 								}
 							}
-						}
-						var sl = Sleep(sleep_ms);
-						if(instruct_type != "sleep"){
-							if(Skyblue_exec_instruct!=""){
-								//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
-								API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+							
+							if(loopState < 2){
+								break;	
 							}
-						}
-						if(instruct_type != ""){
-							/*APIdebug.value += ";\r\n";*/
-							addDebugMessageLineElement(APIdebugMes + ";<br>", debugAreaID);
-						}
 						
-						/*var APIdebug_console = $('#APIscript_debug');
-						APIdebug_console.scrollTop(
-							APIdebug_console[0].scrollHeight - APIdebug_console.height()
-						);*/
-						
-						var APIdebug_console2 = $('#APIscript_debug_scroll');
-						APIdebug_console2.scrollTop(
-							APIdebug_console2[0].scrollHeight - APIdebug_console2.height()
-						);
-						/*var animation_area_container_console = $('#animation_area_container_scroll');
-						animation_area_container_console.scrollTop(
-							animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
-						);*/
+						}
+						//Of outer While
+						r = r + 1;
+						console.log("The lasted r: " + r + " exec_instructs.length: "+ exec_instructs.length +"\r\n");
 					}
 					document.getElementById("exec_btn").disabled = false;
 				}
