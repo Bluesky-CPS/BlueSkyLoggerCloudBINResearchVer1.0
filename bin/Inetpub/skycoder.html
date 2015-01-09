@@ -1603,7 +1603,7 @@ MTRepetition.queue = [];
 					var r = 0;
 					while(r < exec_instructs.length){
 						console.log("begin r: " + r + "\r\n");
-					//for(var i = 0; i < exec_instructs.length; i++){
+					//for(var r = 0; r < exec_instructs.length; r++){
 						/* Reset all basical instruction data */
 						Skyblue_exec_instruct="";
 						instruct_type="";
@@ -1613,7 +1613,7 @@ MTRepetition.queue = [];
 						console.log("before doloop\r\n");
 						
 						
-						/*doloop_instruct:*/ while(1){
+						doloop_instruct: while(1){
 							for(var j = 0; j < exec_instructs[r].length; j++){
 								//exec_instructs[r][j] = exec_instructs[r][j].trim()
 								/*APIdebug.value += exec_instructs[r][j] + " ";*/
