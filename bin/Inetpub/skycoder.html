@@ -1612,8 +1612,8 @@ MTRepetition.queue = [];
 						APIdebugMes = "";
 						console.log("before doloop\r\n");
 						
-						
-						doloop_instruct: while(1){
+						/* While(of loop instruction) only 1 time exec when loopState: 0*/
+						while(1){
 							for(var j = 0; j < exec_instructs[r].length; j++){
 								//exec_instructs[r][j] = exec_instructs[r][j].trim()
 								/*APIdebug.value += exec_instructs[r][j] + " ";*/
@@ -1723,9 +1723,9 @@ MTRepetition.queue = [];
 									r = loopEndIdxFlag + 1;
 									console.log("r: " + r);
 									/* Reset loop instruction data */
-									loopstate = 0;
+									loopState = 0;
 									loopNum = 0;
-									
+									console.log("The end of Loop. \r\n");
 									break;
 								}else{
 									continue;
@@ -1737,7 +1737,7 @@ MTRepetition.queue = [];
 							}
 						
 						}
-						//Of outer While
+						//Of outer While(of loop instruction)
 						r = r + 1;
 						console.log("The lasted r: " + r + " exec_instructs.length: "+ exec_instructs.length +"\r\n");
 					}
