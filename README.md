@@ -36,7 +36,7 @@ Getting Started
 	
 - **Enjoy the environment**
 
-  If you has been prepared embedded devices ([Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial),etc.), you can enjoy the environment at your browser [here](http://127.0.0.1:8189).
+  You have to prepare the embedded devices before your enjoying the environment. If you has not been prepared the embedded devices, you can see the preparing method at [here](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial) for the [Bluesky-Raspbian](https://github.com/not001praween001/Raspberry-Pi-CPS-SN-trial), etc. Then, you can enjoy your environment at your local browsing page from [here](http://127.0.0.1:8189).
 
 The other references
 ---------------------
