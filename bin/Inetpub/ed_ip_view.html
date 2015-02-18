@@ -45,8 +45,10 @@ function handleRequestConnectedStatementSkycoder(req) {
 		
 		if(connstatus == "online"){
 			statICN = "/image/onlineICN.gif";
-		}else{
+		}else if(connstatus == "offline"){
 			statICN = "/image/offlineICN.gif";
+		}else{
+			statICN = "/image/sleepICN.gif";
 		}
 		//alert("edipdat");
 		/*var jsonOBJ = new Object();
