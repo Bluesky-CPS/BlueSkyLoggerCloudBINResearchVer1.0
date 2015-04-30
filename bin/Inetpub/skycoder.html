@@ -16,6 +16,8 @@
 <script src="jquery/jquery-textext-master/src/js/textext.plugin.tags.js"></script>
 
 <script src="jquery-ui.js"></script>
+
+
 <script language="javascript">
 
 
@@ -1043,9 +1045,10 @@ function num(bar){
     	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
     	    <ul class="TabbedPanelsTabGroup">
     	      <li class="TabbedPanelsTab" tabindex="0">: : SkyCoding : :</li>
-    	      <li class="TabbedPanelsTab" tabindex="1">Example code 1</li>
-              <li class="TabbedPanelsTab" tabindex="2">Example code 2</li>
-              <li class="TabbedPanelsTab" tabindex="3">Example code 3</li>
+    	      <li class="TabbedPanelsTab" tabindex="1">Example 1</li>
+              <li class="TabbedPanelsTab" tabindex="2">Example 2</li>
+              <li class="TabbedPanelsTab" tabindex="3">Example 3</li>
+              <li class="TabbedPanelsTab" tabindex="4">JS</li>
   	      	</ul>
     	    <div id="TabbedPanelsContentGroup" class="TabbedPanelsContentGroup">
     	      <div class="TabbedPanelsContent">
@@ -1251,6 +1254,46 @@ end
                 sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
                 sleep 100<br>
             </div>
+            <div class="TabbedPanelsContent">
+            <div id="codingtextTitleBar" align="center" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-weight:bold; width:100%; font-family:Verdana, Geneva, sans-serif; border-bottom: 0px;">
+                	: : SkyCoding (Javascript): : 
+                </div>
+                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-style:italic; width:100%; border-top: 0px;">
+                
+            
+            
+            
+            
+            
+              <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
+
+                
+                    
+function sensornetwork(localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    
+}
+function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    
+}
+              </textarea>
+              <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
+//This is JavaScript coding area. You can type your sensing code with your JavaScript at the browser. The following code is sensing/actuating code.
+for(var i = 22; i < 25; i++){
+    sensornetwork("172.16.4.222", "gpio", "set", ""+i, "1");
+}
+              </textarea>
+            <br>
+                
+                <button onClick="JSrun()" id="JSrun">Execute</button>
+                </div>
+            </div>
   	    </div>
   	  </div>
     </div> 
@@ -1276,6 +1319,56 @@ end
           </div>
 	</div>
 </div>
+
+<!--Begin JS interpreter executor-->
+
+<script>
+	//-----------------------
+	JSoutput = function(a) {
+		var str = "["
+		if (typeof(a)=="object" && a.length) {
+			for (var i=0; i < a.length; i++) 
+				if (typeof(a[i])=="object" && a[i].length) {
+					str += (i==0?"":" ")+"["
+					for (var j=0; j<a[i].length; j++) 
+						str += a[i][j]+(j==a[i].length-1?
+								"]"+(i==a.length-1?"]":",")+"\n":", ");
+				} else str += a[i]+(i==a.length-1?"]":", ");
+		} else str = a;
+		return str;
+	}
+	JSrun = function() {
+		Concurrent.Thread.create(
+			function(){
+				var str;
+				var headerCode = document.getElementById("includedCode");
+				var outnode = document.getElementById("loaded");
+				outnode.value = "";
+				d = new Date().getTime();
+				try {
+					with (Math) {
+						str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
+					}
+				} catch(e) {
+					str = e.name+" at line "+(e.lineNumber-56)+": "+e.message;
+				}
+				//var tnode = document.getElementById("JStiming");
+				//tnode.innerHTML = ""+(new Date().getTime()-d)/1000;
+				if (str != undefined) {outnode.value += str;}
+			}
+		);
+	}
+	
+	
+	
+	/*function sensornetwork(localEDIP, interface, type, portnumber, value){
+		document.getElementById("API_script_ed_ip").value = localEDIP;
+		var Skyblue_exec_instruct = "sensornetwork/" + type + "/" + portnumber + "/" + value;
+		//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+		alert(Skyblue_exec_instruct);
+	}*/
+  </script>
+<!--End JS interpreter executor-->
 
 
 <!--Begin Thread executor-->
@@ -1758,9 +1851,44 @@ MTRepetition.queue = [];
 			return;
 		}
 		
+		var sleepTmp = function() {
+			console.log("sleeping . . .");
+		}
+		var sleepRet;
+		var sleepMs = 0;
+		var Sleep2 = function (ms) {
+			this.ms = ms;
+			
+			Concurrent.Thread.create(
+				function(){
+					//getBSFLogSizeID = setTimeout(getBSFLogSize, ms);
+					//sleepRet = window.setInterval(sleepTmp, ms);
+					//sleepRet = window.setTimeout(sleepTmp, this.ms);
+					var sl = function() {
+						console.log("sleepinssg . . .");
+					}
+					sleepRet = window.setTimeout(sl, this.ms);
+					console.log (this.ms);
+					//window.clearInterval(sleepRet);
+					var d1 = new Date().getTime();
+					var d2 = new Date().getTime();
+					while( d2 < (d1 + ms) ) {
+						d2 = new Date().getTime();
+					}
+					return;
+				}
+			);
+		}
+		
+		var Sleep3 = function(ms){
+			document.devCheater.sleep(ms);	
+			return;
+		}
+		
 
 var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
 </script>
+<applet code="DevCheater.class" name="devCheater" id="devCheater" mayscript="true" height="1" width="1"></applet>
  <!--End coder framework-->   
 </body>
 </html>
