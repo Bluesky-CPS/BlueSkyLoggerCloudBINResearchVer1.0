@@ -653,13 +653,18 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 			var yBias = 15;
 			
 			dragBarObj.onmousedown = function() { dragBarObj.isMouseDown = true;  };
-			dragBarObj.onmouseup   = function() { dragBarObj.isMouseDown = false; 
+			dragBarObj.onmouseup   = function() { 
+				dragBarObj.isMouseDown = false; 
 				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
 				edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
 				
 				
 				sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
 				networkVS = new vis.Network(container, edNetworkData, options);
+				networkVS.on('select', function (properties) {
+					console.log('selected nodes: ' + properties.nodes);
+					
+				});
 			};
 			dragBarObj.onmouseout  = function(e) { 
 				if(dragBarObj.isMouseDown){
@@ -778,7 +783,7 @@ function refreshCanvas(){
 	right: 0;
 	bottom: 0;
 	width: 100%;
-	height:30px;
+	height:45px;
 	margin-top: 0;
 	background-color:#FFFFFF;
 	border-bottom: groove;
@@ -1490,8 +1495,8 @@ for(var i = 22; i < 25; i++){
 	</div>
   
   <div id="footerContainer">
-  	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; height:50px; position:static; cursor:n-resize"><img src="image/dot_list.jpg"> Embedded devices connecting graph
-          </div>
+  	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; border-top: #333 5px groove; height:30px; position:static; cursor:n-resize; vertical-align:text-bottom; padding-top: 10px" align="center"><span style="vertical-align:bottom"><img src="image/dot_list.jpg">&nbsp;&nbsp;&nbsp;&nbsp;Embedded devices connecting graph&nbsp;&nbsp;&nbsp;&nbsp;<img src="image/dot_list.jpg"></span>
+</div>
           <div id="edNetworkContainer" style="position:static; border:0px; height: 218px;">
     	    <span id="edNetwork" style=" height:100%;"></span>
           </div>
@@ -1540,6 +1545,9 @@ for(var i = 22; i < 25; i++){
 			  /*networkVS.on('resize', function(prop){
 				console.log("width:" + width + " height:" + height);
 			  });*/
+			  networkVS.on('select', function (properties) {
+			 	 console.log('selected nodes: ' + properties.nodes);
+			  });
           </script>
   </div>  
     <div id="ed_ip_graph_container">
