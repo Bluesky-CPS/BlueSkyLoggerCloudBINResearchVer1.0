@@ -176,13 +176,22 @@ function handleGetEDdataForGraph(req){
 	
 		
 	/*{id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
-                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},*/
+                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},
+				Hardware-My-Computer-3-icon
+				*/
 				
-				
+		
+	console.log(document.URL + "\r\n" + window.location.pathname);
+	var URL_STR = document.URL, urlPathname = window.location.pathname;
+	var  centralNodeURL = URL_STR.replace(urlPathname, " ");
+	console.log(centralNodeURL);
+	
 	nodes = [
-                {id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'}
+                {id: 0, label: 'Your Browser', image: DIR1 + 'Hardware-My-Computer-3-icon.png', shape: 'image'},
+				{id: 1, label: 'Central Node\n' + centralNodeURL, image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'}
     ];
 	edges = [
+			 {from: 0, to: 1, length: LENGTH_MAIN*2.5}
     ];
 
 	var pushDat;
@@ -209,8 +218,6 @@ function handleGetEDdataForGraph(req){
 		pushDat = {from: 1, to: (i+2), length: LENGTH_MAIN};
 		edges.push(pushDat);
 	}
-	/*pushDat = {from: 1, to: (i+1)};
-	edges.push(pushDat);*/
 	
 	edNetworkData = {
 		nodes: nodes,
@@ -1492,7 +1499,7 @@ for(var i = 22; i < 25; i++){
 		  <script type="text/javascript">
 			  var DIR1 = 'vis/examples/network/img/refresh-cl/';
 			  var DIR2 = 'image/';
-			  var LENGTH_MAIN = 150;
+			  var LENGTH_MAIN = 160;
 			  var LENGTH_SUB = 50;
               // create an array with nodes
               var nodes = [
