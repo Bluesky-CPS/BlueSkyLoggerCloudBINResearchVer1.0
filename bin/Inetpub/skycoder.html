@@ -1264,24 +1264,45 @@ end
             
             
             
-            
+<script>
+function gainer_aout(localEDIP, oSignalValArr){
+	document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+function gainers_aout(LE_domain, localEDIP, oSignalValArr){
+	document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+
+
+function actuatornetwork(localEDIP, actuatorSigVal){
+    gainer_aout(localEDIP, actuatorSigVal);
+}   
+function actuatornetworks(LE_domain, localEDIP, actuatorSigVal){
+    gainers_aout(LE_domain, localEDIP, actuatorSigVal);
+} 
+</script>
               <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
 
                 
-                    
+
+              
 function sensornetwork(localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
     var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-    
 }
 function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
     var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-    
 }
+
               </textarea>
               <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
 //This is JavaScript coding area. You can type your sensing code with your JavaScript at the browser. The following code is sensing/actuating code.
