@@ -1,0 +1,2120 @@
+<html>
+<head><title>=== SkyCoder framework Environment (Trial version) ===</title>
+<link rel="stylesheet" type="text/css" media="screen" href="css/stylesheet.css" />
+
+<script src="ms-Dropdown/js/jquery/jquery-1.9.0.min.js"></script>
+
+<!-- <msdropdown> -->
+<link rel="stylesheet" type="text/css" href="ms-Dropdown/css/msdropdown/dd.css" />
+<link rel="stylesheet" type="text/css" href="ms-Dropdown/css/msdropdown/skin2.css" />
+<script src="ms-Dropdown/js/msdropdown/jquery.dd.min.js"></script>
+<script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
+<!-- </msdropdown> -->
+
+<script src="jquery/jquery-textext-master/src/js/textext.core.js"></script>
+<script src="jquery/jquery-textext-master/src/js/textext.plugin.prompt.js"></script>
+<script src="jquery/jquery-textext-master/src/js/textext.plugin.tags.js"></script>
+
+<script src="jquery-ui.js"></script>
+
+
+<script language="javascript">
+
+
+$(function() {
+	$( "#loaded_container" ).draggable();
+	$( "#ed_ip_view_container" ).draggable();
+	$( "#animation_container" ).draggable();
+	$( "#animation_container" ).resize(function(){ 
+		console.log( $("#animation_container").height() + " sss\r\n" ); 
+	}); 
+})
+var animation_area_container_console = $('#animation_area_container_scroll');
+
+
+function downloadLog(type){
+	var edIP = document.getElementById('ed_ip');
+	window.open("embeddedlog?instruction=DOWNLOADLOG&opt1=" + edIP.value + "&opt2=" + type );
+}
+function openxml(isMultipart){
+	var writeroot = document.getElementById('loaded'); 
+	var dateElement = document.getElementById('jsonDate');
+	var numElement = document.getElementById('jsonNum');
+	writeroot.innerHTML = "";
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+	var edIP = document.getElementById('ed_ip');
+	//window.open(edIP.value + ".xml");
+	if(!isMultipart){
+		window.open("embeddedlog?instruction=GETLOG&opt1=" + edIP.value + "&opt2=xml" );
+	}else{
+		window.open("embeddedlog?instruction=GETLOG&opt1=" + edIP.value + "&opt2=xml&opt3=" + dateElement.value + "&opt4=" +  numElement.value);
+	}
+}
+function handleRequest2(req) {
+	var writeroot = document.getElementById('loaded');
+	writeroot.innerHTML = "Wait...";
+	writeroot.innerHTML = req.responseText;
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+}
+function handleRequestAPI_Script(req) {
+	var writeroot = document.getElementById('loaded');
+	//var res = req.responseText;
+	writeroot.innerHTML = "Wait...";
+	writeroot.innerHTML = req.responseText;
+	
+	writeroot.style.display = 'block';
+	//writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+	
+	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
+	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
+}
+
+
+
+var isNoDevice = 0;
+var isLoggingByAnother = 0;
+var loggingState = "";
+function handleRequestStartAndStopLogging(req) {
+	var writeroot = document.getElementById('loaded'); 
+	var JSONtxt = req.responseText;
+	var JSONParse = JSON.parse(JSONtxt);
+	var resTXT = "";
+	if(JSONParse.ETLog.logging.state == "started"){
+		resTXT = "Embedded device is logging to LCP.";
+		isNoDevice = 0;
+		isLoggingByAnother = 0;
+		speak("Logging now.");
+	}else if(JSONParse.ETLog.logging.state == "stopped"){
+		resTXT = "Embedded device has stopped logging data to LCP.";
+		isNoDevice = 0;
+		isLoggingByAnother = 0;
+	}else if(JSONParse.ETLog.logging.state == "logging"){
+		resTXT = "Device has been logging by another. You can suddenly stop this session by [stoplogging API].";
+		isLoggingByAnother = 1;
+		//speak("Sorry, the target device has been logging. Please stop previous logging session before start it again.");
+	}else{
+		resTXT = "No Embedded device connection.";
+		isNoDevice = 1;
+	}
+	writeroot.innerHTML = resTXT;
+
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+
+
+}
+function handleRequestAnalysisContentPieces(req) {
+	var writeroot = document.getElementById('loaded');
+	var JSONtxt = req.responseText;
+	var JSONParse = JSON.parse(JSONtxt);
+	writeroot.innerHTML = JSONParse.ETLog.FileName + " is splited to " + JSONParse.ETLog.CONTENTPIECES + " piece(s)";
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+
+}
+function handleRequestConnectedStatement(req) {
+	var writeroot = document.getElementById('loaded');
+	var selectBox = document.getElementById('ed_ip');
+	var JSONtxt = req.responseText;
+	var JSONParse = JSON.parse(JSONtxt);
+	var len = JSONParse.ETLog.EDConnStatement.length;
+	var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+	var selectLen = selectBox.length;
+	
+	for(var i = 0; i < selectLen; i++){
+			selectBox.remove(0);
+	}
+	selectBox.refresh();
+	var tmp = "";
+	var selectedIndex = 0;
+	var statICN = "/image/offlineICN.gif";
+	for(var i = 0; i < len; i++){
+		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
+		
+		if(connstatus == "online"){
+			statICN = "/image/onlineICN.gif";
+		}else if(connstatus == "offline"){
+			statICN = "/image/offlineICN.gif";
+		}else{
+			statICN = "/image/sleepICN.gif";
+		}
+		
+		var jsonOBJ = new Object();
+		jsonOBJ.text = edipdat + " (" + connstatus + ")";
+		jsonOBJ.value = edipdat;
+		jsonOBJ.description = 'Device type: ' + edtype;
+		jsonOBJ.image = statICN;
+		jsonOBJ.className = '';
+		jsonOBJ.title = '';
+		
+		selectBox.add(jsonOBJ);
+
+		if(connstatus == "online"){
+			selectedIndex = selectBox.length - 1;
+		}
+	}
+	selectBox.set("selectedIndex",selectedIndex);
+	//selectBox.options[selectedIndex].selected = true;
+	selectBox.refresh();
+}
+
+function handleGetEDdataForGraph(req){
+	var JSONtxt = req.responseText;
+	var JSONParse = JSON.parse(JSONtxt);
+	var len = JSONParse.ETLog.EDConnStatement.length;
+	var statICN = "/image/offlineICN.gif";
+	
+		
+	nodes = [
+                {id: 1, label: 'Central Node'}
+    ];
+	edges = [
+    ];
+
+	var pushDat;
+	var i = 0;
+	for(i = 0; i < len; i++){
+		
+		
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		
+		if(connstatus == "online"){
+			statICN = "/image/onlineICN.gif";
+		}else if(connstatus == "offline"){
+			statICN = "/image/offlineICN.gif";
+		}else{
+			statICN = "/image/sleepICN.gif";
+		}
+		
+		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP + "\n[" + JSONParse.ETLog.EDConnStatement[i].EDCNAME + "]";
+		
+		
+		
+		pushDat = {id: (i + 2), label: edipdat};
+		nodes.push(pushDat);
+		pushDat = {from: 1, to: (i+2)};
+		edges.push(pushDat);
+	}
+	/*pushDat = {from: 1, to: (i+1)};
+	edges.push(pushDat);*/
+	
+	edNetworkData = {
+		nodes: nodes,
+		edges: edges,
+	};
+	
+	console.log(edNetworkData);
+}
+
+var isLogging = 0;
+function handleRequestGetBSFLogSize(req) {
+	var writeroot = document.getElementById('loaded');
+	var JSONtxt = req.responseText;
+	var describeTXT = "";
+	if(isNoDevice == 0){
+		if(isLogging == 1){
+			describeTXT = "Embedded device is logging to LCP. . . .";
+		}else{
+			
+			describeTXT = "Embedded device has stopped logging data to LCP";
+			//describeTXT += "<br>Logging time usage: " + ((stopLoggingTime - startLoggingTime)/1000) + " s<br>";
+		}
+		if(JSONtxt > 1024){
+			JSONtxt /= 1024;
+			JSONtxt = Math.round(JSONtxt*100);
+			JSONtxt /= 100;
+			JSONtxt += "KB"
+		}
+		describeTXT += "<br>BSF log file size on server: " + JSONtxt;
+		describeTXT += "<br>Logging time usage: " + (((new Date).getTime() - startLoggingTime)/1000) + " s<br>";
+	}else{
+		describeTXT = "No Embedded device connection.";
+	}
+
+	writeroot.innerHTML = describeTXT;
+	writeroot.style.display = 'block';
+	writeroot.style.top = '191';
+	writeroot.style.marginTop = '0';
+}
+
+function handleRequest(req) {
+	var writeroot = document.getElementById('loaded');
+	writeroot.innerHTML = req.responseText;
+	writeroot.style.display = 'block';
+}
+function handleDownload(req) {
+/*	var writeroot = document.getElementById('loaded');
+	
+	//writeroot.innerHTML = req.responseText;
+	writeroot.innerHTML = "iiiii";
+	writeroot.style.display = 'block';
+	//alert("LO");
+	var fd = fopen("~/JSON.json", 3);
+	if(fd != -1){
+		fwrite(fd, req.responseText);
+		fclose(fd);
+	}else{
+		alert("sss");
+	}
+alert("LOs");
+	writeroot.style.display = 'block';*/
+}
+function doExtract(doType){
+	var statusElement = document.getElementById('loaded');
+	statusElement.innerHTML = "<table border=0 style='border-collapse: collapse'><tr><td>Wait</td><td><img src='wait_dot.gif'></td></table>";
+	
+	if(doType == "xml"){
+		speak('System is extracting BSF log to xml log!');
+		sendRequest2('extractlog/xml',handleRequest2,'ETLOG');
+	}else if(doType == "json"){
+		speak('System is extracting BSF log to json log!');
+		sendRequest2('extractlog/json',handleRequest2,'ETLOG');
+	}else if(doType == "cts"){
+		speak('System is extracting BSF log to traditional context switch log!');
+		sendRequest2('extractlog/cts',handleRequest2,'ETLOG');
+	}else if(doType == "kcts"){
+		speak('System is extracting BSF log to lasted context switch log!');
+		sendRequest2('extractlog/kcts',handleRequest2,'ETLOG');
+	}
+}
+var cnt = 0;
+var startLoggingTime = 0;
+var stopLoggingTime = 0;
+
+
+function sendRequestLogging(url,callback,postData){
+	if(url=="startlogging"){
+		startLoggingTime = (new Date()).getTime();
+	}
+	if(url=="stoplogging"){
+		stopLoggingTime = (new Date()).getTime();
+	}
+	cnt = 0;
+	sendRequest2(url,callback,postData);
+}
+//<!--sensornetwork/set/SignalType/PinNumber/OnOffDigitNumber-->
+function motor(onOff){
+	if(onOff == "on"){
+		//sensornetwork/set/SignalType[as]/NumberOfAllPins/dataEachPinBased10
+		sendRequest2('sensornetwork/set/as/8/0,255,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/1',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/1',handleRequest2,'ETLOG');
+	}else if(onOff == "off"){
+		sendRequest2('sensornetwork/set/as/8/0,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/0',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/0',handleRequest2,'ETLOG');
+	}else if(onOff == "right"){
+		sendRequest2('sensornetwork/set/as/8/255,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/1',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/1',handleRequest2,'ETLOG');
+	}else if(onOff == "left"){
+		sendRequest2('sensornetwork/set/as/8/0,255,0,0,0,0,0,0',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/0/1',handleRequest2,'ETLOG');
+		//sendRequest2('sensornetwork/set/a/1/0',handleRequest2,'ETLOG');
+
+		//sendRequest2('sensornetwork/set/motor/0/2',handleRequest2,'ETLOG');
+	}
+
+}
+
+function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod, username, password) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	//var API_Script_edIP = document.getElementById('API_script_ed_ip');
+	var API_Script_edIP = edIP;
+	//alert(API_Script_edIP.value);
+	var method = httpMethod;
+	
+	//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
+	communicationTxID++;
+	var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+	
+	req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
+	req.timeStamp = timeStamp;
+	req.id = communicationTxID;
+	req.instruction = instruction;
+	req.LE_domain = LE_domain;
+	req.edIP = API_Script_edIP;
+
+	if (httpMethod){
+		req.getRequestHeader = function(){
+			var ret = method + " " + LE_domain + instruction + " HTTP/1.1\r\n" + "Host: " + document.URL + "\r\n";
+			ret += "Content-type" + ": " + "application/x-www-form-urlencoded";
+			req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+			
+			if(LE_domain!=""){
+				//req.setRequestHeader('Host', 'LE_domain');
+			}
+			return ret;
+		}
+	}
+	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
+	req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			//----------------stepBehaviors section.----------------
+			addCommunicationTraceDivElement("rx", "Error:" + req.status, req.id, req);
+			//var animation_area_container_console = $('#animation_area_container_scroll');
+			/*animation_area_container_console.scrollTop(
+				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+			);*/
+			//----------------Show data in data viewer section.----------------
+			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
+			return;
+		}
+		/*self.onComplete = function(req){
+			console.log("self.onComplete()\r\n");
+		};*/
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(httpMethod);
+
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(instruction == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(instruction == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+function sendRequest2(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var edIP = document.getElementById('ed_ip');
+	var method = postData;
+	req.open(method,edIP.value + '/' + url,true);
+
+
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(url == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(url == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+
+function getJSONCallback(getURL, callback){
+	/*Wait until Done state of the AJAX.*/
+	$.getJSON( getURL ).done(
+		function(returndat){
+			callback(returndat);
+		}
+	)
+}
+var getBrowserServerTimeDifference = function(serverURL) {
+	var def = $.Deferred();
+	
+	//var a;
+	
+	$.getJSON( serverURL )
+	.done(function(etlogJSON){
+	//getJSONCallback(serverURL, function(etlogJSON){
+		var browserTime = new Date();
+		var browserNanoTime = browserTime.getTime();
+		//Get the differece time.
+		document.difftime = ((browserNanoTime) - (etlogJSON.ETLog.server.time));
+		//console.log("document.difftime: " + document.difftime);
+		def.resolve(JSON.parse(etlogJSON));
+		
+	});
+	return def;
+	//});
+}
+
+function doSigninoutRequest(url,callback,postData,noticeContainer) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	req.open(method,url,true);
+	
+	if (postData){
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.send(postData);
+	}
+		
+	console.log("send: " + postData);
+	req.noticeContainerID = noticeContainer;
+	req.onreadystatechange = function () {
+		console.log('onreadystatechenge===================\r\n');
+		if (req.readyState == 1){//unsent
+			console.log('unsent state\r\n');
+			return;
+		}
+		if (req.readyState == 2){//opened
+			console.log('opened state\r\n');
+			if(postData){
+				req.send(postData);
+			}
+			return;
+		}
+		if (req.readyState == 3){//header received
+			console.log('header received state\r\n');
+			return;
+		}
+		if (req.readyState == 4){//done
+			console.log('done state\r\n');
+			if (req.status != 200 && req.status != 304) {
+				console.log('HTTP error ' + req.status);
+				return;
+			}
+			callback(req);
+			return;
+		}
+		//if (req.readyState != 4) return;
+		
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
+function handleSignin(req) {
+	var noticeContainer = document.getElementById(req.noticeContainerID);
+	var writeroot = document.getElementById("loaded");
+	var serverResponse = req.responseText;
+	writeroot.innerHTML = serverResponse;
+	
+	var JSONParse = JSON.parse(serverResponse);
+	console.log(JSONParse.ETLog.login.username + "<br>" + JSONParse.ETLog.login.yourIP + "<br>"  + JSONParse.ETLog.login.yourCNAME + "\r\n");
+	var loginResult = JSONParse.ETLog.login.result;
+	if(loginResult == "true"){
+		//var len = JSONParse.ETLog.EDConnStatement.length;
+		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCNAME + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
+	}else{
+		
+	}
+}
+function handleSignout(req) {
+	var noticeContainer = document.getElementById(req.noticeContainerID);
+	var writeroot = document.getElementById("loaded");
+	var serverResponse = req.responseText;
+	writeroot.innerHTML = serverResponse;
+	
+	var JSONParse = JSON.parse(serverResponse);
+	
+	var logoutResult = JSONParse.ETLog.logout.result;
+	if(logoutResult == "true"){
+		//var len = JSONParse.ETLog.EDConnStatement.length;
+		noticeContainer.innerHTML = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                    <form action=\"skycoder.html\" method=\"post\" id=\"singinform\">                    <tr>                        <td width=\"60\" class=\"loginTD\" valign=\"top\">                            <div class=\"loginTitleTxt\" style=\"padding-left: 4px;\">                                &nbsp;Username                             </div>                            <div id=\"loginInput\" style=\"padding-right: 4px; padding-left: 4px;\">                                <input name=\"user\" type=\"text\" id=\"user\" size=\"10\" value=\"guest\">                            </div>                        </td>                        <td width=\"67\" class=\"loginTD\" valign=\"top\"><div class=\"loginTitleTxt\">&nbsp;Password </div>                          <div id=\"loginInput\" style=\"padding-right: 4px;\">                            <input name=\"pass\" type=\"password\" id=\"pass\" size=\"10\" value=\"guest\">                          </div></td>                        <td width=\"62\" class=\"loginTD\" valign=\"top\" style=\"padding-right: 8px;\"><div class=\"loginTitleTxt\"> &nbsp;&nbsp; </div>                          <div id=\"loginInput\">                            <input onMouseOver=\"showMenuBar('skyCoderDetail','',90);\" onMouseMove=\"showMenuBar('skyCoderDetail','',90);\" onMouseOut=\"\" type=\"button\" name=\"login_btn\" id=\"login_btn\" value=\"Sign In\" onClick=\"doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');\">                            <input type=\"hidden\" name=\"mode\" value=\"signin\" id=\"mode\">                          </div>                        </td>                    </tr>                    </form>                    <tr>                        <td class=\"loginTD\" valign=\"top\" colspan=\"3\">                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">Do you forgot the account?</a></div>                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">How can I get the account?</a></div>                        </td>                    </tr>                </table>";
+	}else{
+		
+	}
+}
+
+function handleDiffTime(req){
+	var browserTime = new Date(now);
+	console.log("browserTime.getTime(): " + browserTime.getTime());
+	console.log("browserTime.getMilliseconds(): " + browserTime.getMilliseconds());
+	var serverResponse = req.responseText;
+	var JSONParse = JSON.parse(serverResponse);
+	var serverTime = JSONParse.server.time;
+	
+	req.timeDifference = serverTime;
+}
+
+function sendRequest(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	req.open(method,url,true);
+	req.setRequestHeader('User-Agent','XMLHTTP/1.0');
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			alert('HTTP error ' + req.status);
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
+var XMLHttpFactories = [
+	function () {return new XMLHttpRequest()},
+	function () {return new ActiveXObject("Msxml2.XMLHTTP")},
+	function () {return new ActiveXObject("Msxml3.XMLHTTP")},
+	function () {return new ActiveXObject("Microsoft.XMLHTTP")}
+];
+function createXMLHTTPObject() {
+	var xmlhttp = false;
+	for (var i=0;i<XMLHttpFactories.length;i++) {
+		try {
+			xmlhttp = XMLHttpFactories[i]();
+		}
+		catch (e) {
+			continue;
+		}
+		break;
+	}
+	return xmlhttp;
+}
+
+var getBSFLogSizeID = 0;
+var getBSFSizeCNT = 0;
+
+function startGetBSFLogSize(){
+	getBSFSizeCNT = 0;
+	isLogging =1;
+	for(var i = 0; i < 100000000; i++){}
+	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+	getBSFLogSizeID = setTimeout(getBSFLogSize, 0);
+	//alert("fffff");
+}
+function getBSFLogSize(){
+	getBSFSizeCNT++;
+	if(getBSFSizeCNT % 500 == 0){
+		sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+	}
+	getBSFLogSizeID = setTimeout(getBSFLogSize, 0);
+}
+function stopGetBSFLogSize(){
+	isLogging = 0;
+	clearTimeout(this.getBSFLogSizeID);
+	getBSFSizeCNT = 0;
+	for(var i = 0; i < 100000000; i++){}
+	//alert(i);
+	//nsWaitForDelay(10);
+	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
+}
+function initOnload(){
+	initFooterDragEventListener("footerDragBar", "footerContainer");
+	
+	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	//The difference time will be store in "document.difftime"
+	var timeDifference = getBrowserServerTimeDifference("/ETLog?instruction=time&opt1=this");
+	/*dd = new Date();
+	var dDate = (dd.getDate() < 10)?("0" + dd.getDate()):(dd.getDate()+"");
+	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
+	var dDateOBJ = document.getElementById("jsonDate");
+	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
+}
+
+var prevMouse = {x: 0, y: 0};
+function initFooterDragEventListener(dragBarObjID, actionObjID){
+	var dragBarObj;
+	var actionObj;
+	
+	if(dragBarObjID){
+		actionObjID = actionObjID?actionObjID:dragBarObjID;
+		
+		dragBarObj = document.getElementById(dragBarObjID);
+		actionObj = document.getElementById(actionObjID);
+		
+		if(dragBarObj){
+			
+			dragBarObj.isMouseDown = false;
+			
+			var yBias = 15;
+			
+			dragBarObj.onmousedown = function() { dragBarObj.isMouseDown = true;  };
+			dragBarObj.onmouseup   = function() { dragBarObj.isMouseDown = false; 
+				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
+				edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
+				
+				
+				sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+				networkVS = new vis.Network(container, edNetworkData, options);
+			};
+			dragBarObj.onmouseout  = function(e) { 
+				if(dragBarObj.isMouseDown){
+					var mouse = {x: 0, y: 0};
+				
+					mouse.x = e.clientX || e.pageX; 
+					mouse.y = e.clientY || e.pageY;
+					
+					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var mouseCurrY = parseInt(mouse.y);
+					
+					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+					//networkVS.setSize("100%", "100%");
+				}
+			};
+			dragBarObj.onmousemove = function(e) { 
+				if(dragBarObj.isMouseDown) { 
+					console.log("drag\r\n");
+					
+					var mouse = {x: 0, y: 0};
+					var mouseCurrY = parseInt(mouse.y);
+					
+					mouse.x = e.clientX || e.pageX; 
+					mouse.y = e.clientY || e.pageY;
+						
+					var dragBarObjStyle = window.getComputedStyle(dragBarObj), dragBarObjHeight = dragBarObjStyle.getPropertyValue("height");
+					var actionObjStyle = window.getComputedStyle(actionObj), actionObjHeight = actionObjStyle.getPropertyValue("height");
+					
+					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var screenDH = parseInt($(document).height()); // returns height of HTML document
+					var mouseCurrY = parseInt(mouse.y);
+					var mousePrevY = parseInt(prevMouse.y);
+					var footerRefFromTopDiff = parseInt(screenVH - mousePrevY);
+					
+					
+					console.log("dragBarObjHeight: " + dragBarObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
+					console.log("   actionObjHeight: " + parseInt(actionObjHeight));
+					console.log("   dragBarObjHeight: " + parseInt(dragBarObjHeight));
+					console.log("   screenVH: " + parseInt(screenVH));
+					console.log("   screenDH: " + parseInt(screenDH));
+					console.log("   yBias: " + parseInt(yBias));
+					console.log("   footerRefFromTopDiff: " + parseInt(footerRefFromTopDiff));
+					
+					
+					
+					console.log("actionObjHeight: " + actionObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
+					
+					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+					
+					//networkVS.setSize("100%", "100%");
+					
+					prevMouse = mouse;
+				} 
+			};
+		}
+	}
+}
+var footerDrag = function(objID){
+	var actionObjID = "test";
+	console.log("actionObjID: " + this.actionObjID + "objID: " + objID + " action.....\r\n");
+}
+
+var isCameraShowing = 0;
+var lock = 0;
+var refCanvasID;
+var ctx = document.getElementById('cameraCanvas').getContext('2d');
+var img = new Image();
+function showCamera(srcDat){
+	while(lock == 1){}
+	var cameraContainer = document.getElementById("camera");
+	ctx = document.getElementById('cameraCanvas').getContext('2d');
+	img = new Image();
+	if(isCameraShowing == 0){
+		cameraContainer.style.display = 'block';
+		ctx.textAlign = 'right';
+		img.onload = function() {
+			ctx.drawImage(img, 0, 0);
+		};
+		img.src = srcDat;
+		refCanvasID = window.setInterval("refreshCanvas()", 10);
+		isCameraShowing = 1;
+	}else{
+		window.clearInterval(refCanvasID);
+		cameraContainer.style.display = 'none';
+		isCameraShowing = 0;
+	}
+}
+function refreshCanvas(){
+	ctx.drawImage(img, 0, 0);
+}
+</script>
+
+<style>
+[draggable=true] {
+    cursor: move;
+}
+#headerContainer {
+	z-index: 3000;
+}
+#headerContainer {
+	position: fixed;
+	z-index: 3000;
+	left: 0;
+	right: 0;
+	top: 0;
+	width: 100%;
+	height:50px;
+	margin-top: 0;
+	background-color:#000;
+	border-bottom: groove;
+}
+#footerContainer {
+	position: fixed;
+	z-index: 3000;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height:30px;
+	margin-top: 0;
+	background-color:#FFFFFF;
+	border-bottom: groove;
+}
+#titleTXT {
+	text-shadow: 1px 1px 1px #16366c;
+	font-weight: bold;
+	font-size: 19px;
+	color: #fefedb;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	padding-right: 0px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+#titleTXT2 {
+	text-shadow: 2px 2px 2px #16366c;
+	font-weight: bold;
+	font-size: 8px;
+	color: #FFFFFF;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	padding-right: 0px;
+	font-family:Verdana, Geneva, sans-serif;
+}
+#menuBar {
+	margin: 0px;
+	height: 30px;
+	border: #000000 1px solid;
+	vertical-align: middle;
+	padding: 0px;
+	text-align:left;
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:15px;
+	background-color:#ffffff;
+	box-shadow: 10px 2px 3px 0px rgba(0,0,0,0.5);
+}
+#loaded_container {
+	position:absolute;
+	z-index: 3;
+	left: 571px;
+	right: 0;
+	top: 18px;
+	width: 400px;
+	height:140px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF;
+	word-wrap:break-word;
+	display: block;
+}
+#loaded_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+#loaded_container .loaded{
+		
+}
+#loaded_scroll{
+	height:118px;
+	overflow: auto;
+	width: 100%;
+}
+#codingtextdiv {
+	position:absolute;
+	z-index: 2;
+	left: 0;
+	right: 0;
+	top: 61px;
+	width: 100%;
+	height:100%;
+	margin-top: 0;
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	padding: 0;
+}
+
+#camera {
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 171;
+  height:160;
+  margin-top: 0;
+  text-align:right;
+}
+#cameraCanvas {
+  position: relative;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin-top: 0;
+  text-align:right;
+}
+tr#table_title {
+	color:#000;
+	font-family:"Times New Roman", Times, serif;
+	font-size:16px;
+}
+body {
+	background-color: #e3d6ee;
+	background-image:url(sky-bg.jpg);
+	background-repeat:repeat;
+	background-repeat: no-repeat;
+	background-position: top center;
+	background-attachment: fixed
+}
+</style>
+<link href="down.css" rel="stylesheet" type="text/css" />
+<script src="cssmenu.htc" type="text/javascript"></script>
+
+<script>
+$(document).ready(function(e) {
+	$("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}); //rounded corner is off now
+});
+</script> 
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.stepContentContainer{
+	border: 0px;
+}
+.stepContentContainer:hover{
+	border: #000 1px solid;
+}
+.titleSendInstTimestamp{
+	background-color: #3f67a9;
+	color:#FFF;
+	padding: 3px;
+}
+.descriptSendInstTimestamp{
+	background-color: #c3e2e7;
+	color:#000;
+	padding: 5px;
+	padding-left: 10px;
+	word-wrap:break-word;
+}
+.titleReceivedResTimestamp{
+	background-color: #a93f3f;
+	color:#FFF;
+	padding: 3px;
+}
+.descriptReceivedResTimestamp{
+	background-color: #e7c3c3;
+	color:#000;
+	padding: 5px;
+	padding-left: 10px;
+	word-wrap:break-word;
+}
+.debugMessageLine {
+	padding-left: 10px;
+	
+}
+#animation_container {
+	position:absolute;
+	z-index: 3;
+	left: 572px;
+	right: 0;
+	top: 195px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF;
+	resize: vertical;
+	min-width: 400px;
+    min-height: 247px;
+    max-width: 401px;
+    max-height: 900px;
+	overflow: hidden;
+	display: block;
+}
+#animation_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+#animation_area_container_scroll{
+	height:218px;
+	overflow-y: auto;
+	overflow-x: none;
+	width: 100%;
+	resize: none;
+}
+#APIscript_debug_scroll{
+	height:80px;
+	overflow-y: auto;
+	overflow-x: none;
+	width: 100%;
+	resize: none;
+}
+#div_x_scroll_container{
+	overflow-y: none;
+	overflow-x: auto;
+	width: 100%;
+	resize: none;
+}
+#div_y_scroll_container{
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: none;
+	resize: none;
+}
+#ed_ip_view_container {
+	position:absolute;
+	z-index: 1;
+	left: 571px;
+	right: 0;
+	top: 473px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF;
+	display: block;
+}
+#ed_ip_view_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+
+
+
+
+#TabbedPanelsContentGroup {
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+#TabbedPanelsContentGroup:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+/*about menuBar*/
+#menuElement{
+	list-style: none;
+	
+}
+/*about skyCoderDetail*/
+#skyCoderDetail{
+	z-index: 100;
+	border-bottom:groove;
+	border-top: 0px;
+	background-color: #88c0d7;
+	padding: 3px;
+	border-top: #000000 1px dotted;
+	word-wrap:break-word;
+	height: 80px;
+}
+.loginTD {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+	height: 30px;
+	word-wrap:break-word;
+}
+.loginTitleTxt {
+	text-shadow: 1px 1px 1px #16366c;
+	color: #FFF;
+	padding-bottom: 4px;
+}
+.loginOptionalTxtContainer {
+	padding-left: 10px;
+	padding-bottom: 4px;
+}
+.loginLink {
+	text-decoration: underline;
+	color:#FFF;
+	text-shadow: 1px 1px 1px #000000;
+}
+.loginLink:hover {
+	text-decoration: none;
+	color:#FF0;
+	text-shadow: 1px 1px 1px #000000;
+}
+-->
+</style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" rightmargin="0" bottommargin="0" onLoad="javascript:initOnload(); document.getElementById('skyCoderDetail').style.display='none';">
+<!--Begin header & menu-->
+<div id="headerContainer" align="center">
+<div align="center" style=" background-color:#e9e9eb">
+<!--<font color="#FFFFFF">111</font>-->
+<div align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+      <td width="190" bgcolor="#88c0d7"><div id="titleTXT" style="cursor: hand;" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOver="showMenuBar('skyCoderDetail','',90); document.getElementById('user').focus(); document.getElementById('user').select()" onMouseOut="">SkyCoder</div>
+      <div id="titleTXT2">A CPS coding framework (Trial)</div></td>
+      <td width="10" bgcolor="#b4ced9">&nbsp;</td>
+      <td width="10" bgcolor="#cfdce1">&nbsp;</td>
+      <td align="right"><div align="right">
+      <table border="0" cellpadding="0" cellspacing="0" width="815" align="right">
+        <tr>
+          <td>
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+            <tr>
+            <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar('menuBar', '', 45);" onMouseOver="showMenuBar('menuBar', '', 45);" onMouseOut="">Main menu</div></td>
+              <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
+              <td width="210" valign="middle"><span style="vertical-align:middle">
+                <select id="ed_ip" name="ed_ip">
+                  <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected> Device IP: 172.16.4.127 (Offline) </option>
+                </select>
+              </span></td>
+              <td width="279" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div></td>
+            </tr>
+          </table></td>
+        </tr>
+      </table></div></td>
+    </tr>
+</table>
+</div>
+<!--This is a skyCoder explaination area-->
+<div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOver="showMenuBar('skyCoderDetail','',90);" align="left">
+  
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td>
+        	<!--Begin Login div table-->
+            <div id="loginCapabalityContainer">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <form action="skycoder.html" method="post" id="singinform">
+                    <tr>
+                        <td width="60" class="loginTD" valign="top">
+                            <div class="loginTitleTxt" style=" padding-left: 4px;">
+                                &nbsp;Username 
+                            </div>
+                            <div id="loginInput" style="padding-right: 4px; padding-left: 4px;">
+                                <input name="user" type="text" id="user" size="10" value="guest">
+                            </div>
+                        </td>
+                        <td width="67" class="loginTD" valign="top"><div class="loginTitleTxt">&nbsp;Password </div>
+                          <div id="loginInput" style="padding-right: 4px;">
+                            <input name="pass" type="password" id="pass" size="10" value="guest">
+                          </div></td>
+                        <td width="62" class="loginTD" valign="top" style="padding-right: 8px;"><div class="loginTitleTxt"> &nbsp;&nbsp; </div>
+                          <div id="loginInput">
+                            <input onMouseOver="showMenuBar('skyCoderDetail','',90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOut="" type="button" name="login_btn" id="login_btn" value="Sign In" onClick="doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');">
+                            <input type="hidden" name="mode" value="signin" id="mode">
+                          </div>
+                        </td>
+                    </tr>
+                    </form>
+                    <tr>
+                        <td class="loginTD" valign="top" colspan="3">
+                            <div class="loginOptionalTxtContainer"><a class="loginLink" href="#">Do you forgot the account?</a></div>
+                            <div class="loginOptionalTxtContainer"><a class="loginLink" href="#">How can I get the account?</a></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--End Login div table-->
+        </td>
+        <td width="300" class="loginTD" valign="top" style="word" rowspan="2">
+        	<div class="loginTitleTxt" style="word-wrap:break-word; width:100%; padding-left: 8px; padding-right: 8px; height:80px; border-left: #b4ced9 4px dotted;"> &nbsp;&nbsp;</div>
+        </td>
+        <td width="100%" rowspan="2" align="right" valign="top" class="loginTD"><div id="div_y_scroll_container" style="word-wrap:break-word; width:400px; padding-left: 10px; padding-right: 8px; height:80px; border-left: #b4ced9 4px dotted;" onMouseOver="showMenuBar('skyCoderDetail','',90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOut="" align="left">
+        <span style="text-align:left;">
+          <div class="loginTitleTxt" style=" border-bottom: #b4ced9 1px dotted;">What is SkyCoder?</div>
+          <div style="padding-top: 4px; color: #000; text-shadow: 1px 0px 1px rgba(255,255,255,0.7);"><u><i>SkyCoder</i></u> is a Cyber-Physical System (CPS) virtual framework that provides coding environment with communication tracer tool. It allows you to learn the CPS with a simple CPS virtual instruction code. The framework is operated on across cloud environment by CPS administrators. You can program CPS virtual instruction code to control multiple sensors and actuators interact together across a bridge cloud environment. </div>
+        </span> </div></td>
+      </tr>
+
+    </table>
+    <div style="height: 40px; width:100%; position:relative;">&nbsp;</div>
+</div>
+<!--End skyCoder explaination area-->
+<!--This is a skyCoder menubar container-->
+<div id="menuBar" class="menuBar" style="display: none;" onMouseOut="hiddenMenuBar('menuBar', -45);" onMouseMove="showMenuBar('menuBar', '', 45);" onMouseOver="showMenuBar('menuBar', '', 45);">
+    <ul class="menu" onMouseMove="showMenuBar('menuBar', '', 45);" onMouseOut="" onMouseOver="showMenuBar('menuBar', '', 45);">
+      <li id="m1" onMouseMove="showDescriptionOf('m1', 'Server response data viewer');"><a href="#" onClick="swapContainer('m1', 'loaded_container', 'Server response data viewer');"><span>Data viewer</span></a></li>
+      <li id="m2" onMouseMove="showDescriptionOf('m2', 'Communication behavior steping tracer');"><a href="#" onClick="swapContainer('m2', 'animation_container', 'Communication behavior steping tracer');"><span>CPS network communication tracer</span></a></li>
+      <li id="m3" onMouseMove="showDescriptionOf('m3', 'Embedded devices connecting statement');"><a href="#" onClick="swapContainer('m3', 'ed_ip_view_container', 'Embedded devices connecting statement');"><span>ED statement</span></a></li>
+      <div id="menuDescription">&nbsp;</div>
+    </ul>
+    <div style="height: 40px; width:100%; position:relative;">&nbsp;</div>
+</div>
+<!--End skyCoder menubar container-->
+</div>
+<!--End Menu-->
+  <br>
+</div><br>
+<div id="camera" align="right" style="display: none"><canvas id='cameraCanvas' width='320px' height='240px' align='right' style="border: #000000 1px solid"></canvas>
+	<div id="motionVal">0</div>
+	<input type="range" style="float:bottom; -webkit-transform: rotate(90); -webkit-appearance: slider-vertical" value="50" onChange="num(this.valueAsNumber)">
+    <input type="range" style="float:bottom;" value="50" onChange="num(this.valueAsNumber)">
+</div>
+<div id="audio"></div>
+<script language="javascript">
+function num(bar){
+	var datChk = bar - 50;
+	if(datChk > 0){
+		var motionAnalogVal = Math.floor(datChk*255/50);
+		document.getElementById("motionVal").innerText = "motion right: " + Math.floor(datChk*255/50);
+		sendRequest2('sensornetwork/set/as/8/'+motionAnalogVal+',0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}else if(datChk == 0){
+		document.getElementById("motionVal").innerText = 0;
+		sendRequest2('sensornetwork/set/as/8/0,0,0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}else{
+		var motionAnalogVal = Math.floor(Math.abs(datChk)*255/50);
+		document.getElementById("motionVal").innerText = "motion left: " + Math.floor(Math.abs(datChk)*255/50);
+		sendRequest2('sensornetwork/set/as/8/0,'+motionAnalogVal+',0,0,0,0,0,0',handleRequest2,'ETLOG');
+	}
+}
+</script>
+
+
+<!-- API scripts section-->
+
+<div id="codingtextdiv" style=" top: 61px">
+    	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center; padding: 20px">
+    	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
+    	    <ul class="TabbedPanelsTabGroup">
+    	      <li class="TabbedPanelsTab" tabindex="0">: : SkyCoding : :</li>
+    	      <li class="TabbedPanelsTab" tabindex="1">Example 1</li>
+              <li class="TabbedPanelsTab" tabindex="2">Example 2</li>
+              <li class="TabbedPanelsTab" tabindex="3">Example 3</li>
+              <li class="TabbedPanelsTab" tabindex="4">JS</li>
+  	      	</ul>
+    	    <div id="TabbedPanelsContentGroup" class="TabbedPanelsContentGroup">
+    	      <div class="TabbedPanelsContent">
+
+<!--<textarea id="textarea" rows="1"></textarea>
+
+<script type="text/javascript">
+    $('#textarea').textext({ plugins : 'prompt tags' });
+</script>-->
+
+
+                <div id="codingtextTitleBar" align="center" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-weight:bold; width:100%; font-family:Verdana, Geneva, sans-serif; border-bottom: 0px;">
+                	: : SkyCoding : : 
+                </div>
+                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-style:italic; width:100%; border-top: 0px;">
+                    <label>
+                      <textarea name="codingtext" id="codingtext" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;"></textarea>
+                      <br>
+                    </label>
+                    <label>
+                    	<input type="submit" name="exec_btn" id="exec_btn" value="execute" onClick="APIExecute()">
+                 	</label>
+                    <input type="submit" name="exec_btn2" id="instruct_clr" value="clear" onClick="clearDebugMessageLienElement('APIscript_debug_area'); document.getElementById('codingtext').value='';">
+                    <!--<textarea name="APIscript_debug" id="APIscript_debug" cols="60" rows="5" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%; background-color:#009; color:#FFF; disabled: true;" data-role="none" disabled></textarea>-->
+                    
+                    <!--<div id="APIscript_debug" style="border:1px #FFF solid; background-color:#00F; font-family: Tahoma, Geneva, sans-serif; font-style:normal"> &nbsp;executed</div>-->
+                    
+                    <input type="hidden" id="API_script_ed_ip" value="">
+                    <br>
+                    <label>
+                    <div id="APIscript_debug_scroll" data-role="none" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 0px; padding-bottom: 20px; padding-right: 0px; opacity: 1; filter: alpha(opacity=100); background-color:#009; color:#FFF;">
+                        <span id="APIscript_debug_area" class="APIscript_debug_area">
+                        &nbsp;
+                        </span>
+                    </div>
+                    </label>
+               </div>
+        	</div>
+        	<div class="TabbedPanelsContent">
+            	#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetworks http://PUBLICHOST:8189 LOCAL_ED_IP set as 8 255,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,255,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 100<br>
+                sensornetworks http://PUBLICHOST:8189 LOCAL_ED_IP set d 3 0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+            </div>
+    	    <div class="TabbedPanelsContent">
+				#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 1<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP set d 3 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 0<br>
+                sensornetwork LOCAL_ED_IP gpio set 27 0<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 0<br>
+                sleep 500<br>
+                sensornetwork LOCAL_ED_IP gpio set 27 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP get a 3 0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP gps global get GPGGA<br>
+                sleep 800<br>
+                sensornetwork LOCAL_ED_IP gps global get GPGSA<br>
+                sleep 800<br>
+                sensornetwork LOCAL_ED_IP gps global get GPRMC<br>
+                sleep 800<br>
+                sensornetwork LOCAL_ED_IP gps global get GPVTG<br>
+                sleep 800<br>
+                loop 10<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 0<br>
+sensornetwork LOCAL_ED_IP gpio set 27 0<br>
+sensornetwork LOCAL_ED_IP gpio set 23 0<br>
+sleep 500 <br>
+sensornetwork LOCAL_ED_IP gpio set 27 1<br>
+sleep 200<br>
+sensornetwork LOCAL_ED_IP gpio set 22 1<br>
+sleep 200<br>
+sensornetwork LOCAL_ED_IP gpio set 23 1<br>
+sleep 200<br>
+end
+<br>
+                <br>
+            </div>
+            <div class="TabbedPanelsContent">
+				#For example: replace LOCAL_ED_IP with 172.16.4.222
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 20,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 30,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 60,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 70,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 80,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 90,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 100,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 110,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 120,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 130,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 140,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 150,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 160,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 170,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 180,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 190,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 200,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 210,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 220,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 225,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 220,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 210,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 200,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 190,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 180,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 170,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 160,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 150,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 140,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 130,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 120,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 110,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 100,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 90,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 80,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 70,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 60,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 50,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 40,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 30,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 20,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+                sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
+                sleep 100<br>
+            </div>
+            <div class="TabbedPanelsContent">
+            <div id="codingtextTitleBar" align="center" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-weight:bold; width:100%; font-family:Verdana, Geneva, sans-serif; border-bottom: 0px;">
+                	: : SkyCoding (Javascript): : 
+                </div>
+                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-style:italic; width:100%; border-top: 0px;">
+                
+            
+            
+            
+            
+<script>
+function gainer_aout(localEDIP, oSignalValArr){
+	document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+function gainers_aout(LE_domain, localEDIP, oSignalValArr){
+	document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+
+
+function actuatornetwork(localEDIP, actuatorSigVal){
+    gainer_aout(localEDIP, actuatorSigVal);
+}   
+function actuatornetworks(LE_domain, localEDIP, actuatorSigVal){
+    gainers_aout(LE_domain, localEDIP, actuatorSigVal);
+} 
+</script>
+              <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
+
+                
+
+              
+function sensornetwork(localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+}
+
+              </textarea>
+              <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
+//This is JavaScript coding area. You can type your sensing code with your JavaScript at the browser. The following code is sensing/actuating code.
+for(var i = 22; i < 25; i++){
+    sensornetwork("172.16.4.222", "gpio", "set", ""+i, "1");
+}
+              </textarea>
+            <br>
+                
+                <button onClick="JSrun()" id="JSrun">Execute</button>
+                </div>
+            </div>
+  	    </div>
+  	  </div>
+    </div> 
+    <div id="ed_ip_view_container" onMouseDown="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseUp="document.getElementById('ed_ip_view_container').style.opacity=1;" onMouseOut="document.getElementById('ed_ip_view_container').style.opacity=0.5;" onMouseOver="document.getElementById('ed_ip_view_container').style.opacity=1;">
+    	  <div id="ed_view_title" style="border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move"><img src="image/dot_list.jpg"> Embedded devices connecting statement
+          </div>
+          <div style="position:static; border:0px; height: 218px;">
+    	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
+          </div>
+	</div>
+  
+  <div id="footerContainer">
+  	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; height:50px; position:static; cursor:n-resize"><img src="image/dot_list.jpg"> Embedded devices connecting graph
+          </div>
+          <div id="edNetworkContainer" style="position:static; border:0px; height: 218px;">
+    	    <span id="edNetwork" style=" height:100%;"></span>
+          </div>
+          <script type="text/javascript" src="vis/dist/vis.js"></script>
+		  <script type="text/javascript">
+              // create an array with nodes
+              var nodes = [
+                {id: 1, label: 'Central Node'},
+                {id: 2, label: '172.16.4.222'},
+                {id: 3, label: '172.16.4.223'},
+                {id: 4, label: '172.16.4.224'},
+                {id: 5, label: '172.16.4.225'}
+              ];
+            
+			var dat = {id: 6, label: '172.16.4.226'};
+			nodes.push(dat);
+              // create an array with edges
+              var edges = [
+                {from: 1, to: 2},
+                {from: 1, to: 3},
+                {from: 1, to: 4},
+                {from: 1, to: 5}
+              ];
+			  
+			  dat = {from: 1, to: 6};
+			  edges.push(dat);
+            
+              // create a network
+              var container = document.getElementById('edNetwork');
+              var edNetworkData = {
+                nodes: nodes,
+                edges: edges,
+              };
+              var options = {
+                width: '100%',
+                height: '100%'
+              };
+              var networkVS = new vis.Network(container, edNetworkData, options);
+			  //networkVS.resize("100%", "100%");
+			  /*networkVS.on('resize', function(prop){
+				console.log("width:" + width + " height:" + height);
+			  });*/
+          </script>
+  </div>  
+    <div id="ed_ip_graph_container">
+    	  
+	</div>
+  
+  
+	<div id="loaded_container" draggable="true" onMouseDown="document.getElementById('loaded_container').style.opacity=0.5;" onMouseUp="document.getElementById('loaded_container').style.opacity=1;" onMouseOut="document.getElementById('loaded_container').style.opacity=0.5;" onMouseOver="document.getElementById('loaded_container').style.opacity=1;">
+<div id="loaded_title" style=" border-bottom: #000000 1px dotted; position: static; background-color:#FFF; width: 100%"><img src="image/dot_list.jpg"> Server response data viewer</div>
+		<div id="loaded_scroll" data-role="none">
+			<span class="loaded" id="loaded">Environment has loaded.</span>
+		</div>
+	</div>
+
+	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" style="height:247px;">
+    	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
+          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
+    	    <span id="animation_area" class="animation_area">&nbsp;</span>
+          </div>
+	</div>
+</div>
+
+<!--Begin JS interpreter executor-->
+
+<script>
+	//-----------------------
+	JSoutput = function(a) {
+		var str = "["
+		if (typeof(a)=="object" && a.length) {
+			for (var i=0; i < a.length; i++) 
+				if (typeof(a[i])=="object" && a[i].length) {
+					str += (i==0?"":" ")+"["
+					for (var j=0; j<a[i].length; j++) 
+						str += a[i][j]+(j==a[i].length-1?
+								"]"+(i==a.length-1?"]":",")+"\n":", ");
+				} else str += a[i]+(i==a.length-1?"]":", ");
+		} else str = a;
+		return str;
+	}
+	JSrun = function() {
+		document.getElementById("animation_area").innerHTML = "";
+		Concurrent.Thread.create(
+			function(){
+				var str;
+				var headerCode = document.getElementById("includedCode");
+				var outnode = document.getElementById("loaded");
+				outnode.value = "";
+				d = new Date().getTime();
+				try {
+					with (Math) {
+						str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
+					}
+				} catch(e) {
+					str = e.name+" at line "+(e.lineNumber-56)+": "+e.message;
+				}
+				//var tnode = document.getElementById("JStiming");
+				//tnode.innerHTML = ""+(new Date().getTime()-d)/1000;
+				if (str != undefined) {outnode.value += str;}
+			}
+		);
+	}
+	
+	
+	
+	/*function sensornetwork(localEDIP, interface, type, portnumber, value){
+		document.getElementById("API_script_ed_ip").value = localEDIP;
+		var Skyblue_exec_instruct = "sensornetwork/" + type + "/" + portnumber + "/" + value;
+		//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+		alert(Skyblue_exec_instruct);
+	}*/
+  </script>
+<!--End JS interpreter executor-->
+
+
+<!--Begin Thread executor-->
+<script type="text/javascript" src="Concurrent.Thread.js"></script>
+<script type="text/javascript"><!--
+var MTRepetition = function(){
+  MTRepetition.prototype.start = function(initFunc, condFunc, nextFunc, mainFunc){
+    this.condFunc = condFunc;
+    this.nextFunc = nextFunc;
+    this.mainFunc = mainFunc;
+    initFunc();
+    MTRepetition.queue.push(this);
+    setTimeout(MTRepetition.repeat, 0);
+  };
+  MTRepetition.prototype.repeat = function(){
+    if(this.condFunc()){
+      this.mainFunc();
+      this.nextFunc();
+      MTRepetition.queue.push(this);
+      setTimeout(MTRepetition.repeat, 0);
+    }
+  }
+  MTRepetition.repeat = function(){
+    MTRepetition.queue.shift().repeat();
+  };
+};
+MTRepetition.queue = [];
+--></script>
+<!--End Thread executor-->
+<!--Begin menu bar controll-->
+<script language="javascript">
+	var isShowFlag = false;
+	var isHiddenFlag = true;
+	var showMenuBar = function(menuContainer, menuDescription, sliceYPos){
+		if(!menuContainer){
+			menuContainer = "menuBar";
+	    }
+		if(!menuDescription){
+			menuDescription = "menuDescription";
+		}
+		if(!sliceYPos){
+			sliceYPos = 20;
+		}
+		
+		if(!isShowFlag){
+			document.getElementById(menuContainer).style.display='block';
+			document.getElementById(menuDescription).innerHTML = "";
+			moveElement(sliceYPos);
+			isHiddenFlag = false;
+		}
+		isShowFlag = true;
+	} 
+	var hiddenMenuBar = function(menuContainer, sliceYPos){
+		if(!menuContainer){
+			menuContainer = "menuBar";
+		}
+		if(!sliceYPos){
+			sliceYPos = -20;
+		}
+		if(!isHiddenFlag){
+			document.getElementById(menuContainer).style.display='none';
+			moveElement(sliceYPos);
+			isShowFlag = false;
+		}
+		isHiddenFlag = true;
+	} 
+	var moveElement = function(vertical){
+		var ele_pos = parseInt(document.getElementById("codingtextdiv").style.top);
+		document.getElementById("codingtextdiv").style.top = (ele_pos + vertical) + "px";
+		//console.log(ele_pos + " + " + vertical + " = " + document.getElementById("codingtextdiv").style.top + "\r\n");
+	}
+	
+	var swapContainer = function(btnID, containerID, containerTitle) {
+		//console.log(containerID);
+		if(!document.getElementById(containerID).clickStatus || document.getElementById(containerID).clickStatus == null){
+			document.getElementById(containerID).clickStatus = "no";
+			document.getElementById(btnID).clickStatus = "no";
+			//console.log("null");
+		}
+		if(document.getElementById(containerID).clickStatus == "no"){
+			document.getElementById(containerID).style.display = "none";
+			document.getElementById(containerID).clickStatus = "yes";
+			var btnObj = document.getElementById(btnID);
+			console.log(btnObj.length);
+			btnObj.clickStatus = "yes";
+			var attr = '0% -90px';
+			var attr_a = '0% -90px';
+			var attr_span = '100% -90px';
+			console.log(btnObj.style.background + "\r\n" + btnObj.firstChild.style.background + "\r\n" + btnObj.firstChild.firstChild.style.background + "\r\n");
+			btnObj.style.backgroundPosition = attr;
+			btnObj.firstChild.style.backgroundPosition = attr_a;
+			btnObj.firstChild.firstChild.style.backgroundPosition = attr_span;
+			document.getElementById("menuDescription").innerHTML = "Off " + containerTitle;
+		}else if(document.getElementById(containerID).clickStatus == "yes"){
+			document.getElementById(containerID).style.display = "block";
+			document.getElementById(containerID).clickStatus = "no";
+			var btnObj = document.getElementById(btnID);
+			btnObj.clickStatus = "no";
+			var attr = '';
+			btnObj.style.backgroundPosition = attr;
+			btnObj.firstChild.style.backgroundPosition = attr;
+			btnObj.firstChild.firstChild.style.backgroundPosition = attr;
+			document.getElementById("menuDescription").innerHTML = "On " + containerTitle;
+		}
+	}
+	var showDescriptionOf = function(btnID, containerTitle) {
+		if(!document.getElementById(btnID).clickStatus || document.getElementById(btnID).clickStatus == null){
+			document.getElementById(btnID).clickStatus = "no";
+		}
+		
+		if(document.getElementById(btnID).clickStatus == "no"){
+			document.getElementById("menuDescription").innerHTML = "Click to <b>hide</b> '" + containerTitle + "' box.";
+		}else if(document.getElementById(btnID).clickStatus == "yes"){
+			document.getElementById("menuDescription").innerHTML = "Click to <b>show</b> '" + containerTitle + "' box.";
+		}
+	}
+</script>
+<!--End menu bar controll-->
+<!--Begin coder framework-->
+<script language="javascript">
+		/*var APIdebug = document.getElementById("APIscript_debug");*/
+		var stepBehavior = document.getElementById("animation_area");
+		/*APIdebug.value = "";*/
+		var exec_instructs;
+		Array.prototype.clone = function() {
+			return this.slice(0);
+		};
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g, "");
+		}
+
+		var instruction_parser = function (){
+			var codingtext_var = document.getElementById("codingtext");
+			
+			var lines = codingtext_var.value.split("\n");
+			
+			var exec_instruct_obj = new Array();
+			for(var i = 0; i < lines.length; i++){
+				var instruct_line = lines[i];
+				var instruct_elements = instruct_line.split(" ");
+				var instruct_elements_Trim = new Array();
+				for(var j = 0; j < instruct_elements.length; j++){
+					var instEleTrim = instruct_elements[j].trim();
+					if(instEleTrim != ""){
+						instruct_elements_Trim.push(instEleTrim);
+					}
+				}
+				exec_instruct_obj.push(instruct_elements_Trim);
+			}
+			
+			exec_instructs = exec_instruct_obj.clone();
+				
+		}
+		function doSignout(username, mode, noticeContainer){
+			var usernameElement = document.getElementById(username);
+			var modeElement = document.getElementById(mode);	
+			
+			var logoutQuery = "username=" + usernameElement.value + "&mode=" +modeElement.value
+			console.log(noticeContainer + "\r\nBefore invoke doSignOutRequert\r\n");
+			doSigninoutRequest("/doLogout.ins",handleSignout, logoutQuery, noticeContainer);
+		}
+		function doSignin(username, password, mode, noticeContainer){
+			var usernameElement = document.getElementById(username);
+			var passwordElement = document.getElementById(password);
+			var modeElement = document.getElementById(mode);
+			
+			console.log(usernameElement.value + "\r\n");
+			console.log(passwordElement.value + "\r\n");
+			console.log(modeElement.value + "\r\n");
+			
+			var loginQuery = "username=" + usernameElement.value + "&password=" + passwordElement.value + "&mode=" +modeElement.value
+			console.log(noticeContainer + "\r\nBefore invoke doSignInRequert\r\n");
+			doSigninoutRequest("/doLogin.ins",handleSignin, loginQuery, noticeContainer);
+			
+			//console.log("Before invoke doSignRequert\r\n");
+		}
+			
+		
+		function getLocalTimestamp(){
+			var d = new Date();
+			var year  = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day   = d.getDate();
+			//var test = d.getTime();
+			
+			var hour = d.getHours();
+			var min = d.getMinutes();
+			var sec = d.getSeconds();
+			var msec = d.getMilliseconds();
+			
+			hour  = ( hour   < 10 ) ? '0' + hour   : hour;
+			min   = ( min < 10 ) ? '0' + min : min;
+			sec   = ( sec < 10 ) ? '0' + sec : sec;
+			msec   = ( msec < 10 )? ('00' + msec):((msec < 100)? ('0' + msec):msec);
+			
+			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
+		}
+		function convertMilliToTimestamp(millisecond){
+			var d = new Date(millisecond);
+			var year  = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day   = d.getDate();
+			//var test = d.getTime();
+			
+			var hour = d.getHours();
+			var min = d.getMinutes();
+			var sec = d.getSeconds();
+			var msec = d.getMilliseconds();
+			
+			hour  = ( hour   < 10 ) ? '0' + hour   : hour;
+			min   = ( min < 10 ) ? '0' + min : min;
+			sec   = ( sec < 10 ) ? '0' + sec : sec;
+			msec   = ( msec < 10 )? ('00' + msec):((msec < 100)? ('0' + msec):msec);
+			
+			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
+		}
+		
+		var communicationTableIDs = new Array();
+		var communicationTxID = 0;
+		
+		var addCommunicationTraceDivElement = function (commuDirection, description, id, txCallback){
+			var timeStamp = getLocalTimestamp();
+			var newContentContainer = document.createElement("div");
+			newContentContainer.className = "stepContentContainer";
+			var newTag = document.createElement("div");
+			var newTag2 = document.createElement("div");
+			
+			if(commuDirection == 'tx'){
+				newContentContainer.id="tx_" + id;
+				newTag.textContent="TX-" + id + "@{"+ timeStamp +"}";
+				newTag.className = "titleSendInstTimestamp";
+				newTag2.className = "descriptSendInstTimestamp";
+				newTag2.innerHTML = description;
+				
+				newContentContainer.appendChild(newTag);
+				newContentContainer.appendChild(newTag2);
+			}else if(commuDirection == 'rx'){
+				newContentContainer.id="rx_" + id;
+				newTag.textContent="RX-" + id + "@{"+ timeStamp +"}";
+				newTag.className = "titleReceivedResTimestamp";
+				newTag2.className = "descriptReceivedResTimestamp";
+				
+				var serverToEtTimeStampMilli = parseInt(txCallback.getResponseHeader("Server-Et-Timestamp"));
+				var etToServerTimeStampMilli = parseInt(txCallback.getResponseHeader("Et-Server-Timestamp"));
+				
+				var serverToEtTimeStamp = convertMilliToTimestamp(serverToEtTimeStampMilli);
+				var etToServerTimeStamp = convertMilliToTimestamp(etToServerTimeStampMilli);
+				
+				console.log("document.difftime: " + document.difftime);
+				
+				var serverToEtTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Server-Et-Timestamp")) + parseInt(document.difftime));
+				var etToServerTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Et-Server-Timestamp")) + parseInt(document.difftime));
+				console.log("serverToEtTimeStamp_BasedOnSkyCoder: " + serverToEtTimeStamp_BasedOnSkyCoder);
+				console.log("etToServerTimeStamp_BasedOnSkyCoder: " + etToServerTimeStamp_BasedOnSkyCoder);
+							
+				console.log(serverToEtTimeStampMilli + "  " + etToServerTimeStampMilli);
+				
+				var tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				newTag2.innerHTML = "Responsed data:<br>" + tab + description + "<br>Back track:<br>" + tab + "TX-"+id+"@skycoderTime{" + txCallback.timeStamp + "}<br>" + tab + tab + "Send[" + txCallback.instruction + "] to server<br>" + tab + "TX-" + id + "@serverTime{" + serverToEtTimeStamp + "}<br>" + tab + tab + "Send instruction to [" + txCallback.edIP + "]<br>" + tab + "RX-" + id + "@serverTime{" + etToServerTimeStamp + "}<br>" + tab + tab + "Received data from device<br>" + tab + "RX-"+id+"@skycoderTime{" + timeStamp + "}";
+				var newTagBackTrack1 = document.createElement("div");
+				
+				newContentContainer.appendChild(newTag);
+				newContentContainer.appendChild(newTag2);
+			}
+			
+			stepBehavior.appendChild(newContentContainer);
+			
+			var animation_area_container_console = $('#animation_area_container_scroll');
+			animation_area_container_console.scrollTop(
+				animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+			);
+			return timeStamp;
+		}
+		var addDebugMessageLineElement = function(message,contentID){
+			var elementObj = document.getElementById(contentID);
+			var newTag = document.createElement("div");
+			newTag.className = "debugMessageLine";
+			newTag.innerHTML = message;
+			newTag.style = "padding-left: 10px; margin-left: 10px;";
+			elementObj.appendChild(newTag);
+		}
+		var clearDebugMessageLienElement = function(contentID){
+			var elementObj = document.getElementById(contentID);
+			elementObj.innerHTML = "";
+		}
+		
+		var APIExecute = function (){
+			Concurrent.Thread.create(
+				function(){
+					document.getElementById("exec_btn").disabled = true;
+					debugAreaID = "APIscript_debug_area";
+					clearDebugMessageLienElement(debugAreaID);
+					
+					/*APIdebug.value = "";*/
+					
+					
+					stepBehavior.innerHTML = "";
+					communicationTableIDs = new Array();
+					communicationTxID = 0;
+					
+					instruction_parser();
+					var execTimeout;
+					var sleepTimeout;
+					
+					var Skyblue_exec_instruct="";
+					var instruct_type="";
+					var sleep_ms = 0;
+					var LE_domain = "";
+					
+					var titleSendInstTimestamp = "";
+					var descriptSendInstTimestamp = "";
+					var APIdebugMes = "";
+					
+					/*
+					 * loopState: The state of loop execution.
+					 * 0: noLoop now 
+					 * 1: Read the loop instruction
+					 * 2: loop execution now
+					 */
+					var loopState = 0;
+					var loopNum = 0;
+					var loopBeginIdxFlag = 0;
+					var loopEndIdxFlag = 0;
+					
+
+					/*var loopInstructionSet = new Array();*/
+					var r = 0;
+					while(r < exec_instructs.length){
+						console.log("begin r: " + r + "\r\n");
+					//for(var r = 0; r < exec_instructs.length; r++){
+						/* Reset all basical instruction data */
+						Skyblue_exec_instruct="";
+						instruct_type="";
+						sleep_ms = 0;
+						LE_domain = "";
+						APIdebugMes = "";
+						console.log("before doloop\r\n");
+						
+						/* While(of loop instruction) only 1 time exec when loopState: 0*/
+						while(1){
+							for(var j = 0; j < exec_instructs[r].length; j++){
+								//exec_instructs[r][j] = exec_instructs[r][j].trim()
+								/*APIdebug.value += exec_instructs[r][j] + " ";*/
+								APIdebugMes += exec_instructs[r][j] + " ";
+								
+								if(exec_instructs[r][0]=="sensornetwork"){
+									if(j < 1){
+										Skyblue_exec_instruct += exec_instructs[r][0];
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										document.getElementById("API_script_ed_ip").value = exec_instructs[r][j];
+									}else{
+										Skyblue_exec_instruct += "/" + exec_instructs[r][j];
+									}
+								}
+								/*Need check! why it has not "else"*/
+								if(exec_instructs[r][0]=="sensornetworks"){
+									if(j < 1){
+										Skyblue_exec_instruct += "sensornetwork";
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										LE_domain = exec_instructs[r][j] + "/";
+									}else if(j < 3){
+										document.getElementById("API_script_ed_ip").value = exec_instructs[r][j];
+										//alert(document.getElementById("API_script_ed_ip").value);
+									}else{
+										Skyblue_exec_instruct += "/" + exec_instructs[r][j];
+									}
+								}else if(exec_instructs[r][0]=="sleep"){
+									if(j < 1){
+										instruct_type = exec_instructs[r][0];
+									}else if(j < 2){
+										sleep_ms = parseInt(exec_instructs[r][1]);
+										//break;
+									}
+								}else if(exec_instructs[r][0]=="loop"){
+									if(loopState == 0){
+										if(j < 1){
+											instruct_type = exec_instructs[r][0];
+										}else if(j < 2){
+											loopnum = parseInt(exec_instructs[r][1]) - 1;
+											loopState = 1;
+											loopBeginIdxFlag = r;
+										}
+									}
+									console.log("loop instruct..\r\n");
+								}else if(exec_instructs[r][0]=="end"){
+									
+									if(loopState == 1){
+										instruct_type = exec_instructs[r][0];
+										/* Switch to loop execution mode */
+										loopState = 2;
+										loopEndIdxFlag = r - 1;
+										r = loopBeginIdxFlag;
+										console.log("exec end: r = " + r);
+										console.log("loopEndIdxFlag: " + loopEndIdxFlag);
+									}	
+								}
+								
+							}
+							var sl = Sleep(sleep_ms);
+							if(instruct_type != "sleep"){
+								if(Skyblue_exec_instruct != ""){
+									//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
+									API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+								}
+							}
+							if(instruct_type != ""){
+								/*APIdebug.value += ";\r\n";*/
+								addDebugMessageLineElement(APIdebugMes + ";<br>", debugAreaID);
+							}
+							
+							/*var APIdebug_console = $('#APIscript_debug');
+							APIdebug_console.scrollTop(
+								APIdebug_console[0].scrollHeight - APIdebug_console.height()
+							);*/
+							
+							var APIdebug_console2 = $('#APIscript_debug_scroll');
+							APIdebug_console2.scrollTop(
+								APIdebug_console2[0].scrollHeight - APIdebug_console2.height()
+							);
+							/*var animation_area_container_console = $('#animation_area_container_scroll');
+							animation_area_container_console.scrollTop(
+								animation_area_container_console[0].scrollHeight - animation_area_container_console.height()
+							);*/
+							
+							if(loopState == 2){
+								/*Each element in the loop*/
+								if(r < loopEndIdxFlag){
+								/*In a present loop*/
+									r = r + 1;
+								}else{
+								/*In a next loop*/
+									r = loopBeginIdxFlag;
+									loopnum = loopnum - 1;
+								}
+								
+								/* Reset all basical instruction data */
+								Skyblue_exec_instruct = "";
+								instruct_type = "";
+								sleep_ms = 0;
+								LE_domain = "";
+								APIdebugMes = "";
+									
+								if(loopnum <= 0){
+									console.log("loopnum <= 0: loopEndIdxFlag: " + loopEndIdxFlag + "\r\n");
+									r = loopEndIdxFlag + 1;
+									console.log("r: " + r);
+									/* Reset loop instruction data */
+									loopState = 0;
+									loopNum = 0;
+									console.log("The end of Loop. \r\n");
+									break;
+								}else{
+									continue;
+								}
+							}
+							
+							if(loopState < 2){
+								break;	
+							}
+						
+						}
+						//Of outer While(of loop instruction)
+						r = r + 1;
+						console.log("The lasted r: " + r + " exec_instructs.length: "+ exec_instructs.length +"\r\n");
+					}
+					document.getElementById("exec_btn").disabled = false;
+				}
+			);
+		}
+		var Sleep = function (ms) {
+			//getBSFLogSizeID = setTimeout(getBSFLogSize, ms);
+			
+			var d1 = new Date().getTime();
+			var d2 = new Date().getTime();
+			while( d2 < (d1 + ms) ) {
+				d2 = new Date().getTime();
+			}
+			return;
+		}
+		
+		var sleepTmp = function() {
+			console.log("sleeping . . .");
+		}
+		var sleepRet;
+		var sleepMs = 0;
+		var Sleep2 = function (ms) {
+			this.ms = ms;
+			
+			Concurrent.Thread.create(
+				function(){
+					//getBSFLogSizeID = setTimeout(getBSFLogSize, ms);
+					//sleepRet = window.setInterval(sleepTmp, ms);
+					//sleepRet = window.setTimeout(sleepTmp, this.ms);
+					var sl = function() {
+						console.log("sleepinssg . . .");
+					}
+					sleepRet = window.setTimeout(sl, this.ms);
+					console.log (this.ms);
+					//window.clearInterval(sleepRet);
+					var d1 = new Date().getTime();
+					var d2 = new Date().getTime();
+					while( d2 < (d1 + ms) ) {
+						d2 = new Date().getTime();
+					}
+					return;
+				}
+			);
+		}
+		
+		var Sleep3 = function(ms){
+			document.devCheater.sleep(ms);	
+			return;
+		}
+		
+
+var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+</script>
+<applet code="DevCheater.class" name="devCheater" id="devCheater" mayscript="true" height="1" width="1"></applet>
+ <!--End coder framework-->   
+</body>
+</html>
