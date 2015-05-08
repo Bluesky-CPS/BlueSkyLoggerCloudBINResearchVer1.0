@@ -175,8 +175,12 @@ function handleGetEDdataForGraph(req){
 	var statICN = "/image/offlineICN.gif";
 	
 		
+	/*{id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
+                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},*/
+				
+				
 	nodes = [
-                {id: 1, label: 'Central Node'}
+                {id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'}
     ];
 	edges = [
     ];
@@ -189,20 +193,20 @@ function handleGetEDdataForGraph(req){
 		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
 		
 		if(connstatus == "online"){
-			statICN = "/image/onlineICN.gif";
+			statICN = "/image/ed_online.gif";
 		}else if(connstatus == "offline"){
-			statICN = "/image/offlineICN.gif";
+			statICN = "/image/ed_offline.gif";
 		}else{
-			statICN = "/image/sleepICN.gif";
+			statICN = "/image/ed_sleep.gif";
 		}
 		
 		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP + "\n[" + JSONParse.ETLog.EDConnStatement[i].EDCNAME + "]";
 		
 		
 		
-		pushDat = {id: (i + 2), label: edipdat};
+		pushDat = {id: (i + 2), label: edipdat, image: statICN, shape: 'image'};
 		nodes.push(pushDat);
-		pushDat = {from: 1, to: (i+2)};
+		pushDat = {from: 1, to: (i+2), length: LENGTH_MAIN};
 		edges.push(pushDat);
 	}
 	/*pushDat = {from: 1, to: (i+1)};
@@ -1486,16 +1490,20 @@ for(var i = 22; i < 25; i++){
           </div>
           <script type="text/javascript" src="vis/dist/vis.js"></script>
 		  <script type="text/javascript">
+			  var DIR1 = 'vis/examples/network/img/refresh-cl/';
+			  var DIR2 = 'image/';
+			  var LENGTH_MAIN = 150;
+			  var LENGTH_SUB = 50;
               // create an array with nodes
               var nodes = [
-                {id: 1, label: 'Central Node'},
-                {id: 2, label: '172.16.4.222'},
-                {id: 3, label: '172.16.4.223'},
-                {id: 4, label: '172.16.4.224'},
-                {id: 5, label: '172.16.4.225'}
+                {id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
+                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 3, label: '172.16.4.223', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 4, label: '172.16.4.224', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 5, label: '172.16.4.225', image: DIR2 + 'ed.gif', shape: 'image'}
               ];
             
-			var dat = {id: 6, label: '172.16.4.226'};
+			var dat = {id: 6, label: '172.16.4.226', image: DIR2 + 'ed.gif', shape: 'image'};
 			nodes.push(dat);
               // create an array with edges
               var edges = [
