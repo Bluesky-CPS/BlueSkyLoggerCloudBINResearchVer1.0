@@ -138,7 +138,7 @@ function handleRequestConnectedStatement(req) {
 	var statICN = "/image/offlineICN.gif";
 	for(var i = 0; i < len; i++){
 		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
-		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus;
 		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
 		
 		if(connstatus == "online"){
@@ -168,23 +168,17 @@ function handleRequestConnectedStatement(req) {
 	selectBox.refresh();
 }
 
+var edData = [];
+
 function handleGetEDdataForGraph(req){
 	var JSONtxt = req.responseText;
 	var JSONParse = JSON.parse(JSONtxt);
 	var len = JSONParse.ETLog.EDConnStatement.length;
+	edData = JSONParse.ETLog.EDConnStatement;
 	var statICN = "/image/offlineICN.gif";
 	
-		
-	/*{id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
-                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},
-				Hardware-My-Computer-3-icon
-				*/
-				
-		
-	console.log(document.URL + "\r\n" + window.location.pathname);
 	var URL_STR = document.URL, urlPathname = window.location.pathname;
 	var  centralNodeURL = URL_STR.replace(urlPathname, " ");
-	console.log(centralNodeURL);
 	
 	nodes = [
                 {id: 0, label: 'Your Browser', image: DIR1 + 'Hardware-My-Computer-3-icon.png', shape: 'image'},
@@ -225,6 +219,7 @@ function handleGetEDdataForGraph(req){
 	};
 	
 	console.log(edNetworkData);
+	console.log(edData);
 }
 
 var isLogging = 0;
@@ -622,8 +617,25 @@ function stopGetBSFLogSize(){
 	//nsWaitForDelay(10);
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 }
+
+var autoReloadEDdataRetID;
+var autoRedrawEDGraphRetID;
+function redrawEDGraph(){
+	networkVS = new vis.Network(container, edNetworkData, options);
+	networkVS.on('select', function (properties) {
+		console.log('selected nodes: ' + properties.nodes);
+	});
+}
+function reloadEDData(){
+	sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+}
 function initOnload(){
 	initFooterDragEventListener("footerDragBar", "footerContainer");
+	reloadEDData();
+	redrawEDGraph();
+	autoReloadEDdataRetID = setInterval(reloadEDData, 30000);
+	autoRedrawEDGraphRetID = setInterval(redrawEDGraph, 60000);
+	//autoReloadEDdataRetID = setInterval(testReload, 1000);
 	
 	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
 	//The difference time will be store in "document.difftime"
@@ -647,10 +659,8 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 		actionObj = document.getElementById(actionObjID);
 		
 		if(dragBarObj){
-			
-			dragBarObj.isMouseDown = false;
-			
 			var yBias = 15;
+			dragBarObj.isMouseDown = false;
 			
 			dragBarObj.onmousedown = function() { dragBarObj.isMouseDown = true;  };
 			dragBarObj.onmouseup   = function() { 
@@ -658,13 +668,8 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
 				edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
 				
-				
 				sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
-				networkVS = new vis.Network(container, edNetworkData, options);
-				networkVS.on('select', function (properties) {
-					console.log('selected nodes: ' + properties.nodes);
-					
-				});
+				redrawEDGraph();
 			};
 			dragBarObj.onmouseout  = function(e) { 
 				if(dragBarObj.isMouseDown){
@@ -676,6 +681,10 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					var screenVH = parseInt($(window).height());   // returns height of browser viewport
 					var mouseCurrY = parseInt(mouse.y);
 					
+					//var headerBarObjStyle = window.getComputedStyle("headerContainer"), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					/*if(parseInt(screenVH) - parseInt(actionObj.style.height) > headerBarObjHeight){
+						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+					}*/
 					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
 					//networkVS.setSize("100%", "100%");
 				}
@@ -712,8 +721,11 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					
 					console.log("actionObjHeight: " + actionObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
 					
+					//var headerBarObjStyle = window.getComputedStyle("headerContainer"), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					/*if(parseInt(screenVH) - parseInt(actionObj.style.height) > headerBarObjHeight){
+						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+					}*/
 					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-					
 					//networkVS.setSize("100%", "100%");
 					
 					prevMouse = mouse;
@@ -722,10 +734,10 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 		}
 	}
 }
-var footerDrag = function(objID){
+/*var footerDrag = function(objID){
 	var actionObjID = "test";
 	console.log("actionObjID: " + this.actionObjID + "objID: " + objID + " action.....\r\n");
-}
+}*/
 
 var isCameraShowing = 0;
 var lock = 0;
@@ -1497,7 +1509,7 @@ for(var i = 22; i < 25; i++){
   <div id="footerContainer">
   	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; border-top: #333 5px groove; height:30px; position:static; cursor:n-resize; vertical-align:text-bottom; padding-top: 10px" align="center"><span style="vertical-align:bottom"><img src="image/dot_list.jpg">&nbsp;&nbsp;&nbsp;&nbsp;Embedded devices connecting graph&nbsp;&nbsp;&nbsp;&nbsp;<img src="image/dot_list.jpg"></span>
 </div>
-          <div id="edNetworkContainer" style="position:static; border:0px; height: 218px;">
+          <div id="edNetworkContainer" style="position:static; border:0px; height: 218px; background-image:url(image/sky-bg.jpg); background-repeat:repeat; background-repeat: no-repeat; background-position: top center; background-attachment: fixed">
     	    <span id="edNetwork" style=" height:100%;"></span>
           </div>
           <script type="text/javascript" src="vis/dist/vis.js"></script>
@@ -1538,7 +1550,9 @@ for(var i = 22; i < 25; i++){
               var options = {
                 width: '100%',
                 height: '100%',
-				stabilize: false
+				stabilize: false,
+				nodes: {fontColor: 'black'},
+				edges: {color: 'blue'}
               };
               var networkVS = new vis.Network(container, edNetworkData, options);
 			  //networkVS.resize("100%", "100%");
@@ -1589,6 +1603,10 @@ for(var i = 22; i < 25; i++){
 	}
 	JSrun = function() {
 		document.getElementById("animation_area").innerHTML = "";
+		stepBehavior.innerHTML = "";
+		communicationTableIDs = new Array();
+		communicationTxID = 0;
+		
 		Concurrent.Thread.create(
 			function(){
 				var str;
