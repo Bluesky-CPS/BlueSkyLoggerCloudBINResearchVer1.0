@@ -678,10 +678,11 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					mouse.x = e.clientX || e.pageX; 
 					mouse.y = e.clientY || e.pageY;
 					
-					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var screenVH = parseInt(window.innerHeight) || parseInt($(window).height());   // returns height of browser viewport
 					var mouseCurrY = parseInt(mouse.y);
 					
-					//var headerBarObjStyle = window.getComputedStyle("headerContainer"), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					var headerBarObjStyle = window.getComputedStyle(document.getElementById("headerContainer")), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					console.log("headerBarObjHeight: " + headerBarObjHeight);
 					/*if(parseInt(screenVH) - parseInt(actionObj.style.height) > headerBarObjHeight){
 						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
 					}*/
@@ -702,12 +703,13 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					var dragBarObjStyle = window.getComputedStyle(dragBarObj), dragBarObjHeight = dragBarObjStyle.getPropertyValue("height");
 					var actionObjStyle = window.getComputedStyle(actionObj), actionObjHeight = actionObjStyle.getPropertyValue("height");
 					
-					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var screenVH =  parseInt(window.innerHeight) || parseInt($(window).height());   // returns height of browser viewport
 					var screenDH = parseInt($(document).height()); // returns height of HTML document
 					var mouseCurrY = parseInt(mouse.y);
 					var mousePrevY = parseInt(prevMouse.y);
 					var footerRefFromTopDiff = parseInt(screenVH - mousePrevY);
 					
+					console.log(parseInt($(window).height()) + " " + parseInt(window.screen.height) + " " + parseInt(window.screen.availHeight) + " " + parseInt(window.innerHeight));
 					
 					console.log("dragBarObjHeight: " + dragBarObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
 					console.log("   actionObjHeight: " + parseInt(actionObjHeight));
@@ -721,11 +723,15 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					
 					console.log("actionObjHeight: " + actionObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
 					
-					//var headerBarObjStyle = window.getComputedStyle("headerContainer"), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
-					/*if(parseInt(screenVH) - parseInt(actionObj.style.height) > headerBarObjHeight){
+					var headerBarObjStyle = window.getComputedStyle(document.getElementById("headerContainer")), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					console.log("headerBarObjHeight: " + headerBarObjHeight + " diff:" + (parseInt(screenVH) - parseInt(actionObjHeight)));
+					if( parseInt(screenVH) - parseInt(actionObjHeight) > parseInt(headerBarObjHeight)){
 						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-					}*/
-					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+						console.log("iffffffffffffffffffffffff");
+					}else{
+						actionObj.style.height = headerBarObjHeight + "px";
+					}
+					//actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
 					//networkVS.setSize("100%", "100%");
 					
 					prevMouse = mouse;
