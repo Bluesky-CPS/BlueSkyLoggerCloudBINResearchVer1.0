@@ -618,18 +618,60 @@ function stopGetBSFLogSize(){
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 }
 
+
+var bodyMouse = {x: 0, y: 0};
+function addBodyMouseListener(){
+	var bodyObj = document.body;
+	bodyObj.onmousemove = function(e){
+		var mouse = {x: 0, y: 0};
+		mouse.x = e.clientX || e.pageX; 
+		mouse.y = e.clientY || e.pageY;
+		bodyMouse = mouse;
+	}
+	bodyObj.onmouseup = function(e){
+		var mouse = {x: 0, y: 0};
+		mouse.x = e.clientX || e.pageX; 
+		mouse.y = e.clientY || e.pageY;
+		bodyMouse = mouse;
+	}
+}
+
+
+
 var autoReloadEDdataRetID;
 var autoRedrawEDGraphRetID;
 function redrawEDGraph(){
 	networkVS = new vis.Network(container, edNetworkData, options);
 	networkVS.on('select', function (properties) {
 		console.log('selected nodes: ' + properties.nodes);
+		//edData = JSONParse.ETLog.EDConnStatement;
+		var edIdx = parseInt(properties.nodes) - 2;
+		showEDDetail(edIdx);
 	});
+	
 }
+function showEDDetail(edIdx){
+		var edDetailDescriptionObj = document.getElementById("edDetailDescription");
+		if(edIdx >= 0){
+			console.log(edData[edIdx].loggingStatus);
+			console.log(edData[edIdx].EDIP);
+			console.log(edData[edIdx].EDCNAME);
+			console.log(edData[edIdx].EDType);
+			edDetailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + edData[edIdx].EDIP + "<br>" + "<strong>Device Name: </strong>" + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
+			edDetailDescriptionObj.style.top = bodyMouse.y + "px";
+			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
+			edDetailDescriptionObj.style.visibility = "visible";
+			console.log("BODYMOUSE:" + bodyMouse.x + " " + bodyMouse.y);
+		}else{
+			edDetailDescriptionObj.style.visibility = "hidden";
+		}
+}
+
 function reloadEDData(){
 	sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
 }
 function initOnload(){
+	addBodyMouseListener();
 	initFooterDragEventListener("footerDragBar", "footerContainer");
 	reloadEDData();
 	redrawEDGraph();
@@ -1512,12 +1554,16 @@ for(var i = 22; i < 25; i++){
           </div>
 	</div>
   
+  <div id="edDetailDescription" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: 332px; top: 552px; z-index:3001; background-color:#CCC; padding: 6px;">----------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate----------------------------------------------</div>
   <div id="footerContainer">
   	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; border-top: #333 5px groove; height:30px; position:static; cursor:n-resize; vertical-align:text-bottom; padding-top: 10px" align="center"><span style="vertical-align:bottom"><img src="image/dot_list.jpg">&nbsp;&nbsp;&nbsp;&nbsp;Embedded devices connecting graph&nbsp;&nbsp;&nbsp;&nbsp;<img src="image/dot_list.jpg"></span>
 </div>
+
+		  
+
           <div id="edNetworkContainer" style="position:static; border:0px; height: 218px; background-image:url(image/sky-bg.jpg); background-repeat:repeat; background-repeat: no-repeat; background-position: top center; background-attachment: fixed">
     	    <span id="edNetwork" style=" height:100%;"></span>
-          </div>
+</div>
           <script type="text/javascript" src="vis/dist/vis.js"></script>
           <link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
 		  <script type="text/javascript">
