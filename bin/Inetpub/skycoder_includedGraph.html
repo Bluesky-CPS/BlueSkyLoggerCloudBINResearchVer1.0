@@ -662,6 +662,12 @@ function showEDDetail(edIdx){
 			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
 			edDetailDescriptionObj.style.visibility = "visible";
 			console.log("BODYMOUSE:" + bodyMouse.x + " " + bodyMouse.y);
+			
+			var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+			var val = edData[edIdx].EDIP;
+			document.querySelector('#ed_ip [value="' + val + '"]').selected = true;
+			selectBox.refresh();
+			
 		}else{
 			edDetailDescriptionObj.style.visibility = "hidden";
 		}
@@ -769,12 +775,9 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					console.log("headerBarObjHeight: " + headerBarObjHeight + " diff:" + (parseInt(screenVH) - parseInt(actionObjHeight)));
 					if( parseInt(screenVH) - parseInt(actionObjHeight) > parseInt(headerBarObjHeight)){
 						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-						console.log("iffffffffffffffffffffffff");
 					}else{
 						actionObj.style.height = headerBarObjHeight + "px";
 					}
-					//actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-					//networkVS.setSize("100%", "100%");
 					
 					prevMouse = mouse;
 				} 
