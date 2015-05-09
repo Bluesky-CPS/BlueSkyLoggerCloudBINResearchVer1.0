@@ -648,6 +648,10 @@ function redrawEDGraph(){
 		var edIdx = parseInt(properties.nodes) - 2;
 		showEDDetail(edIdx);
 	});
+	networkVS.on('dragEnd', function (properties) {
+		console.log("drag: " + properties.nodeIds);
+		hideEDDetail("edDetailDescription");
+	});
 	
 }
 function showEDDetail(edIdx){
@@ -669,8 +673,12 @@ function showEDDetail(edIdx){
 			selectBox.refresh();
 			
 		}else{
-			edDetailDescriptionObj.style.visibility = "hidden";
+			hideEDDetail("edDetailDescription");
 		}
+}
+function hideEDDetail(detailID){
+	var edDetailDescriptionObj = document.getElementById(detailID);
+	edDetailDescriptionObj.style.visibility = "hidden";
 }
 
 function reloadEDData(){
@@ -710,7 +718,10 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 			var yBias = 15;
 			dragBarObj.isMouseDown = false;
 			
-			dragBarObj.onmousedown = function() { dragBarObj.isMouseDown = true;  };
+			dragBarObj.onmousedown = function() { 
+				dragBarObj.isMouseDown = true;  
+				hideEDDetail("edDetailDescription");
+			};
 			dragBarObj.onmouseup   = function() { 
 				dragBarObj.isMouseDown = false; 
 				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
