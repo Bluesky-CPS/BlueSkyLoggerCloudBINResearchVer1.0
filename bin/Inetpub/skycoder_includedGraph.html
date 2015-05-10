@@ -120,6 +120,7 @@ function handleRequestAnalysisContentPieces(req) {
 	writeroot.style.marginTop = '0';
 
 }
+
 function handleRequestConnectedStatement(req) {
 	var writeroot = document.getElementById('loaded');
 	var selectBox = document.getElementById('ed_ip');
@@ -169,7 +170,57 @@ function handleRequestConnectedStatement(req) {
 }
 
 var edData = [];
-
+function refreshEdConnStatSelectBox(){
+	var edDat = edData;
+	var len = edDat.length;
+	console.log(edDat);
+	if(edDat.length > 0){
+		//edDat[i].loggingStatus
+			
+		var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+		//var selectBox = document.getElementById("ed_ip");
+		var selectLen = selectBox.length;
+		
+		for(var i = 0; i < selectLen; i++){
+				selectBox.remove(0);
+		}
+		selectBox.refresh();
+		var tmp = "";
+		var selectedIndex = 0;
+		var statICN = "/image/offlineICN.gif";
+		for(var i = 0; i < len; i++){
+			var edipdat = edDat[i].EDIP;
+			var connstatus = edDat[i].connStatus;
+			var edtype = edDat[i].EDType;
+			
+			if(connstatus == "online"){
+				statICN = "/image/onlineICN.gif";
+			}else if(connstatus == "offline"){
+				statICN = "/image/offlineICN.gif";
+			}else{
+				statICN = "/image/sleepICN.gif";
+			}
+			
+			var jsonOBJ = new Object();
+			jsonOBJ.text = edipdat + " (" + connstatus + ")";
+			jsonOBJ.value = edipdat;
+			jsonOBJ.description = 'Device type: ' + edtype;
+			jsonOBJ.image = statICN;
+			jsonOBJ.className = '';
+			jsonOBJ.title = '';
+			
+			selectBox.add(jsonOBJ);
+	
+			if(connstatus == "online"){
+				selectedIndex = selectBox.length - 1;
+			}
+		}
+		selectBox.set("selectedIndex",selectedIndex);
+		
+		//selectBox.options[selectedIndex].selected = true;
+		selectBox.refresh();
+	}
+}
 function handleGetEDdataForGraph(req){
 	var JSONtxt = req.responseText;
 	var JSONParse = JSON.parse(JSONtxt);
@@ -640,6 +691,7 @@ function addBodyMouseListener(){
 
 var autoReloadEDdataRetID;
 var autoRedrawEDGraphRetID;
+var autoRefreshEDSelectBoxRetID;
 function redrawEDGraph(){
 	networkVS = new vis.Network(container, edNetworkData, options);
 	networkVS.on('select', function (properties) {
@@ -665,6 +717,13 @@ function showEDDetail(edIdx){
 			edDetailDescriptionObj.style.top = bodyMouse.y + "px";
 			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
 			edDetailDescriptionObj.style.visibility = "visible";
+			edDetailDescriptionObj.style.border = "#000000 1px dotted";
+			edDetailDescriptionObj.style.padding = "6px";
+			edDetailDescriptionObj.style.backgroundColor = "#CCC";
+			edDetailDescriptionObj.style.zIndex = "3001";
+			edDetailDescriptionObj.style.position = "fixed";
+			
+			
 			console.log("BODYMOUSE:" + bodyMouse.x + " " + bodyMouse.y);
 			
 			var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
@@ -691,6 +750,7 @@ function initOnload(){
 	redrawEDGraph();
 	autoReloadEDdataRetID = setInterval(reloadEDData, 30000);
 	autoRedrawEDGraphRetID = setInterval(redrawEDGraph, 60000);
+	autoRefreshEDSelectBoxRetID = setInterval(refreshEdConnStatSelectBox, 50000);
 	//autoReloadEDdataRetID = setInterval(testReload, 1000);
 	
 	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
@@ -787,7 +847,6 @@ function moveFooterUpMax(actionObjID){
 	
 	var edNetworkContainerObj = document.getElementById("edNetworkContainer");
 	edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + 15) + "px";
-				//edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
 	redrawEDGraph();
 }
 function moveFooterDownMax(actionObjID){
@@ -1167,11 +1226,12 @@ $(document).ready(function(e) {
             <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar('menuBar', '', 45);" onMouseOver="showMenuBar('menuBar', '', 45);" onMouseOut="">Main menu</div></td>
               <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
               <td width="210" valign="middle"><span style="vertical-align:middle">
-                <select id="ed_ip" name="ed_ip">
+                <select id="ed_ip" name="ed_ip" onChange="showEDSetting('edSettingContainer', 'edSettingBody');" onselect="showEDSetting('edSettingContainer', 'edSettingBody');">
                   <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected> Device IP: 172.16.4.127 (Offline) </option>
                 </select>
               </span></td>
-              <td width="279" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div></td>
+              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="showEDSetting('edSettingContainer', 'edSettingBody');"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="showEDSetting('edSettingContainer', 'edSettingBody');">Setting VD</div></td>
+              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh VD stat</div></td>
             </tr>
           </table></td>
         </tr>
@@ -1273,10 +1333,29 @@ function num(bar){
 }
 </script>
 
+<!-- Begin ed Setting Plate section-->
+<div id="edSettingContainer" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: calc(100% - 900px); top: 50px; z-index:3002; background-color:#FFFFFF; padding: 10px; padding-top: 6px; width: 900px; height:100%;">
+  <div id="edSettingTitle" align="right"><img src="image/x.gif" style="cursor: hand" onClick="document.getElementById('edSettingContainer').style.visibility='hidden'; ">&nbsp;&nbsp;&nbsp;</div>
+  <p><span id="edSettingBody">Underconstruction</span></p>
+  <p>&nbsp;</p>
+  <script>
+  	var showEDSetting = function(edSettingObjID, edSettingBodyObjID){
+		var edSettingObj = document.getElementById(edSettingObjID);
+		var edSettingBodyObj = document.getElementById(edSettingBodyObjID);
+		var edIPSelectionObj = document.getElementById("ed_ip");
+		
+		edSettingObj.style.visibility = "visible";
+		edSettingBodyObj.innerHTML = "Embedded Device IP: [" + edIPSelectionObj.value + "]<br><br> Sorry! It does not allow the setting feature of the virtual embedded device, please check the physical embedded device configuration again.";
+	}
+  </script>
+</div>
+<!-- End ed Setting Plate section-->
 
 <!-- API scripts section-->
 
 <div id="codingtextdiv" style=" top: 61px">
+
+
     	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center; padding: 20px">
     	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
     	    <ul class="TabbedPanelsTabGroup">
