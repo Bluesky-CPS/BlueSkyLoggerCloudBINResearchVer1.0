@@ -175,8 +175,7 @@ function refreshEdConnStatSelectBox(){
 	var len = edDat.length;
 	console.log(edDat);
 	if(edDat.length > 0){
-		//edDat[i].loggingStatus
-			
+		var previousSelectedVal = document.getElementById("ed_ip").value;
 		var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
 		//var selectBox = document.getElementById("ed_ip");
 		var selectLen = selectBox.length;
@@ -217,7 +216,8 @@ function refreshEdConnStatSelectBox(){
 		}
 		selectBox.set("selectedIndex",selectedIndex);
 		
-		//selectBox.options[selectedIndex].selected = true;
+		document.querySelector('#ed_ip [value="' + previousSelectedVal + '"]').selected = true;
+		
 		selectBox.refresh();
 	}
 }
