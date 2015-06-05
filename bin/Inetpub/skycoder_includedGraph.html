@@ -402,7 +402,30 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	communicationTxID++;
 	var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
 	
-	req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
+	var instruction_set = "";
+	if(!isProxy){
+		instruction_set = API_Script_edIP + '/' + instruction
+	}else{
+		/**
+		 * Convert to get method query parameters.
+		 * Convert ETlog request method to GET request method:
+		 *     "xxx.xx.xx.xxx/sensornetwork/gpio/set/22/1" => 
+		 *     "/ETLog?instrcution=sensornetwork&opt1=xxx.xx.xx.xxx&opt2=gpio&opt3=set&opt4=22&opt5=1"
+		 */
+		var instruction_splited = instruction.split("/");
+		var optDataSet = new Array();
+		var inst = instruction_splited[0];
+		optDataSet.push("opt1=" + API_Script_edIP);
+		instruction = "/ETLog?instruction=" + inst + "&" + optDataSet;
+		for(var i = 1; i < instruction_splited.length; i++){
+			optDataSet.push("opt" + (i + 1) + "=" + instruction_splited[i]);
+			instruction += "&" + optDataSet[i];
+		}
+		instruction_set = instruction;
+		method = "GET";
+	}
+	req.open(method, LE_domain + '' + instruction_set,true);
+	//req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
 	req.timeStamp = timeStamp;
 	req.id = communicationTxID;
 	req.instruction = instruction;
@@ -474,6 +497,34 @@ function sendRequest2(url,callback,postData) {
 	if (req.readyState == 4) return;
 	req.send(postData);
 
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(url == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(url == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+function sendRequestGET(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	//var edIP = document.getElementById('ed_ip');
+	var method = postData;
+	req.open(method,'/ETLog?' + url,true);
+	if (postData)
+		//req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
 	cnt++;
 	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
 		if(url == "startlogging"){
@@ -713,7 +764,7 @@ function showEDDetail(edIdx){
 			console.log(edData[edIdx].EDIP);
 			console.log(edData[edIdx].EDCNAME);
 			console.log(edData[edIdx].EDType);
-			edDetailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + edData[edIdx].EDIP + "<br>" + "<strong>Device Name: </strong>" + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
+			edDetailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + "<a href='#' onclick='copyTextToClipboard(\"" + edData[edIdx].EDIP + "\");'>" + edData[edIdx].EDIP + "</a>" + "<br>" + "<strong>Device Name: </strong>"  + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
 			edDetailDescriptionObj.style.top = bodyMouse.y + "px";
 			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
 			edDetailDescriptionObj.style.visibility = "visible";
@@ -741,9 +792,22 @@ function hideEDDetail(detailID){
 }
 
 function reloadEDData(){
-	sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+	if(!isProxy){
+		sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+	}else{
+		sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleGetEDdataForGraph,'GET');
+	}
+}
+var isProxy = false;
+var isOnProxy = function(){
+	var req = new XMLHttpRequest();
+	req.open('GET', document.location, false);
+	req.send();
+	return (req.getResponseHeader("Proxy-Connection") || req.getResponseHeader("via")) ? true : false;
 }
 function initOnload(){
+	isProxy = isOnProxy();
+	console.log(isProxy);
 	addBodyMouseListener();
 	initFooterDragEventListener("footerDragBar", "footerContainer");
 	reloadEDData();
@@ -752,8 +816,11 @@ function initOnload(){
 	autoRedrawEDGraphRetID = setInterval(redrawEDGraph, 60000);
 	autoRefreshEDSelectBoxRetID = setInterval(refreshEdConnStatSelectBox, 50000);
 	//autoReloadEDdataRetID = setInterval(testReload, 1000);
-	
-	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	if(!isProxy){
+		sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	}else{
+		sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleRequestConnectedStatement,'GET');
+	}
 	//The difference time will be store in "document.difftime"
 	var timeDifference = getBrowserServerTimeDifference("/ETLog?instruction=time&opt1=this");
 	/*dd = new Date();
@@ -786,8 +853,11 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 				dragBarObj.isMouseDown = false; 
 				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
 				edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
-				
-				sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+				if(!isProxy){
+					sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+				}else{
+					sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleGetEDdataForGraph,'GET');
+				}
 				redrawEDGraph();
 			};
 			dragBarObj.onmouseout  = function(e) { 
@@ -853,6 +923,15 @@ function moveFooterDownMax(actionObjID){
 	var actionObj = document.getElementById(actionObjID);
 	actionObj.style.height = "45px";
 }
+var copyTextToClipboard = function(txt){
+    var copyArea = $("<textarea/>");
+    copyArea.text(txt);
+    $("body").append(copyArea);
+    copyArea.select();
+    document.execCommand("copy");
+    copyArea.remove();
+}
+
 
 var isCameraShowing = 0;
 var lock = 0;
@@ -1231,7 +1310,7 @@ $(document).ready(function(e) {
                 </select>
               </span></td>
               <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="showEDSetting('edSettingContainer', 'edSettingBody');"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="showEDSetting('edSettingContainer', 'edSettingBody');">Setting VD</div></td>
-              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh VD stat</div></td>
+              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="if(isProxy){sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleRequestConnectedStatement,'GET');}else{sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');}">Refresh VD stat</div></td>
             </tr>
           </table></td>
         </tr>
