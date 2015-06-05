@@ -410,7 +410,7 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 		 * Convert to get method query parameters.
 		 * Convert ETlog request method to GET request method:
 		 *     "xxx.xx.xx.xxx/sensornetwork/gpio/set/22/1" => 
-		 *     "/ETLog?instrcution=sensornetwork&opt1=xxx.xx.xx.xxx&opt2=gpio&opt3=set&opt4=22&opt5=1"
+		 *     "/ETLog?instruction=sensornetwork&opt1=xxx.xx.xx.xxx&opt2=gpio&opt3=set&opt4=22&opt5=1"
 		 */
 		var instruction_splited = instruction.split("/");
 		var optDataSet = new Array();
