@@ -17,9 +17,27 @@
 
 <script src="jquery-ui.js"></script>
 
+<script type="text/javascript" src="zeroclipboard/ZeroClipboard.js"></script>
+<!--<script type="text/javascript" src="zeroclipboard/jquery.zclip.js"></script> 
+<script type="text/javascript" src="zeroclipboard/jquery.zclip.minjs"></script>-->
 
 <script language="javascript">
+/*$(document).ready(function(){
+	$('a#edipclick').zclip({
+	path:'zeroclipboard/ZeroClipboard.swf',
+	copy:$('p#description').text()
+	});
+	// The link with ID "copy-description" will copy
+	// the text of the paragraph with ID "description"
+});
 
+$("a#edipclick").zclip({
+path: "zeroclipboard/ZeroClipboard.swf",
+copy: function(){
+    return $(this).prev().val();
+    }
+});
+*/
 
 $(function() {
 	$( "#loaded_container" ).draggable();
@@ -120,6 +138,7 @@ function handleRequestAnalysisContentPieces(req) {
 	writeroot.style.marginTop = '0';
 
 }
+
 function handleRequestConnectedStatement(req) {
 	var writeroot = document.getElementById('loaded');
 	var selectBox = document.getElementById('ed_ip');
@@ -138,7 +157,7 @@ function handleRequestConnectedStatement(req) {
 	var statICN = "/image/offlineICN.gif";
 	for(var i = 0; i < len; i++){
 		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP;
-		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
+		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus;
 		var edtype = JSONParse.ETLog.EDConnStatement[i].EDType;
 		
 		if(connstatus == "online"){
@@ -168,17 +187,74 @@ function handleRequestConnectedStatement(req) {
 	selectBox.refresh();
 }
 
+var edData = [];
+function refreshEdConnStatSelectBox(){
+	var edDat = edData;
+	var len = edDat.length;
+	console.log(edDat);
+	if(edDat.length > 0){
+		var previousSelectedVal = document.getElementById("ed_ip").value;
+		var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+		//var selectBox = document.getElementById("ed_ip");
+		var selectLen = selectBox.length;
+		
+		for(var i = 0; i < selectLen; i++){
+				selectBox.remove(0);
+		}
+		selectBox.refresh();
+		var tmp = "";
+		var selectedIndex = 0;
+		var statICN = "/image/offlineICN.gif";
+		for(var i = 0; i < len; i++){
+			var edipdat = edDat[i].EDIP;
+			var connstatus = edDat[i].connStatus;
+			var edtype = edDat[i].EDType;
+			
+			if(connstatus == "online"){
+				statICN = "/image/onlineICN.gif";
+			}else if(connstatus == "offline"){
+				statICN = "/image/offlineICN.gif";
+			}else{
+				statICN = "/image/sleepICN.gif";
+			}
+			
+			var jsonOBJ = new Object();
+			jsonOBJ.text = edipdat + " (" + connstatus + ")";
+			jsonOBJ.value = edipdat;
+			jsonOBJ.description = 'Device type: ' + edtype;
+			jsonOBJ.image = statICN;
+			jsonOBJ.className = '';
+			jsonOBJ.title = '';
+			
+			selectBox.add(jsonOBJ);
+	
+			if(connstatus == "online"){
+				selectedIndex = selectBox.length - 1;
+			}
+		}
+		selectBox.set("selectedIndex",selectedIndex);
+		
+		document.querySelector('#ed_ip [value="' + previousSelectedVal + '"]').selected = true;
+		
+		selectBox.refresh();
+	}
+}
 function handleGetEDdataForGraph(req){
 	var JSONtxt = req.responseText;
 	var JSONParse = JSON.parse(JSONtxt);
 	var len = JSONParse.ETLog.EDConnStatement.length;
+	edData = JSONParse.ETLog.EDConnStatement;
 	var statICN = "/image/offlineICN.gif";
 	
-		
+	var URL_STR = document.URL, urlPathname = window.location.pathname;
+	var  centralNodeURL = URL_STR.replace(urlPathname, " ");
+	
 	nodes = [
-                {id: 1, label: 'Central Node'}
+                {id: 0, label: 'Your Browser', image: DIR1 + 'Hardware-My-Computer-3-icon.png', shape: 'image'},
+				{id: 1, label: 'Central Node\n' + centralNodeURL, image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'}
     ];
 	edges = [
+			 {from: 0, to: 1, length: LENGTH_MAIN*2.5}
     ];
 
 	var pushDat;
@@ -189,24 +265,22 @@ function handleGetEDdataForGraph(req){
 		var connstatus = JSONParse.ETLog.EDConnStatement[i].connStatus
 		
 		if(connstatus == "online"){
-			statICN = "/image/onlineICN.gif";
+			statICN = "/image/ed_online.gif";
 		}else if(connstatus == "offline"){
-			statICN = "/image/offlineICN.gif";
+			statICN = "/image/ed_offline.gif";
 		}else{
-			statICN = "/image/sleepICN.gif";
+			statICN = "/image/ed_sleep.gif";
 		}
 		
 		var edipdat = JSONParse.ETLog.EDConnStatement[i].EDIP + "\n[" + JSONParse.ETLog.EDConnStatement[i].EDCNAME + "]";
 		
 		
 		
-		pushDat = {id: (i + 2), label: edipdat};
+		pushDat = {id: (i + 2), label: edipdat, image: statICN, shape: 'image'};
 		nodes.push(pushDat);
-		pushDat = {from: 1, to: (i+2)};
+		pushDat = {from: 1, to: (i+2), length: LENGTH_MAIN};
 		edges.push(pushDat);
 	}
-	/*pushDat = {from: 1, to: (i+1)};
-	edges.push(pushDat);*/
 	
 	edNetworkData = {
 		nodes: nodes,
@@ -214,6 +288,7 @@ function handleGetEDdataForGraph(req){
 	};
 	
 	console.log(edNetworkData);
+	console.log(edData);
 }
 
 var isLogging = 0;
@@ -345,7 +420,30 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	communicationTxID++;
 	var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
 	
-	req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
+	var instruction_set = "";
+	if(!isProxy){
+		instruction_set = API_Script_edIP + '/' + instruction
+	}else{
+		/**
+		 * Convert to get method query parameters.
+		 * Convert ETlog request method to GET request method:
+		 *     "xxx.xx.xx.xxx/sensornetwork/gpio/set/22/1" => 
+		 *     "/ETLog?instruction=sensornetwork&opt1=xxx.xx.xx.xxx&opt2=gpio&opt3=set&opt4=22&opt5=1"
+		 */
+		var instruction_splited = instruction.split("/");
+		var optDataSet = new Array();
+		var inst = instruction_splited[0];
+		optDataSet.push("opt1=" + API_Script_edIP);
+		instruction = "/ETLog?instruction=" + inst + "&" + optDataSet;
+		for(var i = 1; i < instruction_splited.length; i++){
+			optDataSet.push("opt" + (i + 1) + "=" + instruction_splited[i]);
+			instruction += "&" + optDataSet[i];
+		}
+		instruction_set = instruction;
+		method = "GET";
+	}
+	req.open(method, LE_domain + '' + instruction_set,true);
+	//req.open(method, LE_domain + '' + API_Script_edIP + '/' + instruction,true);
 	req.timeStamp = timeStamp;
 	req.id = communicationTxID;
 	req.instruction = instruction;
@@ -417,6 +515,34 @@ function sendRequest2(url,callback,postData) {
 	if (req.readyState == 4) return;
 	req.send(postData);
 
+	cnt++;
+	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
+		if(url == "startlogging"){
+			startGetBSFLogSize();	
+		}else if(url == "stoplogging"){
+			stopGetBSFLogSize();
+		}
+	}
+	return;
+}
+function sendRequestGET(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	//var edIP = document.getElementById('ed_ip');
+	var method = postData;
+	req.open(method,'/ETLog?' + url,true);
+	if (postData)
+		//req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+			document.getElementById("loaded").innerHTML = "Something wrong! Please check network connection or your server operation.";
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
 	cnt++;
 	if(isNoDevice == 0 /*&& cnt%2 == 1*/){
 		if(url == "startlogging"){
@@ -611,10 +737,136 @@ function stopGetBSFLogSize(){
 	//nsWaitForDelay(10);
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 }
-function initOnload(){
-	initFooterDragEventListener("footerDragBar", "footerContainer");
+
+
+var bodyMouse = {x: 0, y: 0};
+function addBodyMouseListener(){
+	var bodyObj = document.body;
+	bodyObj.onmousemove = function(e){
+		var mouse = {x: 0, y: 0};
+		mouse.x = e.clientX || e.pageX; 
+		mouse.y = e.clientY || e.pageY;
+		bodyMouse = mouse;
+	}
+	bodyObj.onmouseup = function(e){
+		var mouse = {x: 0, y: 0};
+		mouse.x = e.clientX || e.pageX; 
+		mouse.y = e.clientY || e.pageY;
+		bodyMouse = mouse;
+	}
+}
+
+
+
+var autoReloadEDdataRetID;
+var autoRedrawEDGraphRetID;
+var autoRefreshEDSelectBoxRetID;
+var curr_edIdx = 0;
+function redrawEDGraph(){
+	networkVS = new vis.Network(container, edNetworkData, options);
+	networkVS.on('select', function (properties) {
+		console.log('selected nodes: ' + properties.nodes);
+		//edData = JSONParse.ETLog.EDConnStatement;
+		var edIdx = parseInt(properties.nodes) - 2;
+		curr_edIdx = edIdx;
+		showEDDetail(edIdx);
+	});
+	networkVS.on('dragEnd', function (properties) {
+		console.log("drag: " + properties.nodeIds);
+		hideEDDetail("edDetailDescription");
+	});
+}
+var clipboard = null;
+function clipboardInit() {
+	clipboard = new ZeroClipboard.Client();
+	clipboard.setHandCursor( true );
 	
-	sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+	/*clipboard.addEventListener('load', function (client) {
+		debugstr("Flash movie loaded and ready.");
+	});*/
+	
+	clipboard.addEventListener('mouseOver', function (client) {
+		// update the text on mouse over
+		clipboard.setText( document.getElementById('edipclickeddata').value );
+		//clipboard.setText( "fsefsefsdfse" );
+		console.log("update the text on mouse over: " + edData[curr_edIdx].EDIP);
+	});
+	
+	
+	/*clipboard.addEventListener('complete', function (client, text) {
+		debugstr("Copied text to clipboard: " + text );
+	});*/
+	
+	clipboard.glue('edipclick');
+	
+	//copyTextToClipboard("textssssss");
+}
+function showEDDetail(edIdx){
+		var edDetailDescriptionObj = document.getElementById("edDetailDescription");
+		if(edIdx >= 0){
+			console.log(edData[edIdx].loggingStatus);
+			console.log(edData[edIdx].EDIP);
+			console.log(edData[edIdx].EDCNAME);
+			console.log(edData[edIdx].EDType);
+			edDetailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + "<a href='#' onclick='copyTextToClipboard(\"" + edData[edIdx].EDIP + "\");' id='edipclick'>" + edData[edIdx].EDIP + "</a>" + "<br>" + "<strong>Device Name: </strong>"  + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
+			edDetailDescriptionObj.style.top = bodyMouse.y + "px";
+			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
+			edDetailDescriptionObj.style.visibility = "visible";
+			edDetailDescriptionObj.style.border = "#000000 1px dotted";
+			edDetailDescriptionObj.style.padding = "6px";
+			edDetailDescriptionObj.style.backgroundColor = "#CCC";
+			edDetailDescriptionObj.style.zIndex = "3001";
+			edDetailDescriptionObj.style.position = "fixed";
+			
+			
+			console.log("BODYMOUSE:" + bodyMouse.x + " " + bodyMouse.y);
+			
+			var selectBox = $("#ed_ip").msDropdown({roundedCorner:false, visibleRows: 4}).data("dd");
+			var val = edData[edIdx].EDIP;
+			document.querySelector('#ed_ip [value="' + val + '"]').selected = true;
+			selectBox.refresh();
+			
+		}else{
+			hideEDDetail("edDetailDescription");
+		}
+}
+function hideEDDetail(detailID){
+	var edDetailDescriptionObj = document.getElementById(detailID);
+	edDetailDescriptionObj.style.visibility = "hidden";
+}
+
+function reloadEDData(){
+	if(!isProxy){
+		sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+	}else{
+		sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleGetEDdataForGraph,'GET');
+	}
+}
+var isProxy = false;
+var isOnProxy = function(){
+	var req = new XMLHttpRequest();
+	req.open('GET', document.location, false);
+	req.send();
+	return (req.getResponseHeader("Proxy-Connection") || req.getResponseHeader("via")) ? true : false;
+}
+function initOnload(){
+	isProxy = isOnProxy();
+	
+	addBodyMouseListener();
+	initFooterDragEventListener("footerDragBar", "footerContainer");
+	reloadEDData();
+	redrawEDGraph();
+	autoReloadEDdataRetID = setInterval(reloadEDData, 30000);
+	autoRedrawEDGraphRetID = setInterval(redrawEDGraph, 60000);
+	autoRefreshEDSelectBoxRetID = setInterval(refreshEdConnStatSelectBox, 50000);
+	//autoReloadEDdataRetID = setInterval(testReload, 1000);
+	if(!isProxy){
+		sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
+		console.log("handleRequestConnectedStatement with ETLOG");
+	}else{
+		sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleRequestConnectedStatement,'GET');
+		console.log("handleRequestConnectedStatement with GET");
+	}
 	//The difference time will be store in "document.difftime"
 	var timeDifference = getBrowserServerTimeDifference("/ETLog?instruction=time&opt1=this");
 	/*dd = new Date();
@@ -622,6 +874,9 @@ function initOnload(){
 	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
 	var dDateOBJ = document.getElementById("jsonDate");
 	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
+	showEDDetail(0);
+	hideEDDetail("edDetailDescription");
+	clipboardInit();
 }
 
 var prevMouse = {x: 0, y: 0};
@@ -636,19 +891,23 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 		actionObj = document.getElementById(actionObjID);
 		
 		if(dragBarObj){
-			
+			var yBias = 15;
 			dragBarObj.isMouseDown = false;
 			
-			var yBias = 15;
-			
-			dragBarObj.onmousedown = function() { dragBarObj.isMouseDown = true;  };
-			dragBarObj.onmouseup   = function() { dragBarObj.isMouseDown = false; 
+			dragBarObj.onmousedown = function() { 
+				dragBarObj.isMouseDown = true;  
+				hideEDDetail("edDetailDescription");
+			};
+			dragBarObj.onmouseup   = function() { 
+				dragBarObj.isMouseDown = false; 
 				var edNetworkContainerObj = document.getElementById("edNetworkContainer");
 				edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + parseInt(dragBarObj.style.height)) + "px";
-				
-				
-				sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
-				networkVS = new vis.Network(container, edNetworkData, options);
+				if(!isProxy){
+					sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG');
+				}else{
+					sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleGetEDdataForGraph,'GET');
+				}
+				redrawEDGraph();
 			};
 			dragBarObj.onmouseout  = function(e) { 
 				if(dragBarObj.isMouseDown){
@@ -657,11 +916,12 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					mouse.x = e.clientX || e.pageX; 
 					mouse.y = e.clientY || e.pageY;
 					
-					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var screenVH = parseInt(window.innerHeight) || parseInt($(window).height());   // returns height of browser viewport
 					var mouseCurrY = parseInt(mouse.y);
 					
+					var headerBarObjStyle = window.getComputedStyle(document.getElementById("headerContainer")), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					console.log("headerBarObjHeight: " + headerBarObjHeight);
 					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-					//networkVS.setSize("100%", "100%");
 				}
 			};
 			dragBarObj.onmousemove = function(e) { 
@@ -677,28 +937,18 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 					var dragBarObjStyle = window.getComputedStyle(dragBarObj), dragBarObjHeight = dragBarObjStyle.getPropertyValue("height");
 					var actionObjStyle = window.getComputedStyle(actionObj), actionObjHeight = actionObjStyle.getPropertyValue("height");
 					
-					var screenVH = parseInt($(window).height());   // returns height of browser viewport
+					var screenVH =  parseInt(window.innerHeight) || parseInt($(window).height());   // returns height of browser viewport
 					var screenDH = parseInt($(document).height()); // returns height of HTML document
 					var mouseCurrY = parseInt(mouse.y);
 					var mousePrevY = parseInt(prevMouse.y);
 					var footerRefFromTopDiff = parseInt(screenVH - mousePrevY);
 					
-					
-					console.log("dragBarObjHeight: " + dragBarObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
-					console.log("   actionObjHeight: " + parseInt(actionObjHeight));
-					console.log("   dragBarObjHeight: " + parseInt(dragBarObjHeight));
-					console.log("   screenVH: " + parseInt(screenVH));
-					console.log("   screenDH: " + parseInt(screenDH));
-					console.log("   yBias: " + parseInt(yBias));
-					console.log("   footerRefFromTopDiff: " + parseInt(footerRefFromTopDiff));
-					
-					
-					
-					console.log("actionObjHeight: " + actionObjHeight + "  x: " + mouse.x + ", y: " + mouse.y);
-					
-					actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
-					
-					//networkVS.setSize("100%", "100%");
+					var headerBarObjStyle = window.getComputedStyle(document.getElementById("headerContainer")), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+					if( parseInt(screenVH) - parseInt(actionObjHeight) > parseInt(headerBarObjHeight)){
+						actionObj.style.height = (screenVH - mouseCurrY + yBias) + "px";
+					}else{
+						actionObj.style.height = headerBarObjHeight + "px";
+					}
 					
 					prevMouse = mouse;
 				} 
@@ -706,10 +956,44 @@ function initFooterDragEventListener(dragBarObjID, actionObjID){
 		}
 	}
 }
-var footerDrag = function(objID){
-	var actionObjID = "test";
-	console.log("actionObjID: " + this.actionObjID + "objID: " + objID + " action.....\r\n");
+function moveFooterUpMax(actionObjID){
+	var headerBarObjStyle = window.getComputedStyle(document.getElementById("headerContainer")), headerBarObjHeight = headerBarObjStyle.getPropertyValue("height");
+	var screenVH =  parseInt(window.innerHeight) || parseInt($(window).height());   // returns height of browser viewport
+	
+	var actionObj = document.getElementById(actionObjID);
+	console.log(headerBarObjHeight);
+	actionObj.style.height = (parseInt(screenVH) - parseInt(headerBarObjHeight)) + "px";
+	
+	var edNetworkContainerObj = document.getElementById("edNetworkContainer");
+	edNetworkContainerObj.style.height = (parseInt(actionObj.style.height) + 15) + "px";
+	redrawEDGraph();
 }
+function moveFooterDownMax(actionObjID){
+	var actionObj = document.getElementById(actionObjID);
+	actionObj.style.height = "45px";
+}
+var copyTextToClipboard = function(txt){
+	var copyArea = $("<textarea/>");
+	try{
+		copyArea.text(txt);
+		$("body").append(copyArea);
+		copyArea.select();
+		
+		document.execCommand("copy");
+		
+		console.log("copied");
+		copyArea.remove();
+	}catch(e){
+		copyArea.remove();
+		console.log(e);
+		alert("Sorry! Your browser has protected or not supported the clipboard scripted operation. Please, using the manual clipboard operation. \r\n Mask the area =>  right click them => left click the 'copy'");
+	}
+	//----------------------------------------
+	console.log(txt);
+	document.getElementById("edipclickeddata").value = txt;
+	//clipboard.setText(txt);
+}
+
 
 var isCameraShowing = 0;
 var lock = 0;
@@ -767,7 +1051,7 @@ function refreshCanvas(){
 	right: 0;
 	bottom: 0;
 	width: 100%;
-	height:30px;
+	height:45px;
 	margin-top: 0;
 	background-color:#FFFFFF;
 	border-bottom: groove;
@@ -1083,11 +1367,12 @@ $(document).ready(function(e) {
             <td width="164" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid; cursor: hand;"><div id="mainMenuBtn" class="mainMenuBtn" style="vertical-align:middle; padding: 4px; text-align: center; width:100%; font-family:Verdana, Geneva, sans-serif; font-size:12px; cursor: hand;" onMouseMove="showMenuBar('menuBar', '', 45);" onMouseOver="showMenuBar('menuBar', '', 45);" onMouseOut="">Main menu</div></td>
               <td width="152" align="right" valign="middle" background="image/gray_bg_bar.gif" style="vertical-align:middle; border-bottom: #c3c3c3 1px solid; border-left: #c3c3c3 1px solid; border-top: #c3c3c3 1px solid"><div style="vertical-align:middle; padding: 4px; text-align: center; width:150px; font-family:Verdana, Geneva, sans-serif; font-size:12px">Embedded Device: </div></td>
               <td width="210" valign="middle"><span style="vertical-align:middle">
-                <select id="ed_ip" name="ed_ip">
+                <select id="ed_ip" name="ed_ip" onChange="showEDSetting('edSettingContainer', 'edSettingBody');" onselect="showEDSetting('edSettingContainer', 'edSettingBody');">
                   <option data-image="/image/offlineICN.gif" value="172.16.4.127" selected> Device IP: 172.16.4.127 (Offline) </option>
                 </select>
               </span></td>
-              <td width="279" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="javascript:sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG')">Refresh embedded devices statement</div></td>
+              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;" onClick="showEDSetting('edSettingContainer', 'edSettingBody');"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="showEDSetting('edSettingContainer', 'edSettingBody');">Setting VD</div></td>
+              <td width="179" align="left" valign="middle" background="image/gray_bg_bar.gif" style="border: #c3c3c3 1px solid;cursor: hand;"><div style="border: 0px; height:100%; padding: 0px; margin: 0px; padding-left: 5px; padding-right: 5px; cursor: hand; font-family:Verdana, Geneva, sans-serif; font-size:12px; text-align: center; width:100%" onClick="if(isProxy){sendRequestGET('instruction=ls&opt1=noneFix&opt2=edconnected',handleRequestConnectedStatement,'GET');}else{sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');}">Refresh VD stat</div></td>
             </tr>
           </table></td>
         </tr>
@@ -1189,10 +1474,29 @@ function num(bar){
 }
 </script>
 
+<!-- Begin ed Setting Plate section-->
+<div id="edSettingContainer" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: calc(100% - 900px); top: 50px; z-index:3002; background-color:#FFFFFF; padding: 10px; padding-top: 6px; width: 900px; height:100%;">
+  <div id="edSettingTitle" align="right"><img src="image/x.gif" style="cursor: hand" onClick="document.getElementById('edSettingContainer').style.visibility='hidden'; ">&nbsp;&nbsp;&nbsp;</div>
+  <p><span id="edSettingBody">Underconstruction</span></p>
+  <p>&nbsp;</p>
+  <script>
+  	var showEDSetting = function(edSettingObjID, edSettingBodyObjID){
+		var edSettingObj = document.getElementById(edSettingObjID);
+		var edSettingBodyObj = document.getElementById(edSettingBodyObjID);
+		var edIPSelectionObj = document.getElementById("ed_ip");
+		
+		edSettingObj.style.visibility = "visible";
+		edSettingBodyObj.innerHTML = "Embedded Device IP: [" + edIPSelectionObj.value + "]<br><br> Sorry! It does not allow the setting feature of the virtual embedded device, please check the physical embedded device configuration again.";
+	}
+  </script>
+</div>
+<!-- End ed Setting Plate section-->
 
 <!-- API scripts section-->
 
 <div id="codingtextdiv" style=" top: 61px">
+
+
     	<div id="tabContainer" style="width:530px; vertical-align:middle; align: center; padding: 20px">
     	  <div id="TabbedPanels1" class="TabbedPanels" style="align: center">
     	    <ul class="TabbedPanelsTabGroup">
@@ -1477,25 +1781,34 @@ for(var i = 22; i < 25; i++){
     	    <iframe src="ed_ip_view.html" width="100%" height="100%" border="0" style="border: 0px; height: 100%">Sorry!</iframe>
           </div>
 	</div>
-  
+  <input type="hidden" value='0.0.0.0' id="edipclickeddata">
+  <div id="edDetailDescription" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: 332px; top: 552px; z-index:3001; background-color:#CCC; padding: 6px;">----------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate----------------------------------------------</div>
   <div id="footerContainer">
-  	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; height:50px; position:static; cursor:n-resize"><img src="image/dot_list.jpg"> Embedded devices connecting graph
-          </div>
-          <div id="edNetworkContainer" style="position:static; border:0px; height: 218px;">
+  	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; border-top: #333 5px groove; height:30px; position:static; cursor:n-resize; vertical-align:text-bottom; padding-top: 10px" align="center"><span align="left" style=" vertical-align:middle; cursor:hand"><img src="image/upArrow.gif" onClick="moveFooterUpMax('footerContainer'); sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG'); redrawEDGraph();"></span><span style="vertical-align:bottom">&nbsp;&nbsp;&nbsp;&nbsp;Embedded devices connecting graph&nbsp;&nbsp;&nbsp;&nbsp;</span><span align="right" style=" vertical-align:middle; cursor:hand"><img src="image/downArrow.gif" onClick="moveFooterDownMax('footerContainer');"></span>
+</div>
+
+		  
+
+          <div id="edNetworkContainer" style="position:static; border:0px; height: 218px; background-image:url(image/sky-bg.jpg); background-repeat:repeat; background-repeat: no-repeat; background-position: top center; background-attachment: fixed">
     	    <span id="edNetwork" style=" height:100%;"></span>
-          </div>
+</div>
           <script type="text/javascript" src="vis/dist/vis.js"></script>
+          <link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
 		  <script type="text/javascript">
+			  var DIR1 = 'vis/examples/network/img/refresh-cl/';
+			  var DIR2 = 'image/';
+			  var LENGTH_MAIN = 160;
+			  var LENGTH_SUB = 50;
               // create an array with nodes
               var nodes = [
-                {id: 1, label: 'Central Node'},
-                {id: 2, label: '172.16.4.222'},
-                {id: 3, label: '172.16.4.223'},
-                {id: 4, label: '172.16.4.224'},
-                {id: 5, label: '172.16.4.225'}
+                {id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
+                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 3, label: '172.16.4.223', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 4, label: '172.16.4.224', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 5, label: '172.16.4.225', image: DIR2 + 'ed.gif', shape: 'image'}
               ];
             
-			var dat = {id: 6, label: '172.16.4.226'};
+			var dat = {id: 6, label: '172.16.4.226', image: DIR2 + 'ed.gif', shape: 'image'};
 			nodes.push(dat);
               // create an array with edges
               var edges = [
@@ -1516,13 +1829,19 @@ for(var i = 22; i < 25; i++){
               };
               var options = {
                 width: '100%',
-                height: '100%'
+                height: '100%',
+				stabilize: false,
+				nodes: {fontColor: 'black'},
+				edges: {color: 'blue'}
               };
               var networkVS = new vis.Network(container, edNetworkData, options);
 			  //networkVS.resize("100%", "100%");
 			  /*networkVS.on('resize', function(prop){
 				console.log("width:" + width + " height:" + height);
 			  });*/
+			  networkVS.on('select', function (properties) {
+			 	 console.log('selected nodes: ' + properties.nodes);
+			  });
           </script>
   </div>  
     <div id="ed_ip_graph_container">
@@ -1564,6 +1883,10 @@ for(var i = 22; i < 25; i++){
 	}
 	JSrun = function() {
 		document.getElementById("animation_area").innerHTML = "";
+		stepBehavior.innerHTML = "";
+		communicationTableIDs = new Array();
+		communicationTxID = 0;
+		
 		Concurrent.Thread.create(
 			function(){
 				var str;

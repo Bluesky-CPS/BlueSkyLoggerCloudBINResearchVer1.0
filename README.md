@@ -33,7 +33,7 @@ Getting Started
   
   *For stop all running servers.*
   ```shell
-  ./stopAllAerver.sh
+  ./stopAllServer.sh
   ```
 	
 - **Enjoy the environment**
