@@ -1774,7 +1774,7 @@ for(var i = 22; i < 25; i++){
 }
               </textarea>
               <script>
-				var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+				var JsEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
 				mode: "javascript",
 				lineNumbers: true,
 				lineWrapping: true,
@@ -1913,11 +1913,13 @@ for(var i = 22; i < 25; i++){
 				d = new Date().getTime();
 				try {
 					with (Math) {
-						str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
+						//str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
+						str = JSoutput(eval(headerCode.value + "\r\n" + JsEditor.getValue()));
 					}
 				} catch(e) {
 					str = e.name+" at line "+(e.lineNumber-56)+": "+e.message;
 				}
+				console.log(JsEditor.getValue());
 				//var tnode = document.getElementById("JStiming");
 				//tnode.innerHTML = ""+(new Date().getTime()-d)/1000;
 				if (str != undefined) {outnode.value += str;}
