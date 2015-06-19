@@ -29,6 +29,7 @@
 <script src="codemirror/codemirror-5.3/addon/fold/foldgutter.js"></script>
 <script src="codemirror/codemirror-5.3/addon/fold/brace-fold.js"></script>
 <script src="codemirror/codemirror-5.3/addon/fold/comment-fold.js"></script>
+<script src="codemirror/codemirror-5.3/addon/selection/active-line.js"></script>
 <script src="codemirror/codemirror-5.3/mode/javascript/javascript.js"></script>
 <!-- End Code Mirror -->
 
@@ -768,7 +769,31 @@ function addBodyMouseListener(){
 	}
 }
 
+var downloadAsFile = function(downloadToFileName, content) {
+	content = content.replace(/\n/mg, "\r\n");
+	
+	var blob = new Blob([content]);
+	var url = window.URL || window.webkitURL;
+	var blobURL = url.createObjectURL(blob);
 
+	var a = document.createElement('a');
+	a.download = downloadToFileName;
+	a.href = blobURL;
+	a.click();  
+};
+
+var readTextToCodemirrorTxt = function(that, codemirrorInstance){
+	if(that.files && that.files[0]){
+		var reader = new FileReader();
+		reader.onload = function (e) {  
+			var output = e.target.result;
+
+			codemirrorInstance.setValue(output);
+			codemirrorInstance.refresh();
+		};
+		reader.readAsText(that.files[0]);
+	}
+}
 
 var autoReloadEDdataRetID;
 var autoRedrawEDGraphRetID;
@@ -1768,16 +1793,21 @@ function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value
 }
               </textarea>
               <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
-//This is JavaScript coding area. You can type your sensing code with your JavaScript at the browser. The following code is sensing/actuating code.
+/**
+ * This is JavaScript coding area. 
+ * You can edit your sensing code with your JavaScript at the browser. 
+ * The following code is sensing/actuating code.
+ */
+ 
 for(var i = 22; i < 25; i++){
     sensornetwork("172.16.4.222", "gpio", "set", ""+i, "1");
-}
-              </textarea>
+}</textarea>
               <script>
 				var JsEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
 				mode: "javascript",
 				lineNumbers: true,
 				lineWrapping: true,
+				styleActiveLine: true,
 				extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
 				foldGutter: true,
 				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
@@ -1785,7 +1815,9 @@ for(var i = 22; i < 25; i++){
  			</script>
             <br>
                 
-                <button onClick="JSrun()" id="JSrun">Execute</button>
+                <button onClick="JSrun()" id="JSrun">Execute</button> 
+                <button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your local storage</button>
+                <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
                 </div>
             </div>
   	    </div>
@@ -1913,13 +1945,11 @@ for(var i = 22; i < 25; i++){
 				d = new Date().getTime();
 				try {
 					with (Math) {
-						//str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
 						str = JSoutput(eval(headerCode.value + "\r\n" + JsEditor.getValue()));
 					}
 				} catch(e) {
 					str = e.name+" at line "+(e.lineNumber-56)+": "+e.message;
 				}
-				console.log(JsEditor.getValue());
 				//var tnode = document.getElementById("JStiming");
 				//tnode.innerHTML = ""+(new Date().getTime()-d)/1000;
 				if (str != undefined) {outnode.value += str;}
