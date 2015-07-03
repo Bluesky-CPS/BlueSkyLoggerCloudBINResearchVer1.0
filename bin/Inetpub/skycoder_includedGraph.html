@@ -1877,13 +1877,7 @@ function lightSensorDatAt(LE_domain, localEDIP){
 	//sensornetworks(LE_domain, localEDIP, "get", "a", "3", "0");
 	//return document.getElementById("loaded").innerHTML;
 }
-function getValue(){
-   var value= $.ajax({ 
-      url: 'http://172.16.4.147:8189/ETLog?instruction=sensornetwork&opt1=172.16.4.103&opt2=get&opt3=a&opt4=3&opt5=0', 
-      async: false
-   }).responseText;
-   return value;
-}
+
 
 
 function actuatornetwork(localEDIP, actuatorSigVal){
