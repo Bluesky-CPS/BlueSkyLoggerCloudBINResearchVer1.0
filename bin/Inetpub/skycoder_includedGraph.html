@@ -97,6 +97,7 @@ function handleRequestAPI_Script(req) {
 	writeroot.innerHTML = "Wait...";
 	var responsedText = req.responseText;
 	writeroot.innerHTML = responsedText;
+	req.responsedData = responsedText;
 	
 	writeroot.style.display = 'block';
 	//writeroot.style.top = '191';
@@ -426,7 +427,7 @@ function motor(onOff){
 
 function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod, username, password) {
 	var req = createXMLHTTPObject();
-	if (!req) return;
+	if (!req) return -101;
 	//var API_Script_edIP = document.getElementById('API_script_ed_ip');
 	var API_Script_edIP = edIP;
 	//alert(API_Script_edIP.value);
@@ -480,7 +481,10 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	}
 	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
 	req.onreadystatechange = function () {
-		if (req.readyState != 4) return;
+		if (req.readyState != 4) {
+			console.log(")))))))))))))))))))))))))))))))))))))))))))))))))))))))))");
+			return;
+		}
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
 			addCommunicationTraceDivElement("rx", "Error:" + req.status, req.id, req);
@@ -490,15 +494,15 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			);*/
 			//----------------Show data in data viewer section.----------------
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
-			return;
+			return -103;
 		}
 		/*self.onComplete = function(req){
 			console.log("self.onComplete()\r\n");
 		};*/
-		//callback(req);
-		return callback(req);
+		callback(req);
+		//return callback(req);
 	}
-	if (req.readyState == 4) return;
+	if (req.readyState == 4) {return -14; /*req.responsedData;*/}
 	req.send(httpMethod);
 
 	cnt++;
@@ -509,7 +513,7 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			stopGetBSFLogSize();
 		}
 	}
-	return;
+	return -100;
 }
 function sendRequest2(url,callback,postData) {
 	var req = createXMLHTTPObject();
@@ -1775,6 +1779,110 @@ function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
+}
+
+function onLed(localEDIP, ledPin){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "1");
+}
+function offLed(localEDIP, ledPin){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "0");
+}
+function onLedAt(LE_domain, localEDIP, ledPin){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "1");
+}
+function offLedAt(LE_domain, localEDIP, ledPin){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+   
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "0");
+}
+
+function lightSensorDat(localEDIP){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opt3=a&opt4=3&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	
+	
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//sensornetwork(localEDIP, "get", "a", "3", "0");
+	//return document.getElementById("loaded").innerHTML;
+}
+function lightSensorDatAt(LE_domain, localEDIP){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opta=set&opt4=3&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//sensornetworks(LE_domain, localEDIP, "get", "a", "3", "0");
+	//return document.getElementById("loaded").innerHTML;
+}
+function getValue(){
+   var value= $.ajax({ 
+      url: 'http://172.16.4.147:8189/ETLog?instruction=sensornetwork&opt1=172.16.4.103&opt2=get&opt3=a&opt4=3&opt5=0', 
+      async: false
+   }).responseText;
+   return value;
 }
 
 
