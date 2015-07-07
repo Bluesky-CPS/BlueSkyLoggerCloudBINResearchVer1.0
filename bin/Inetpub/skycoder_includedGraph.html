@@ -21,6 +21,19 @@
 <!--<script type="text/javascript" src="zeroclipboard/jquery.zclip.js"></script> 
 <script type="text/javascript" src="zeroclipboard/jquery.zclip.minjs"></script>-->
 
+<!-- Begin Code Mirror -->
+<link rel="stylesheet" href="codemirror/codemirror-5.3/lib/codemirror.css">
+<script src="codemirror/codemirror-5.3/lib/codemirror.js"></script>
+<script src="codemirror/codemirror-5.3/lib/codemirror.js"></script>
+<script src="codemirror/codemirror-5.3/addon/fold/foldcode.js"></script>
+<script src="codemirror/codemirror-5.3/addon/fold/foldgutter.js"></script>
+<script src="codemirror/codemirror-5.3/addon/fold/brace-fold.js"></script>
+<script src="codemirror/codemirror-5.3/addon/fold/comment-fold.js"></script>
+<script src="codemirror/codemirror-5.3/addon/selection/active-line.js"></script>
+<script src="codemirror/codemirror-5.3/mode/javascript/javascript.js"></script>
+<!-- End Code Mirror -->
+
+
 <script language="javascript">
 /*$(document).ready(function(){
 	$('a#edipclick').zclip({
@@ -82,7 +95,9 @@ function handleRequestAPI_Script(req) {
 	var writeroot = document.getElementById('loaded');
 	//var res = req.responseText;
 	writeroot.innerHTML = "Wait...";
-	writeroot.innerHTML = req.responseText;
+	var responsedText = req.responseText;
+	writeroot.innerHTML = responsedText;
+	req.responsedData = responsedText;
 	
 	writeroot.style.display = 'block';
 	//writeroot.style.top = '191';
@@ -90,6 +105,8 @@ function handleRequestAPI_Script(req) {
 	
 	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
 	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
+	
+	return responsedText;
 }
 
 
@@ -410,7 +427,7 @@ function motor(onOff){
 
 function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMethod, username, password) {
 	var req = createXMLHTTPObject();
-	if (!req) return;
+	if (!req) return -101;
 	//var API_Script_edIP = document.getElementById('API_script_ed_ip');
 	var API_Script_edIP = edIP;
 	//alert(API_Script_edIP.value);
@@ -464,7 +481,10 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 	}
 	console.log("Request data to server\r\n" + "====================\r\n" + req.getRequestHeader() + "\r\n" + document.referrer);
 	req.onreadystatechange = function () {
-		if (req.readyState != 4) return;
+		if (req.readyState != 4) {
+			console.log(")))))))))))))))))))))))))))))))))))))))))))))))))))))))))");
+			return;
+		}
 		if (req.status != 200 && req.status != 304) {
 			//----------------stepBehaviors section.----------------
 			addCommunicationTraceDivElement("rx", "Error:" + req.status, req.id, req);
@@ -474,14 +494,15 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			);*/
 			//----------------Show data in data viewer section.----------------
 			document.getElementById("loaded").innerHTML = 'HTTP error ' + req.status;
-			return;
+			return -103;
 		}
 		/*self.onComplete = function(req){
 			console.log("self.onComplete()\r\n");
 		};*/
 		callback(req);
+		//return callback(req);
 	}
-	if (req.readyState == 4) return;
+	if (req.readyState == 4) {return -14; /*req.responsedData;*/}
 	req.send(httpMethod);
 
 	cnt++;
@@ -492,7 +513,7 @@ function API_Script_sendRequest(LE_domain, edIP, instruction, callback, httpMeth
 			stopGetBSFLogSize();
 		}
 	}
-	return;
+	return -100;
 }
 function sendRequest2(url,callback,postData) {
 	var req = createXMLHTTPObject();
@@ -756,7 +777,31 @@ function addBodyMouseListener(){
 	}
 }
 
+var downloadAsFile = function(downloadToFileName, content) {
+	content = content.replace(/\n/mg, "\r\n");
+	
+	var blob = new Blob([content]);
+	var url = window.URL || window.webkitURL;
+	var blobURL = url.createObjectURL(blob);
 
+	var a = document.createElement('a');
+	a.download = downloadToFileName;
+	a.href = blobURL;
+	a.click();  
+};
+
+var readTextToCodemirrorTxt = function(that, codemirrorInstance){
+	if(that.files && that.files[0]){
+		var reader = new FileReader();
+		reader.onload = function (e) {  
+			var output = e.target.result;
+
+			codemirrorInstance.setValue(output);
+			codemirrorInstance.refresh();
+		};
+		reader.readAsText(that.files[0]);
+	}
+}
 
 var autoReloadEDdataRetID;
 var autoRedrawEDGraphRetID;
@@ -1714,7 +1759,7 @@ end
             <div id="codingtextTitleBar" align="center" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-weight:bold; width:100%; font-family:Verdana, Geneva, sans-serif; border-bottom: 0px;">
                 	: : SkyCoding (Javascript): : 
                 </div>
-                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; font-style:italic; width:100%; border-top: 0px;">
+                <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; width:100%; border-top: 0px;">
                 
             
             
@@ -1726,49 +1771,163 @@ function gainer_aout(localEDIP, oSignalValArr){
     var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;
 }
 function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;
+}
+
+function onLed(localEDIP, ledPin){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "1");
+}
+function offLed(localEDIP, ledPin){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "0");
+}
+function onLedAt(LE_domain, localEDIP, ledPin){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "1");
+}
+function offLedAt(LE_domain, localEDIP, ledPin){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+   
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "0");
+}
+
+function lightSensorDat(localEDIP){
+	var LE_domain = "";
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opt3=a&opt4=3&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	
+	
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//sensornetwork(localEDIP, "get", "a", "3", "0");
+	//return document.getElementById("loaded").innerHTML;
+}
+function lightSensorDatAt(LE_domain, localEDIP){
+	var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opta=set&opt4=3&opt5=0";
+	var value= $.ajax({ 
+      url: Skyblue_exec_instruct, 
+      async: false
+   }).responseText;
+   return value;
+	/*document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = LE_domain;
+	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	return document.getElementById("loaded").innerHTML;*/
+	//sensornetworks(LE_domain, localEDIP, "get", "a", "3", "0");
+	//return document.getElementById("loaded").innerHTML;
 }
 
 
+
 function actuatornetwork(localEDIP, actuatorSigVal){
-    gainer_aout(localEDIP, actuatorSigVal);
+    return gainer_aout(localEDIP, actuatorSigVal);
 }   
 function actuatornetworks(LE_domain, localEDIP, actuatorSigVal){
-    gainers_aout(LE_domain, localEDIP, actuatorSigVal);
+    return gainers_aout(LE_domain, localEDIP, actuatorSigVal);
 } 
 </script>
               <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
-
-                
-
-              
 function sensornetwork(localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
     var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    return document.getElementById("loaded").innerHTML;
 }
 function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
     var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    return document.getElementById("loaded").innerHTML;
 }
-
               </textarea>
               <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
-//This is JavaScript coding area. You can type your sensing code with your JavaScript at the browser. The following code is sensing/actuating code.
+/**
+ * This is JavaScript coding area. 
+ * You can edit your sensing code with your JavaScript at the browser. 
+ * The following code is sensing/actuating code.
+ */
+ 
 for(var i = 22; i < 25; i++){
     sensornetwork("172.16.4.222", "gpio", "set", ""+i, "1");
-}
-              </textarea>
+}</textarea>
+              <script>
+				var JsEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
+				mode: "javascript",
+				lineNumbers: true,
+				lineWrapping: true,
+				styleActiveLine: true,
+				extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
+				foldGutter: true,
+				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+				});
+ 			</script>
             <br>
                 
-                <button onClick="JSrun()" id="JSrun">Execute</button>
+                <button onClick="JSrun()" id="JSrun">Execute</button> 
+                <button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your local storage</button>
+                <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
                 </div>
             </div>
   	    </div>
@@ -1802,10 +1961,10 @@ for(var i = 22; i < 25; i++){
               // create an array with nodes
               var nodes = [
                 {id: 1, label: 'Central Node', image: DIR1 + 'Network-Pipe-icon.png', shape: 'image'},
-                {id: 2, label: '172.16.4.222', image: DIR2 + 'ed.gif', shape: 'image'},
-                {id: 3, label: '172.16.4.223', image: DIR2 + 'ed.gif', shape: 'image'},
-                {id: 4, label: '172.16.4.224', image: DIR2 + 'ed.gif', shape: 'image'},
-                {id: 5, label: '172.16.4.225', image: DIR2 + 'ed.gif', shape: 'image'}
+                {id: 2, label: 'NONEDEFINE_IP01', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 3, label: 'NONEDEFINE_IP02', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 4, label: 'NONEDEFINE_IP03', image: DIR2 + 'ed.gif', shape: 'image'},
+                {id: 5, label: 'NONEDEFINE_IP04', image: DIR2 + 'ed.gif', shape: 'image'}
               ];
             
 			var dat = {id: 6, label: '172.16.4.226', image: DIR2 + 'ed.gif', shape: 'image'};
@@ -1896,7 +2055,7 @@ for(var i = 22; i < 25; i++){
 				d = new Date().getTime();
 				try {
 					with (Math) {
-						str = JSoutput(eval(headerCode.value + "\r\n" + document.getElementById("code").value));
+						str = JSoutput(eval(headerCode.value + "\r\n" + JsEditor.getValue()));
 					}
 				} catch(e) {
 					str = e.name+" at line "+(e.lineNumber-56)+": "+e.message;
