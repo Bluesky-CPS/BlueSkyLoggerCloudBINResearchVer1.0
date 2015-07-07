@@ -1901,6 +1901,19 @@ function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
     return document.getElementById("loaded").innerHTML;
 }
+function l_sensornetwork(localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var LE_domain = "";
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    return document.getElementById("loaded").innerHTML;
+}
+function g_sensornetwork(LE_domain, localEDIP, interface, type, portnumber, value){
+    document.getElementById("API_script_ed_ip").value = localEDIP;
+    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+    return document.getElementById("loaded").innerHTML;
+}
               </textarea>
               <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
 /**
@@ -2422,7 +2435,7 @@ MTRepetition.queue = [];
 								/*APIdebug.value += exec_instructs[r][j] + " ";*/
 								APIdebugMes += exec_instructs[r][j] + " ";
 								
-								if(exec_instructs[r][0]=="sensornetwork"){
+								if(exec_instructs[r][0]=="sensornetwork" || exec_instructs[r][0]=="lsn"){
 									if(j < 1){
 										Skyblue_exec_instruct += exec_instructs[r][0];
 										instruct_type = exec_instructs[r][0];
@@ -2433,7 +2446,7 @@ MTRepetition.queue = [];
 									}
 								}
 								/*Need check! why it has not "else"*/
-								if(exec_instructs[r][0]=="sensornetworks"){
+								if(exec_instructs[r][0]=="sensornetworks" || exec_instructs[r][0]=="gsn"){
 									if(j < 1){
 										Skyblue_exec_instruct += "sensornetwork";
 										instruct_type = exec_instructs[r][0];
