@@ -1787,8 +1787,9 @@ function onLed(localEDIP, ledPin){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
@@ -1802,8 +1803,9 @@ function offLed(localEDIP, ledPin){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
@@ -1817,8 +1819,9 @@ function onLedAt(LE_domain, localEDIP, ledPin){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
@@ -1832,8 +1835,9 @@ function offLedAt(LE_domain, localEDIP, ledPin){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
    
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
@@ -1849,8 +1853,9 @@ function lightSensorDat(localEDIP){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
 	
 	
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
@@ -1867,8 +1872,9 @@ function lightSensorDatAt(LE_domain, localEDIP){
 	var value= $.ajax({ 
       url: Skyblue_exec_instruct, 
       async: false
-   }).responseText;
-   return value;
+    }).responseText;
+	document.getElementById("loaded").innerHTML = value;
+    return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
