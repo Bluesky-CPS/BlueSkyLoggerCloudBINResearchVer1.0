@@ -2443,7 +2443,8 @@ MTRepetition.queue = [];
 								
 								if(exec_instructs[r][0]=="sensornetwork" || exec_instructs[r][0]=="lsn"){
 									if(j < 1){
-										Skyblue_exec_instruct += exec_instructs[r][0];
+										Skyblue_exec_instruct += "sensornetwork";
+										//Skyblue_exec_instruct += exec_instructs[r][0];
 										instruct_type = exec_instructs[r][0];
 									}else if(j < 2){
 										document.getElementById("API_script_ed_ip").value = exec_instructs[r][j];
