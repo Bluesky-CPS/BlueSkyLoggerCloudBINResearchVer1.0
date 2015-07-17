@@ -1476,7 +1476,37 @@ $(document).ready(function(e) {
 </div>
 <!--This is a skyCoder explaination area-->
 <div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOver="showMenuBar('skyCoderDetail','',90);" align="left">
-  
+<script language="javascript">
+	var b64EncodeUnicode = function(str) {
+		return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+			return String.fromCharCode('0x' + p1);
+		}));
+	}
+	var browserEncrypt = function(mes, key){
+		var ret = mes;
+		var charCode = 0;
+		for(var i = 0; i < key.length; i++){
+			charCode += key.charCodeAt(i);
+		}
+		
+		var n = charCode % 5;
+		n++;
+		for(var i = 0; i < n; i++){
+			ret = b64EncodeUnicode(ret);
+		}
+		return ret;
+	}
+	var autoGenerateKey = function(){
+		var asciiTableMap = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v','w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+		var key = '';
+		var keyLen = 5;
+		for(var i = 0; i < keyLen + Math.floor(Math.random() * keyLen); i++){
+			var randNum = Math.floor(Math.random() * asciiTableMap.length);
+			key += asciiTableMap[randNum];
+		}
+		return key;
+	}
+</script>
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr>
         <td>
@@ -1570,7 +1600,9 @@ function num(bar){
 
 <!-- Begin ed Setting Plate section-->
 <div id="edSettingContainer" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: calc(100% - 700px); top: 50px; z-index:2999; background-color:#FFFFFF; padding: 10px; padding-top: 6px; width: 700px; height:100%;">
-  <div id="edSettingTitle" align="right"><img src="image/x.gif" style="cursor: hand" onClick="hiddenEDSetting('edSettingContainer', 'edSettingBody');">&nbsp;&nbsp;&nbsp;</div>
+  <div id="edSettingTitle" align="right" style=" height: 30px; width: 100%">
+  	<div style="cursor: hand; width: 30px; height: 30px; padding-right: 10px; padding-top: 10px;" onClick="hiddenEDSetting('edSettingContainer', 'edSettingBody');"><img src="image/x.gif" style="cursor: hand; padding-right: 10px;" onClick="hiddenEDSetting('edSettingContainer', 'edSettingBody');"></div>
+  </div>
   <div>
   <p><span id="edSettingBody">Underconstruction</span></p>
   </div>
@@ -2385,15 +2417,38 @@ MTRepetition.queue = [];
 			doSigninoutRequest("/doLogout.ins",handleSignout, logoutQuery, noticeContainer);
 		}
 		function doSignin(username, password, mode, noticeContainer){
-			var usernameElement = document.getElementById(username);
+			/*var usernameElement = document.getElementById(username);
 			var passwordElement = document.getElementById(password);
 			var modeElement = document.getElementById(mode);
+			
 			
 			console.log(usernameElement.value + "\r\n");
 			console.log(passwordElement.value + "\r\n");
 			console.log(modeElement.value + "\r\n");
 			
-			var loginQuery = "username=" + usernameElement.value + "&password=" + passwordElement.value + "&mode=" +modeElement.value
+			var loginQuery = "username=" + usernameElement.value + "&password=" + passwordElement.value + "&mode=" + modeElement.value;
+			console.log(noticeContainer + "\r\nBefore invoke doSignInRequert\r\n");
+			doSigninoutRequest("/doLogin.ins",handleSignin, loginQuery, noticeContainer);*/
+			doSigninWithkey(username, password, mode, noticeContainer);
+		}
+		function doSigninWithkey(username, password, mode, noticeContainer){
+			var usernameElement = document.getElementById(username);
+			var passwordElement = document.getElementById(password);
+			var modeElement = document.getElementById(mode);
+			
+			var key = autoGenerateKey();
+			
+			
+			var encryptedUsername = browserEncrypt(usernameElement.value, key);
+			var encryptedPass = browserEncrypt(passwordElement.value, key);
+			
+			console.log("encryptedUsername: " + encryptedUsername + "encryptedPass: " + encryptedPass);
+			
+			console.log(usernameElement.value + "\r\n");
+			console.log(passwordElement.value + "\r\n");
+			console.log(modeElement.value + "\r\n");
+			
+			var loginQuery = "username=" + encryptedUsername + "&password=" + encryptedPass + "&mode=" + modeElement.value + "&clientkey=" + key;
 			console.log(noticeContainer + "\r\nBefore invoke doSignInRequert\r\n");
 			doSigninoutRequest("/doLogin.ins",handleSignin, loginQuery, noticeContainer);
 			
