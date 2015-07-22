@@ -2019,7 +2019,6 @@ function getValue(domain){
 
 
 
-
 function actuatornetwork(localEDIP, actuatorSigVal){
     return gainer_aout(localEDIP, actuatorSigVal);
 }   
@@ -2029,14 +2028,48 @@ function actuatornetworks(LE_domain, localEDIP, actuatorSigVal){
 
 function sensornetwork(localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
+	var encodePort = "";
+	if(Array.isArray(portnumber)){
+		var portLen = portnumber.length;
+		for(var i = 0; i < portLen; i++){
+			if(i > 0){
+				encodePort += "/" + portnumber[i];
+			}else{
+				encodePort += portnumber[i];
+			}
+		}
+	}
+	portnumber = encodePort;
     var LE_domain = "";
-    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+	var Skyblue_exec_instruct = "";
+	if(value){
+    	Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+	}else{
+		Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber;
+	}
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
     return document.getElementById("loaded").innerHTML;
 }
 function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value){
     document.getElementById("API_script_ed_ip").value = localEDIP;
-    var Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+	var encodePort = "";
+	if(Array.isArray(portnumber)){
+		var portLen = portnumber.length;
+		for(var i = 0; i < portLen; i++){
+			if(i > 0){
+				encodePort += "/" + portnumber[i];
+			}else{
+				encodePort += portnumber[i];
+			}
+		}
+	}
+	portnumber = encodePort;
+	var Skyblue_exec_instruct = "";
+	if(value){
+    	Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
+	}else{
+		Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber;
+	}
     API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
     return document.getElementById("loaded").innerHTML;
 }
