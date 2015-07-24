@@ -2319,6 +2319,25 @@ function toHex(N){
  N = Math.max(0,N); N=Math.min(N,255); N=Math.round(N);
  return "0123456789ABCDEF".charAt((N-N%16)/16) + "0123456789ABCDEF".charAt(N%16);
 }
+var viewer = new Viewer();
+function Viewer(){
+	this.logDat = "";
+	this.shows = function(){
+		document.getElementById("loaded").innerHTML = this.logDat;
+	}
+	this.log = function(mes){
+		this.logDat += mes + "<br>";
+		this.shows();
+	}
+	this.clear = function(){
+		this.logDat = " ";
+		this.shows();
+	}
+	this.view = function(){
+		document.getElementById("loaded").innerHTML = "";
+		this.shows();
+	}
+}
 </script>
               <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
 
