@@ -603,10 +603,59 @@ var getBrowserServerTimeDifference = function(serverURL) {
 	//});
 }
 
+function doSigninoutRequest(url,callback,postData,noticeContainer, encryptedUsername) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	if(encryptedUsername){
+		req.setRequestHeader( 'Encrypted-Username', encryptedUsername );
+	}
+	req.open(method,url,true);
+	
+	if (postData){
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.send(postData);
+	}
+		
+	console.log("send: " + postData);
+	req.noticeContainerID = noticeContainer;
+	req.onreadystatechange = function () {
+		console.log('onreadystatechenge===================\r\n');
+		if (req.readyState == 1){//unsent
+			console.log('unsent state\r\n');
+			return;
+		}
+		if (req.readyState == 2){//opened
+			console.log('opened state\r\n');
+			if(postData){
+				req.send(postData);
+			}
+			return;
+		}
+		if (req.readyState == 3){//header received
+			console.log('header received state\r\n');
+			return;
+		}
+		if (req.readyState == 4){//done
+			console.log('done state\r\n');
+			if (req.status != 200 && req.status != 304) {
+				console.log('HTTP error ' + req.status);
+				return;
+			}
+			callback(req);
+			return;
+		}
+		//if (req.readyState != 4) return;
+		
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
 function doSigninoutRequest(url,callback,postData,noticeContainer) {
 	var req = createXMLHTTPObject();
 	if (!req) return;
 	var method = (postData) ? "POST" : "GET";
+
 	req.open(method,url,true);
 	
 	if (postData){
@@ -2038,8 +2087,9 @@ function sensornetwork(localEDIP, interface, type, portnumber, value){
 				encodePort += portnumber[i];
 			}
 		}
+		portnumber = encodePort;
 	}
-	portnumber = encodePort;
+	
     var LE_domain = "";
 	var Skyblue_exec_instruct = "";
 	if(value){
@@ -2062,8 +2112,9 @@ function sensornetworks(LE_domain, localEDIP, interface, type, portnumber, value
 				encodePort += portnumber[i];
 			}
 		}
+		portnumber = encodePort;
 	}
-	portnumber = encodePort;
+	
 	var Skyblue_exec_instruct = "";
 	if(value){
     	Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber + "/" + value;
@@ -2483,7 +2534,7 @@ MTRepetition.queue = [];
 			
 			var loginQuery = "username=" + encryptedUsername + "&password=" + encryptedPass + "&mode=" + modeElement.value + "&clientkey=" + key;
 			console.log(noticeContainer + "\r\nBefore invoke doSignInRequert\r\n");
-			doSigninoutRequest("/doLogin.ins",handleSignin, loginQuery, noticeContainer);
+			doSigninoutRequest("/doLogin.ins",handleSignin, loginQuery, noticeContainer, encryptedUsername);
 			
 			//console.log("Before invoke doSignRequert\r\n");
 		}
