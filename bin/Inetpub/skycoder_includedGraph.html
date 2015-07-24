@@ -683,6 +683,7 @@ function handleSignin(req) {
 	if(loginResult == "true"){
 		isSignin = "true";
 		_username = JSONParse.ETLog.login.username;
+		window._username = _username;
 		//var len = JSONParse.ETLog.EDConnStatement.length;
 		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCNAME + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
 	}else{
@@ -1484,12 +1485,12 @@ $(document).ready(function(e) {
 <!--This is a skyCoder explaination area-->
 <div id="skyCoderDetail" onMouseOut="hiddenMenuBar('skyCoderDetail', -90);" onMouseMove="showMenuBar('skyCoderDetail','',90);" onMouseOver="showMenuBar('skyCoderDetail','',90);" align="left">
 <script language="javascript">
-	var b64EncodeUnicode = function(str) {
+	function b64EncodeUnicode(str) {
 		return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
 			return String.fromCharCode('0x' + p1);
 		}));
 	}
-	var browserEncrypt = function(mes, key){
+	function browserEncrypt(mes, key){
 		var ret = mes;
 		var charCode = 0;
 		for(var i = 0; i < key.length; i++){
@@ -1503,7 +1504,7 @@ $(document).ready(function(e) {
 		}
 		return ret;
 	}
-	var autoGenerateKey = function(){
+	function autoGenerateKey(){
 		var asciiTableMap = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v','w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 		var key = '';
 		var keyLen = 5;
@@ -1916,14 +1917,12 @@ function onLed(localEDIP, ledPin){
 	var LE_domain = "";
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
@@ -1958,14 +1957,12 @@ function offLed(localEDIP, ledPin){
 	var LE_domain = "";
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
@@ -2000,14 +1997,12 @@ function onLedAt(LE_domain, localEDIP, ledPin){
 	var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
@@ -2042,14 +2037,12 @@ function offLedAt(LE_domain, localEDIP, ledPin){
 	var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
@@ -2085,14 +2078,12 @@ function lightSensorDat(localEDIP){
 	var LE_domain = "";
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opt3=a&opt4=3&opt5=0";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
@@ -2130,14 +2121,12 @@ function lightSensorDatAt(LE_domain, localEDIP){
 	var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opta=set&opt4=3&opt5=0";
 	
-	var encryptedUsername = " ";
-	var key = " ";
+	var key = autoGenerateKey();
+	var encryptedUsername = browserEncrypt(window._username, key);
 	var value = " ";
-	if(isSignin == "true"){
-		key = autoGenerateKey();
-		var username = _username;
-		encrypetedUsername = browserEncrypt(username, key);
-	}
+	console.log("window._username: " + window._username);
+	console.log("encryptedUsername: " + encryptedUsername);
+	console.log("key: " + key);
 	if(encryptedUsername != " "){
 		value= $.ajax({ 
 		  url: Skyblue_exec_instruct, 
