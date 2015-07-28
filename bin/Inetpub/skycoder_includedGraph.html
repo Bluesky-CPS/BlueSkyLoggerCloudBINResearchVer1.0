@@ -1903,14 +1903,37 @@ function gainer_aout(localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	
+	var username = " ";
+	if(isSignin == "true"){
+		username = _username;
+	}
+	if(username == " "){
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	}else{
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+	}
+	
+	
+    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	
+	var username = " ";
+	if(isSignin == "true"){
+		username = _username;
+	}
+	if(username == " "){
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	}else{
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+	}
+	
+    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function onLed(localEDIP, ledPin){
