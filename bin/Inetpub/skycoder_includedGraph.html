@@ -1788,7 +1788,7 @@ end
                 <br>
             </div>
             <div class="TabbedPanelsContent">
-				#For example: replace LOCAL_ED_IP with 172.16.4.222
+				#For example: replace LOCAL_ED_IP with 172.16.4.222<br>
                 sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
                 sleep 100<br>
                 sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
@@ -2978,7 +2978,16 @@ MTRepetition.queue = [];
 							if(instruct_type != "sleep"){
 								if(Skyblue_exec_instruct != ""){
 									//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
-									API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+									var username = " ";
+									if(isSignin == "true"){
+										username = _username;
+									}
+									if(username == " "){
+										API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+									}else{
+										API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+									}
+									//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 								}
 							}
 							if(instruct_type != ""){
