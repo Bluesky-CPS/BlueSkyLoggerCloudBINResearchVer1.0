@@ -1722,7 +1722,7 @@ function num(bar){
                </div>
         	</div>
         	<div class="TabbedPanelsContent">
-            	#For example: replace LOCAL_ED_IP with 172.16.4.222
+            	#For example: replace LOCAL_ED_IP with 172.16.4.222<br>
                 sensornetworks http://PUBLICHOST:8189 LOCAL_ED_IP set as 8 255,0,0,0,0,0,0,0<br>
                 sleep 100<br>
                 sensornetwork LOCAL_ED_IP set as 8 0,255,0,0,0,0,0,0<br>
@@ -1735,7 +1735,7 @@ function num(bar){
                 sleep 100<br>
             </div>
     	    <div class="TabbedPanelsContent">
-				#For example: replace LOCAL_ED_IP with 172.16.4.222
+				#For example: replace LOCAL_ED_IP with 172.16.4.222<br>
                 sensornetwork LOCAL_ED_IP set d 3 1<br>
                 sleep 500<br>
                 sensornetwork LOCAL_ED_IP set d 3 0<br>
@@ -1788,7 +1788,7 @@ end
                 <br>
             </div>
             <div class="TabbedPanelsContent">
-				#For example: replace LOCAL_ED_IP with 172.16.4.222
+				#For example: replace LOCAL_ED_IP with 172.16.4.222<br>
                 sensornetwork LOCAL_ED_IP set as 8 0,0,0,0,0,0,0,0<br>
                 sleep 100<br>
                 sensornetwork LOCAL_ED_IP set as 8 10,0,0,0,0,0,0,0<br>
@@ -1903,14 +1903,37 @@ function gainer_aout(localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	
+	var username = " ";
+	if(isSignin == "true"){
+		username = _username;
+	}
+	if(username == " "){
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	}else{
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+	}
+	
+	
+    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	
+	var username = " ";
+	if(isSignin == "true"){
+		username = _username;
+	}
+	if(username == " "){
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	}else{
+		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+	}
+	
+    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function onLed(localEDIP, ledPin){
@@ -2318,6 +2341,25 @@ function toHex(N){
  if(N==0 || isNaN(N)) return "00";
  N = Math.max(0,N); N=Math.min(N,255); N=Math.round(N);
  return "0123456789ABCDEF".charAt((N-N%16)/16) + "0123456789ABCDEF".charAt(N%16);
+}
+var viewer = new Viewer();
+function Viewer(){
+	this.logDat = "";
+	this.shows = function(){
+		document.getElementById("loaded").innerHTML = this.logDat;
+	}
+	this.log = function(mes){
+		this.logDat += mes + "<br>";
+		this.shows();
+	}
+	this.clear = function(){
+		this.logDat = " ";
+		this.shows();
+	}
+	this.view = function(){
+		document.getElementById("loaded").innerHTML = "";
+		this.shows();
+	}
 }
 </script>
               <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
@@ -2936,7 +2978,16 @@ MTRepetition.queue = [];
 							if(instruct_type != "sleep"){
 								if(Skyblue_exec_instruct != ""){
 									//addCommunicationTraceDivElement("tx", "Send [" + Skyblue_exec_instruct + "]<br>to [" + document.getElementById("API_script_ed_ip").value + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>");
-									API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+									var username = " ";
+									if(isSignin == "true"){
+										username = _username;
+									}
+									if(username == " "){
+										API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+									}else{
+										API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
+									}
+									//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 								}
 							}
 							if(instruct_type != ""){
