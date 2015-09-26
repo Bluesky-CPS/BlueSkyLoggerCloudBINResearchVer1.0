@@ -50,6 +50,8 @@ copy: function(){
     }
 });
 */
+var codeReceiver;
+
 $(function() {
 	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
@@ -241,15 +243,18 @@ function refreshEdConnStatSelectBox(){
 		selectBox.refresh();
 	}
 }
+function getCurrentHostURL(){
+	var URL_STR = document.URL, urlPathname = window.location.pathname;
+	var currentHostURL = URL_STR.replace(urlPathname, "").replace("#", "").replace(" ", "");	
+	return currentHostURL;
+}
 function handleGetEDdataForGraph(req){
 	var JSONtxt = req.responseText;
 	var JSONParse = JSON.parse(JSONtxt);
 	var len = JSONParse.ETLog.EDConnStatement.length;
 	edData = JSONParse.ETLog.EDConnStatement;
 	var statICN = "/image/offlineICN.gif";
-	
-	var URL_STR = document.URL, urlPathname = window.location.pathname;
-	var  centralNodeURL = URL_STR.replace(urlPathname, " ");
+	var centralNodeURL = getCurrentHostURL();
 	
 	nodes = [
                 {id: 0, label: 'Your Browser', image: DIR1 + 'Hardware-My-Computer-3-icon.png', shape: 'image'},
@@ -581,6 +586,7 @@ function doSigninoutRequest(url,callback,postData,noticeContainer, encryptedUser
 	if(encryptedUsername){
 		req.setRequestHeader( 'Encrypted-Username', encryptedUsername );
 	}
+	
 	req.open(method,url,true);
 	
 	if (postData){
@@ -592,12 +598,74 @@ function doSigninoutRequest(url,callback,postData,noticeContainer, encryptedUser
 	req.noticeContainerID = noticeContainer;
 	req.onreadystatechange = function () {
 		console.log('onreadystatechenge===================\r\n');
+		if (req.readyState == 0){//unsent
+			console.log('unsent state\r\n');
+			return;
+		}
+		if (req.readyState == 1){//opened
+			console.log('opened state\r\n');
+			return;
+		}
+		if (req.readyState == 2){//header received
+			console.log('HEADERS_REVEIVED state\r\n');
+			if(postData){
+				req.send(postData);
+			}
+			return;
+		}
+		if (req.readyState == 3){//loading received
+			console.log('LOADING state\r\n');
+			return;
+		}
+		if (req.readyState == 4){//done
+			console.log('done state\r\n');
+			if (req.status != 200 && req.status != 304) {
+				console.log('HTTP error ' + req.status);
+				return;
+			}
+			callback(req);
+			return;
+		}
+		//if (req.readyState != 4) return;
+		
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
+function doPushCode(url,callback,postData,noticeContainer/*, encryptedUsername*/) {
+	var req = createXMLHTTPObject();
+	
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	/*if(encryptedUsername){
+		req.setRequestHeader( 'Encrypted-Username', encryptedUsername );
+	}*/
+	
+	req.open(method,url,true);
+	
+	if (postData){
+		console.log("doPushCode: " + postData);
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		req.setRequestHeader('Access-Control-Allow-Origin',getCurrentHostURL() + "," + getCurrentHostURL() + "/," + url);
+		console.log(req);
+		req.send(postData);
+		console.log(req);
+	}
+		
+	console.log("send: " + postData);
+	req.noticeContainerID = noticeContainer;
+	/*req.onload = function(){
+		console.log("pushData onload");	
+	}*/
+	req.onreadystatechange = function () {
+		console.log('onreadystatechenge===================\r\n');
 		if (req.readyState == 1){//unsent
 			console.log('unsent state\r\n');
 			return;
 		}
 		if (req.readyState == 2){//opened
 			console.log('opened state\r\n');
+			
 			if(postData){
 				req.send(postData);
 			}
@@ -707,6 +775,12 @@ function handleSignout(req) {
 	}else{
 		
 	}
+}
+function handlePushCode(req){
+	var noticeContainer = document.getElementById(req.noticeContainerID);
+	var writeroot = document.getElementById("loaded");
+	var serverResponse = req.responseText;
+	noticeContainer.innerHTML = serverResponse;
 }
 function handleDiffTime(req){
 	var browserTime = new Date(now);
@@ -910,6 +984,14 @@ var isOnProxy = function(){
 	req.send();
 	return (req.getResponseHeader("Proxy-Connection") || req.getResponseHeader("via")) ? true : false;
 }
+function base64_encode(str){
+	var ret = b64EncodeUnicode(str);
+	return ret;
+}
+function base64_decode(base64_str){
+	var ret = atob(base64_str);
+	return ret;
+}
 function initOnload(){
 	isProxy = isOnProxy();
 	
@@ -935,9 +1017,32 @@ function initOnload(){
 	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
 	var dDateOBJ = document.getElementById("jsonDate");
 	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
+	console.log("ssssssssss");
+	
+	//dohere
+	initConsoleJS();
+	
 	showEDDetail(0);
 	hideEDDetail("edDetailDescription");
 	clipboardInit();
+	
+	
+	
+}
+function initConsoleJS(){
+	var getCodeReceiver = getValue(getCurrentHostURL() + "/ETLog?instruction=wherecodereceiver&opt1=noneFix&opt2=json");
+	this.codeReceiver = JSON.parse(getCodeReceiver);
+	codeReceiver = JSON.parse(getCodeReceiver);
+	console.log("initOnload: " , this.codeReceiver);
+	if(this.codeReceiver){
+		var codeReceiverJSON = this.codeReceiver;
+		console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
+		console.log("code receiver port: " + codeReceiverJSON.ETLog.codeReceiver.port);
+		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');
+		document.getElementById("jstoolbtn").innerHTML += '<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
+		console.log(document.getElementById("jstoolbtn").value);
+		
+	}
 }
 var prevMouse = {x: 0, y: 0};
 function initFooterDragEventListener(dragBarObjID, actionObjID){
@@ -2387,10 +2492,44 @@ for(var i = 22; i < 25; i++){
 				});
  			</script>
             <br>
-                
-                <button onClick="JSrun();" id="JSrun">Execute</button> 
+             <div id="jstoolbtn">   
+                <button onClick="JSrun();" id="JSrun">Execute</button>&nbsp;
                 <button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your local storage</button>
                 <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
+                <!--NOTE: the pushCodeToServerBtn create when the page onload after confirm that the pushing feature is availble on the server. see function initOnload() and initConsoleJS()-->
+             </div>
+<script language="javascript">
+	//NeedFixAgain
+	var pushCodeToServer = function(){
+		var self = this;
+		var b64code = b64EncodeUnicode(JsEditor.getValue());
+		var decode = base64_decode(b64code);
+		var codeReceiverJSON = this.codeReceiver;
+		var noticedContainer = "load";
+		console.log(b64code + '\r\n' + decode);
+		console.log(this.codeReceiver);
+		
+		var username = " ";
+		if(isSignin == "true"){
+			username = _username;
+			var usernameElement = document.getElementById("username");
+			//var key = autoGenerateKey();
+			//var encryptedUsername = browserEncrypt(usernameElement.value, key);
+			//console.log();
+			console.log(username);
+			
+			var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
+			var pushQuery = "code=" + b64code + "&username=" + usernameElement.value + "&ip=0";
+			console.log("pushURI: " + pushURI);
+			console.log("pushQuery: " + pushQuery);
+			doPushCode(pushURI,handlePushCode, pushQuery, noticedContainer);
+		}else{
+			console.log("please sign in");
+			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
+		}
+	}
+</script>
+                
                 <br><br>
                 	<div id="DOMcontainerTitle" style="border-top: #000 1px solid; background-color:#006; text-align:center; color:#FFF; font-weight:bold">
                     DOM container
