@@ -1017,17 +1017,12 @@ function initOnload(){
 	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
 	var dDateOBJ = document.getElementById("jsonDate");
 	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
-	console.log("ssssssssss");
 	
-	//dohere
 	initConsoleJS();
 	
 	showEDDetail(0);
 	hideEDDetail("edDetailDescription");
 	clipboardInit();
-	
-	
-	
 }
 function initConsoleJS(){
 	var getCodeReceiver = getValue(getCurrentHostURL() + "/ETLog?instruction=wherecodereceiver&opt1=noneFix&opt2=json");
@@ -1039,9 +1034,22 @@ function initConsoleJS(){
 		console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
 		console.log("code receiver port: " + codeReceiverJSON.ETLog.codeReceiver.port);
 		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');
-		document.getElementById("jstoolbtn").innerHTML += '<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
-		console.log(document.getElementById("jstoolbtn").value);
-		
+		//document.getElementById("jstoolbtn").innerHTML += '<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
+		//console.log(document.getElementById("jstoolbtn").value);
+		var jstoolbtn = document.getElementById("jstoolbtn");
+		var brTag = document.createElement("br");
+		var buttonTag = document.createElement("button");
+		buttonTag.addEventListener('click', this.pushCodeToServer);
+		buttonTag.id = "pushCodeToServerBtn";
+		buttonTag.type = "button";
+		buttonTag.value = "Save to server";
+		buttonTag.text = "Save to server";
+		buttonTag.textContent = "Save to server";
+		jstoolbtn.appendChild(brTag);
+		jstoolbtn.appendChild(document.createElement("br"));
+		jstoolbtn.appendChild(buttonTag);
+		console.log("jstoolbtn:" + document.getElementById("jstoolbtn"));
+		document.getElementById("pushCodeToServerBtn").onclick = pushCodeToServer();
 	}
 }
 var prevMouse = {x: 0, y: 0};
@@ -2504,11 +2512,13 @@ for(var i = 22; i < 25; i++){
 		var self = this;
 		var b64code = b64EncodeUnicode(JsEditor.getValue());
 		var decode = base64_decode(b64code);
-		var codeReceiverJSON = this.codeReceiver;
-		var noticedContainer = "load";
-		console.log(b64code + '\r\n' + decode);
-		console.log(this.codeReceiver);
+		//var codeReceiverJSON = this.codeReceiver;
+		var codeReceiverJSON = codeReceiver;
 		
+		var noticedContainer = "loaded";
+		console.log(b64code + '\r\n' + decode);
+		console.log("this.codeReceiver: " + this.codeReceiver);
+		console.log("codeReceiver: " + codeReceiver);
 		var username = " ";
 		if(isSignin == "true"){
 			username = _username;
