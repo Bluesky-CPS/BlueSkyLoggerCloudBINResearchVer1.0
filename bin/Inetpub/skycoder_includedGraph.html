@@ -894,6 +894,12 @@ var readTextToCodemirrorTxt = function(that, codemirrorInstance){
 		reader.readAsText(that.files[0]);
 	}
 }
+var loadCodeToCodemirrorTxt = function(code, codemirrorInstance){
+	if(code){
+			codemirrorInstance.setValue(code);
+			codemirrorInstance.refresh();
+	}
+}
 var autoReloadEDdataRetID;
 var autoRedrawEDGraphRetID;
 var autoRefreshEDSelectBoxRetID;
@@ -1017,17 +1023,12 @@ function initOnload(){
 	var dMonth = (dd.getMonth() < 10)?("0" + (dd.getMonth()+1)):((dd.getMonth()+1)+"");
 	var dDateOBJ = document.getElementById("jsonDate");
 	dDateOBJ.value = dd.getFullYear()+""+dMonth +""+ dDate;*/
-	console.log("ssssssssss");
 	
-	//dohere
 	initConsoleJS();
 	
 	showEDDetail(0);
 	hideEDDetail("edDetailDescription");
 	clipboardInit();
-	
-	
-	
 }
 function initConsoleJS(){
 	var getCodeReceiver = getValue(getCurrentHostURL() + "/ETLog?instruction=wherecodereceiver&opt1=noneFix&opt2=json");
@@ -1039,9 +1040,35 @@ function initConsoleJS(){
 		console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
 		console.log("code receiver port: " + codeReceiverJSON.ETLog.codeReceiver.port);
 		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');
-		document.getElementById("jstoolbtn").innerHTML += '<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
-		console.log(document.getElementById("jstoolbtn").value);
+		document.getElementById("jstoolbtn").innerHTML += '<br><br>&nbsp;<button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
+		document.getElementById("jstoolbtn").innerHTML += '&nbsp;<button onClick="loadCodeFromServer();" id="loadCodeFromServerBtn" type="button">Load from server</button>';
+		//console.log(document.getElementById("jstoolbtn").value);
+		var jstoolbtn = document.getElementById("jstoolbtn");
+		var brTag = document.createElement("br");
+		var saveToServerButtonTag = document.createElement("button");
+		//var saveToServerButtonTag = document.createElement("button");
+		///saveToServerButtonTag.addEventListener('click', this.pushCodeToServer);
+		///saveToServerButtonTag.id = "pushCodeToServerBtn";
+		///saveToServerButtonTag.type = "button";
+		///saveToServerButtonTag.value = "Save to server";
+		///saveToServerButtonTag.text = "Save to server";
+		///saveToServerButtonTag.textContent = "Save to server";
 		
+		
+		/*var loadFromServerButtonTag = document.createElement("button");
+		loadFromServerButtonTag.addEventListener('click',this.loadCodeFromServer);
+		loadFromServerButtonTag.id = "loadCodeFromServerBtn";
+		loadFromServerButtonTag.type = "button";
+		loadFromServerButtonTag.value = "";
+		loadFromServerButtonTag.textContent = "Load code from server";*/
+		
+		///jstoobtn.appendChild(document.createElement("br"));
+		///jstoobtn.appendChild(document.createElement("br"));
+		///jstoobtn.appendChild(saveToServerButtonTag);
+		///jstoobtn.appendChild(loadFromServerButtonTag);
+		console.log("jstoolbtn:" + document.getElementById("jstoolbtn"));
+		///document.getElementById("pushCodeToServerBtn").onclick = pushCodeToServer();
+		///document.getElementById("loadCodeFromServerBtn").onclick = loadCodeFromServer();
 	}
 }
 var prevMouse = {x: 0, y: 0};
@@ -2493,33 +2520,67 @@ for(var i = 22; i < 25; i++){
  			</script>
             <br>
              <div id="jstoolbtn">   
-                <button onClick="JSrun();" id="JSrun">Execute</button>&nbsp;
-                <button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your local storage</button>
+                &nbsp;<button onClick="JSrun();" id="JSrun">Execute</button>&nbsp;<br><br>
+                &nbsp;<button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your machine</button>
                 <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
                 <!--NOTE: the pushCodeToServerBtn create when the page onload after confirm that the pushing feature is availble on the server. see function initOnload() and initConsoleJS()-->
              </div>
 <script language="javascript">
+	//dohere
+	var loadCodeFromServer = function(){
+		var codeReceiverJSON = codeReceiver;
+		var noticedContainer = "loaded";
+		if(isSignin == "true"){
+			username = _username;
+			//console.log(username);
+			
+			var getCodesURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/getcode?username=" + username;
+			//console.log(getCodesURI);
+			var codes = getValue(getCodesURI);
+			if(codes){
+				var codesJSON = JSON.parse(codes);
+				var decodedCodeList = decodeAllCodes(codesJSON.codeList);
+				var len = decodedCodeList.length;
+				loadCodeToCodemirrorTxt(decodedCodeList[len-1], JsEditor);
+				window._codeList = decodedCodeList;
+				console.log(codes)
+				console.log(decodedCodeList);
+			}
+		}else{
+			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
+		}
+	}
+	var decodeAllCodes = function(codeList){
+		var ret = new Array();
+		var len = codeList.length;
+		for(var i = 0; i < len; i++){
+			ret.push(base64_decode(codeList[i]));
+		}
+		return ret;
+	}
 	//NeedFixAgain
 	var pushCodeToServer = function(){
 		var self = this;
 		var b64code = b64EncodeUnicode(JsEditor.getValue());
 		var decode = base64_decode(b64code);
-		var codeReceiverJSON = this.codeReceiver;
-		var noticedContainer = "load";
-		console.log(b64code + '\r\n' + decode);
-		console.log(this.codeReceiver);
+		//var codeReceiverJSON = this.codeReceiver;
+		var codeReceiverJSON = codeReceiver;
 		
+		var noticedContainer = "loaded";
+		console.log(b64code + '\r\n' + decode);
+		console.log("this.codeReceiver: " + this.codeReceiver);
+		console.log("codeReceiver: " + codeReceiver);
 		var username = " ";
 		if(isSignin == "true"){
 			username = _username;
-			var usernameElement = document.getElementById("username");
+			//var usernameElement = document.getElementById("username");
 			//var key = autoGenerateKey();
 			//var encryptedUsername = browserEncrypt(usernameElement.value, key);
 			//console.log();
 			console.log(username);
 			
 			var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
-			var pushQuery = "code=" + b64code + "&username=" + usernameElement.value + "&ip=0";
+			var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
 			console.log("pushURI: " + pushURI);
 			console.log("pushQuery: " + pushQuery);
 			doPushCode(pushURI,handlePushCode, pushQuery, noticedContainer);
