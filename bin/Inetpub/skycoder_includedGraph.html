@@ -65,7 +65,6 @@ $(function() {
 	$( "#animation_container" ).resize(function(){ 
 		console.log( $("#animation_container").height() + " sss\r\n" ); 
 	}); 
-	$( "#codeList_selector_group" ).buttonset();
 })
 var animation_area_container_console = $('#animation_area_container_scroll');
 function downloadLog(type){
@@ -1006,7 +1005,7 @@ function base64_decode(base64_str){
 	return ret;
 }
 function initOnload(){
-	//hideCodeList();
+	hideCodeList();
 	isProxy = isOnProxy();
 	
 	addBodyMouseListener();
@@ -2562,39 +2561,27 @@ for(var i = 22; i < 25; i++){
 		amountOfSelector = parseInt(amountOfSelector);
 		if(amountOfSelector){
 			codeListAreaObj.innerHTML = "";
-			//codeListAreaObj.innerHTML += '<div id="codeList_selector_group">';
 			for(var i = amountOfSelector - 1; i >= 0; i--){
-				/*codeListAreaObj.innerHTML += '<input type="radio" name="codeList_selector" value="' + i + '" id="codeList_selector_'+i+'" onclick="loadCodeToCodemirrorTxt(window._codeList['+i+'], JsEditor);" />';
-				codeListAreaObj.innerHTML += '<label for="codeList_selector_' + i + '">code no.'+(i+1)+'</label><br>';*/
 				codeListAreaObj.innerHTML += '<div name="listingElements" alt="" class="listingElements" style="cursor:hand; border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;" id="codeList_selector_' + i + '" onclick=" listingClick(\'listingElements\', \'codeList_selector_' + i + '\'); loadCodeToCodemirrorTxt(window._codeList['+i+'].code, JsEditor);">code no.' + (i+1) + ': ' + convertMilliToTimestamp(window._codeList[i].pushedTimestamp) + '</div>';
-				/*if(typeof window._codeList[i].pushedTimestamp != 'undefind' || window._codeList[i].pushedTimestamp > 0){
-					codeListAreaObj.innerHTML += ' ' + convertMilliToTimestamp(window._codeList[i].pushedTimestamp);
-				}*/
-				//codeListAreaObj.innerHTML += '</div>';
 			}
-			//codeListAreaObj.innerHTML += '</div>';
-			///document.getElementsByName("codeList_selector").item(0).setAttribute("checked","checked");
 		}
 	}
 	var listingClick = function(listingName, that_id){
 		var listing = document.getElementsByName(listingName);
 		var clickedElement = document.getElementById(that_id);
-		var checkedStyle = "border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;";
-		var unCheckedStyle = "border: #FF0000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;";
+		var checkedStyle = "cursor:hand; border: #FF0000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;";
+		var unCheckedStyle = "cursor:hand; border: #000 1px groove; padding: 5px; margin: 3px; border-radius: 6px 6px 6px 6px / 6px 6px 6px 6px;";
 		for(var i = 0; i < listing.length; i++){
 			listing.item(i).checked = 'undefined';
 		}
 		clickedElement.checked = 'checked';
-		clickedElement.style = 'border: #FF0000 1px groove';
 		for(var i = 0; i < listing.length; i++){
-			//console.log(i+": " + listing.item(i).checked);
 			if(listing.item(i).checked == 'checked'){
-				listing.item(i).style = checkedStyle;
+				listing.item(i).setAttribute("style", checkedStyle);
 			}else{
-				listing.item(i).style = unCheckedStyle;
+				listing.item(i).setAttribute("style", unCheckedStyle);
 			}
 		}
-		//console.log("\r\n\r\n");
 	}
 	var showCodeList = function(){
 		document.getElementById("codeList_container").style.visibility = "visible";	
