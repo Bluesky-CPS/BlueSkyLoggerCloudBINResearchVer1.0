@@ -10,6 +10,7 @@
 <script src="ms-Dropdown/js/msdropdown/jquery.dd.min.js"></script>
 <script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
 <!-- </msdropdown> -->
+<link rel="stylesheet" type="text/css" href="css/btn.css" />
 
 <script src="jquery/jquery-textext-master/src/js/textext.core.js"></script>
 <script src="jquery/jquery-textext-master/src/js/textext.plugin.prompt.js"></script>
@@ -1042,8 +1043,8 @@ function initConsoleJS(){
 		console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
 		console.log("code receiver port: " + codeReceiverJSON.ETLog.codeReceiver.port);
 		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');
-		document.getElementById("jstoolbtn").innerHTML += '<br><br>&nbsp;<button onClick="hideCodeList(); pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>';
-		document.getElementById("jstoolbtn").innerHTML += '&nbsp;<button onClick="loadCodeFromServer();" id="loadCodeFromServerBtn" type="button">Load from server</button>';
+		document.getElementById("jstoolbtn").innerHTML += '<br><br>&nbsp;<button onClick="hideCodeList(); pushCodeToServer();" id="pushCodeToServerBtn" type="button" class="button">Save to server</button>';
+		document.getElementById("jstoolbtn").innerHTML += '&nbsp;<button onClick="loadCodeFromServer();" id="loadCodeFromServerBtn" type="button" class="button">Load from server</button>';
 		
 		var jstoolbtn = document.getElementById("jstoolbtn");
 		var brTag = document.createElement("br");
@@ -1842,9 +1843,9 @@ function num(bar){
                       <br>
                     </label>
                     <label>
-                    	<input type="submit" name="exec_btn" id="exec_btn" value="execute" onClick="APIExecute()">
+                    	<input type="submit" name="exec_btn" id="exec_btn" value="execute" onClick="APIExecute()" class="button">
                  	</label>
-                    <input type="submit" name="exec_btn2" id="instruct_clr" value="clear" onClick="clearDebugMessageLienElement('APIscript_debug_area'); document.getElementById('codingtext').value='';">
+                    <input type="submit" name="exec_btn2" id="instruct_clr" value="clear" onClick="clearDebugMessageLienElement('APIscript_debug_area'); document.getElementById('codingtext').value='';" class="button">
                     <!--<textarea name="APIscript_debug" id="APIscript_debug" cols="60" rows="5" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%; background-color:#009; color:#FFF; disabled: true;" data-role="none" disabled></textarea>-->
                     
                     <!--<div id="APIscript_debug" style="border:1px #FFF solid; background-color:#00F; font-family: Tahoma, Geneva, sans-serif; font-style:normal"> &nbsp;executed</div>-->
@@ -2529,11 +2530,11 @@ for(var i = 22; i < 25; i++){
  			</script>
             <br>
              <div id="jstoolbtn">   
-                &nbsp;<button onClick="JSrun();" id="JSrun">Execute</button>&nbsp;<br><br>
-                &nbsp;<button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn">Save to your machine</button>
-                <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
+                &nbsp;<button onClick="JSrun();" id="JSrun" class="button">Execute</button>&nbsp;<button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn" class="button">Save to machine</button>
+                
+               <input type="file" onchange='readTextToCodemirrorTxt(this, JsEditor)' />
                 <!--NOTE: the pushCodeToServerBtn create when the page onload after confirm that the pushing feature is availble on the server. see function initOnload() and initConsoleJS()-->
-             </div>
+             </div><br>
 <script language="javascript">
 	//dohere
 	var createCodeSelector = function(codeListAreaID, amountOfSelector){
@@ -2556,6 +2557,45 @@ for(var i = 22; i < 25; i++){
 	var hideCodeList = function(){
 		document.getElementById("codeList_container").style.visibility = "hidden";	
 	}
+	window._sortCodeList = function(codeList){
+		//var sortedCodeList = new Array();
+		if(Array.isArray(codeList)){
+			var pushedTimestamp;
+			var code;
+			// Regularizing the integer of pushedTimestamp.
+			for(var i = 0; i < codeList.length; i++){
+				pushedTimestamp = codeList[i].pushedTimestamp;
+				if(typeof pushedTimestamp === 'undefined' || !isInteger(pushedTimestamp)){
+					codeList[i]['pushedTimestamp'] = 0;
+				}else{
+					codeList[i].pushedTimestamp = parseInt(pushedTimestamp);
+				}
+			}
+			// Sort it.
+			for(var i = 1; i < codeList.length; i++){
+				for(var j = 2; j < codeList.length; j++){
+					pushedTimestamp = codeList[j].pushedTimestamp;
+					code = codeList[j].code;
+					if(parseInt(codeList[j].pushedTimestamp) < codeList[j - 1].pushedTimestamp){
+						var tmp = codeList[j];
+						codeList[j] = codeList[j - 1];
+						codeList[j - 1] = tmp;
+					}
+				}
+			}
+		}
+		return codeList;
+	}
+	var isInteger = function(dat){
+		var ret = false;
+		try{
+			var testParseInt = parseInt(dat);
+			ret = true;
+		}catch(e){
+			ret = false;
+		}
+		return ret;
+	}
 	var loadCodeFromServer = function(){
 		var codeReceiverJSON = codeReceiver;
 		var noticedContainer = "loaded";
@@ -2567,9 +2607,9 @@ for(var i = 22; i < 25; i++){
 			var codes = getValue(getCodesURI);
 			if(codes){
 				var codesJSON = JSON.parse(codes);
-				var decodedCodeList = decodeAllCodes(codesJSON.codeList);
+				var decodedCodeList = decodeAllCodes(window._sortCodeList(codesJSON.codeList));
 				var len = decodedCodeList.length;
-				loadCodeToCodemirrorTxt(decodedCodeList[len-1], JsEditor);
+				loadCodeToCodemirrorTxt(decodedCodeList[len - 1], JsEditor);
 				window._codeList = decodedCodeList;
 				createCodeSelector("codeList_selector_area", len);
 				showCodeList();
@@ -2584,7 +2624,7 @@ for(var i = 22; i < 25; i++){
 		var ret = new Array();
 		var len = codeList.length;
 		for(var i = 0; i < len; i++){
-			ret.push(base64_decode(codeList[i]));
+			ret.push(base64_decode(codeList[i].code));
 		}
 		return ret;
 	}
@@ -2613,15 +2653,16 @@ for(var i = 22; i < 25; i++){
 			var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
 			console.log("pushURI: " + pushURI);
 			console.log("pushQuery: " + pushQuery);
-			doPushCode(pushURI,handlePushCode, pushQuery, noticedContainer);
+			var isConfirmed = confirm("Do you push the code to the cloud?");
+			if(isConfirmed){
+				doPushCode(pushURI,handlePushCode, pushQuery, noticedContainer);
+			}
 		}else{
 			console.log("please sign in");
 			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
 		}
 	}
 </script>
-                
-                <br><br>
                 	<div id="DOMcontainerTitle" style="border-top: #000 1px solid; background-color:#006; text-align:center; color:#FFF; font-weight:bold">
                     DOM container
                     </div>
@@ -2648,7 +2689,7 @@ for(var i = 22; i < 25; i++){
     	onMouseMove="if(this.isMouseDown){document.getElementById('codeList_container').style.opacity=0.6;}"
         style=" visibility:hidden">
     	  <div id="ed_view_title" style="z-index:501; border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move">
-          	<img id="codeList_x_btn" src="image/x.gif" onclick="document.getElementById('codeList_container').style.visibility='hidden';" style="cursor:default" onMouseDown="document.getElementById('codeList_x_btn').style.border='#cb101d 1px solid';" onMouseUp="document.getElementById('codeList_x_btn').style.border='';"> The code on the cloud.
+          	<img id="codeList_x_btn" src="image/x.gif" onClick="document.getElementById('codeList_container').style.visibility='hidden';" style="cursor:default" onMouseDown="document.getElementById('codeList_x_btn').style.border='#cb101d 1px solid';" onMouseUp="document.getElementById('codeList_x_btn').style.border='';"> The code on the cloud.
           </div>
           <div id="codeList_scroll" style="position:static; border:0px; height: 218px;">
           	<span id="codeList_area" class="codeList_area">
