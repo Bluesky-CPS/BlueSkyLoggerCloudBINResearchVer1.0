@@ -2752,6 +2752,8 @@ for(var i = 22; i < 25; i++){
 		removeCodeListDat();
 		var len = window._codeList.length;
 		createCodeSelector("codeList_selector_area", len);
+		loadCodeToCodemirrorTxt(window._codeList[len - 1].code, JsEditor);
+		listingClick('listingElements', 'codeList_selector_' + (len - 1) + '');
 	}
 </script>
                 	<div id="DOMcontainerTitle" style="border-top: #000 1px solid; background-color:#006; text-align:center; color:#FFF; font-weight:bold">
