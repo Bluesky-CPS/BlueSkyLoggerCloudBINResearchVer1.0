@@ -897,13 +897,20 @@ var downloadAsFile = function(downloadToFileName, content) {
 	a.href = blobURL;
 	a.click();  
 };
+var isASCII = function(str) {
+    return /^[\x00-\x7F]*$/.test(str);
+}
 var readTextToCodemirrorTxt = function(that, codemirrorInstance){
 	if(that.files && that.files[0]){
 		var reader = new FileReader();
 		reader.onload = function (e) {  
 			var output = e.target.result;
-			codemirrorInstance.setValue(output);
-			codemirrorInstance.refresh();
+			if(isASCII(output)){
+				codemirrorInstance.setValue(output);
+				codemirrorInstance.refresh();
+			}else{
+				alert("Your selected file is not available here.");
+			}
 		};
 		reader.readAsText(that.files[0]);
 	}
@@ -2682,35 +2689,41 @@ for(var i = 22; i < 25; i++){
 	//NeedFixAgain
 	var pushCodeToServer = function(){
 		var self = this;
-		var b64code = b64EncodeUnicode(JsEditor.getValue());
-		var decode = base64_decode(b64code);
-		//var codeReceiverJSON = this.codeReceiver;
-		var codeReceiverJSON = codeReceiver;
-		
-		var noticedContainer = "loaded";
-		console.log(b64code + '\r\n' + decode);
-		console.log("this.codeReceiver: " + this.codeReceiver);
-		console.log("codeReceiver: " + codeReceiver);
-		var username = " ";
-		if(isSignin == "true"){
-			username = _username;
-			//var usernameElement = document.getElementById("username");
-			//var key = autoGenerateKey();
-			//var encryptedUsername = browserEncrypt(usernameElement.value, key);
-			//console.log();
-			console.log(username);
+		var readCodeFromEditor = JsEditor.getValue();
+		var codeSize = readCodeFromEditor.length;
+		if(isASCII(readCodeFromEditor) && codeSize < 5242880 ){
+			var b64code = b64EncodeUnicode(readCodeFromEditor);
+			var decode = base64_decode(b64code);
+			var noticedContainer = "loaded";
+			var codeReceiverJSON = codeReceiver;
+			//var codeReceiverJSON = this.codeReceiver;
 			
-			var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
-			var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
-			console.log("pushURI: " + pushURI);
-			console.log("pushQuery: " + pushQuery);
-			var isConfirmed = confirm("Do you push the code to a cloud storage?");
-			if(isConfirmed){
-				doCodeStorage(pushURI,handlePushCode, pushQuery, noticedContainer);
+			console.log(b64code + '\r\n' + decode);
+			console.log("this.codeReceiver: " + this.codeReceiver);
+			console.log("codeReceiver: " + codeReceiver);
+			var username = " ";
+			if(isSignin == "true"){
+				username = _username;
+				//var usernameElement = document.getElementById("username");
+				//var key = autoGenerateKey();
+				//var encryptedUsername = browserEncrypt(usernameElement.value, key);
+				//console.log();
+				console.log(username);
+				
+				var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
+				var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
+				console.log("pushURI: " + pushURI);
+				console.log("pushQuery: " + pushQuery);
+				var isConfirmed = confirm("Do you push the code to a cloud storage?");
+				if(isConfirmed){
+					doCodeStorage(pushURI,handlePushCode, pushQuery, noticedContainer);
+				}
+			}else{
+				console.log("please sign in");
+				document.getElementById(noticedContainer).innerHTML = "please sign in before.";
 			}
 		}else{
-			console.log("please sign in");
-			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
+			alert("Your code is not available to pushing now.");	
 		}
 	}
 	//dohere
