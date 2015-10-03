@@ -965,21 +965,21 @@ function clipboardInit() {
 	//copyTextToClipboard("textssssss");
 }
 function showEDDetail(edIdx){
-		var edDetailDescriptionObj = document.getElementById("edDetailDescription");
+		var detailDescriptionObj = document.getElementById("edDetailDescription");
 		if(edIdx >= 0){
 			console.log(edData[edIdx].loggingStatus);
 			console.log(edData[edIdx].EDIP);
 			console.log(edData[edIdx].EDCNAME);
 			console.log(edData[edIdx].EDType);
-			edDetailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + "<a href='#' onclick='copyTextToClipboard(\"" + edData[edIdx].EDIP + "\");' id='edipclick'>" + edData[edIdx].EDIP + "</a>" + "<br>" + "<strong>Device Name: </strong>"  + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
-			edDetailDescriptionObj.style.top = bodyMouse.y + "px";
-			edDetailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
-			edDetailDescriptionObj.style.visibility = "visible";
-			edDetailDescriptionObj.style.border = "#000000 1px dotted";
-			edDetailDescriptionObj.style.padding = "6px";
-			edDetailDescriptionObj.style.backgroundColor = "#CCC";
-			edDetailDescriptionObj.style.zIndex = "3001";
-			edDetailDescriptionObj.style.position = "fixed";
+			detailDescriptionObj.innerHTML = "<strong>Embedded Device IP: </strong>" + "<a href='#' onclick='copyTextToClipboard(\"" + edData[edIdx].EDIP + "\");' id='edipclick'>" + edData[edIdx].EDIP + "</a>" + "<br>" + "<strong>Device Name: </strong>"  + edData[edIdx].EDCNAME + "<br>" + "<strong>Device Type: </strong>" + edData[edIdx].EDType;
+			detailDescriptionObj.style.top = bodyMouse.y + "px";
+			detailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
+			detailDescriptionObj.style.visibility = "visible";
+			detailDescriptionObj.style.border = "#000000 1px dotted";
+			detailDescriptionObj.style.padding = "6px";
+			detailDescriptionObj.style.backgroundColor = "#CCC";
+			detailDescriptionObj.style.zIndex = "3001";
+			detailDescriptionObj.style.position = "fixed";
 			
 			
 			console.log("BODYMOUSE:" + bodyMouse.x + " " + bodyMouse.y);
@@ -989,13 +989,44 @@ function showEDDetail(edIdx){
 			document.querySelector('#ed_ip [value="' + val + '"]').selected = true;
 			selectBox.refresh();
 			
+		}else if(edIdx >= -1){ // Selected the central node.
+			var systemLoad = getValue("ETLog?instruction=systemload&opt1=noneFix&opt2=json");
+			var systemLoadJson = JSON.parse(systemLoad);
+			var MB = (1024*1024);
+			var totalPhysicalMemorySize = Math.round((systemLoadJson.ETLog.systemLoad.getTotalPhysicalMemorySize)/MB);
+			var freePhysicalMemorySize = Math.round((systemLoadJson.ETLog.systemLoad.getFreePhysicalMemorySize)/MB);
+			var usagePhysicalMemorySize = Math.round(totalPhysicalMemorySize - freePhysicalMemorySize);
+			var totalSwapSpaceSize = Math.round((systemLoadJson.ETLog.systemLoad.getTotalSwapSpaceSize)/MB);
+			var freeSwapSpaceSize = Math.round((systemLoadJson.ETLog.systemLoad.getFreeSwapSpaceSize)/MB);
+			var usageSwapSpaceSize = Math.round(totalSwapSpaceSize - freeSwapSpaceSize);
+			
+			var freePhysicalMemorySizePercent = Math.round(100*(freePhysicalMemorySize/totalPhysicalMemorySize));
+			var usagePhysicalMemorySizePercent = Math.round(100*(usagePhysicalMemorySize/totalPhysicalMemorySize));
+			var freeSwapSpaceSizePercent = Math.round(100*(freeSwapSpaceSize/totalSwapSpaceSize));
+			var usageSwapSpaceSizePercent = Math.round(100*(usageSwapSpaceSize/totalSwapSpaceSize));
+			
+			var systemCpuLoad = systemLoadJson.ETLog.systemLoad.getSystemCpuLoad;
+			
+			detailDescriptionObj.innerHTML = "<strong>Physical memory usage: </strong>"  + (usagePhysicalMemorySize) + " MB (" + usagePhysicalMemorySizePercent + " %)<br>" + "<strong>Physical memory remain: </strong>"  + (freePhysicalMemorySize) + " MB (" + freePhysicalMemorySizePercent + " %)<br>" + "<strong>Total physical memory size: </strong>"  + totalPhysicalMemorySize + " MB<br>" + "<BR>" + "<strong>Swap space usage: </strong>"  + (usageSwapSpaceSize) + " MB (" + usageSwapSpaceSizePercent + " %)<br>" + "<strong>Swap space remain: </strong>"  + (freeSwapSpaceSize) + " MB (" + freeSwapSpaceSizePercent + " %)<br>" + "<strong>Total Swap space: </strong>"  + totalSwapSpaceSize + " MB<br>";
+			if(systemCpuLoad){
+				detailDescriptionObj.innerHTML += "<strong>System CPU load: </strong>"  + (systemCpuLoad) + "%<br>";
+			}
+			detailDescriptionObj.style.top = bodyMouse.y + "px";
+			detailDescriptionObj.style.left = bodyMouse.x + 20 + "px";
+			detailDescriptionObj.style.visibility = "visible";
+			detailDescriptionObj.style.border = "#000000 1px dotted";
+			detailDescriptionObj.style.padding = "6px";
+			detailDescriptionObj.style.backgroundColor = "#CCC";
+			detailDescriptionObj.style.zIndex = "3001";
+			detailDescriptionObj.style.position = "fixed";
+			
 		}else{
 			hideEDDetail("edDetailDescription");
 		}
 }
 function hideEDDetail(detailID){
-	var edDetailDescriptionObj = document.getElementById(detailID);
-	edDetailDescriptionObj.style.visibility = "hidden";
+	var detailDescriptionObj = document.getElementById(detailID);
+	detailDescriptionObj.style.visibility = "hidden";
 }
 function reloadEDData(){
 	if(!isProxy){
