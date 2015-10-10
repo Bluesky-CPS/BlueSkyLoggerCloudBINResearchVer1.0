@@ -2694,7 +2694,6 @@ for(var i = 22; i < 25; i++){
 			username = _username;
 			
 			var getCodesURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/getcode?username=" + username;
-			//console.log(getCodesURI);
 			var codes = getValue(getCodesURI);
 			if(codes){
 				var codesJSON = JSON.parse(codes);
@@ -2718,7 +2717,6 @@ for(var i = 22; i < 25; i++){
 		for(var i = 0; i < len; i++){
 			//code = base64_decode(codeList[i].code);
 			code = LZString.decompress(Base64.decode(codeList[i].code.replace(/ /g, "\+")));
-			console.log("code: " + code);
 			obj = {
 				'code': code,
 				'pushedTimestamp': codeList[i].pushedTimestamp
@@ -2732,23 +2730,19 @@ for(var i = 22; i < 25; i++){
 	var pushCodeToServer = function(){
 		var self = this;
 		var readCodeFromEditor = JsEditor.getValue();
-		var codeSize = readCodeFromEditor.length;
+		var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
+		var codeSize = b64compressedCode.length;
 		if(isASCII(readCodeFromEditor) && codeSize < 5242880 ){
 			//dohere (will be cleaning the code after)
-			var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
-			var b64code = b64EncodeUnicode(readCodeFromEditor);
+			//var b64code = b64EncodeUnicode(readCodeFromEditor);
 			var noticedContainer = "loaded";
 			var codeReceiverJSON = codeReceiver;
-			
-			console.log("this.codeReceiver: " + this.codeReceiver);
-			console.log("codeReceiver: " + codeReceiver);
 			var username = " ";
 			if(isSignin == "true"){
 				username = _username;
 				//var usernameElement = document.getElementById("username");
 				//var key = autoGenerateKey();
 				//var encryptedUsername = browserEncrypt(usernameElement.value, key);
-				//console.log();
 				
 				var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
 				var pushQuery = "code=" + b64compressedCode + "&username=" + username + "&ip=0";
@@ -2775,8 +2769,6 @@ for(var i = 22; i < 25; i++){
 		var username = " ";
 		var b64code = Base64.encode(LZString.compress(window._codeList[codeListIndex].code));
 		
-		console.log("remCodeFromServer: " + window._codeList[codeListIndex].code + ", " + window._codeList[codeListIndex].pushedTimestamp);
-
 		if(isSignin == "true"){
 			username = _username;
 			console.log(username);
@@ -2792,7 +2784,6 @@ for(var i = 22; i < 25; i++){
 				doCodeStorage(remURI,handleRemCode, remQuery, noticedContainer);
 			}
 		}else{
-			console.log("please sign in");
 			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
 		}
 	}
