@@ -2720,7 +2720,7 @@ for(var i = 22; i < 25; i++){
 		for(var i = 0; i < len; i++){
 			obj = {
 				'code': base64_decode(codeList[i].code),
-				//dohere
+				//push with compression
 				//'code': LZString.decompress(Base64.decode(codeList[i].code)),
 				'pushedTimestamp': codeList[i].pushedTimestamp
 			};
@@ -2742,12 +2742,12 @@ for(var i = 22; i < 25; i++){
 		console.log("b64compressedCode["+ b64compressedCode.length +"]: " + b64compressedCode);
 		console.log("Decompress["+ LZString.decompress(Base64.decode(b64compressedCode)).length +"]: " + LZString.decompress(Base64.decode(b64compressedCode)));*/
 		if(isASCII(readCodeFromEditor) && codeSize < 5242880 ){
-			var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
+			//push with compression
+			//var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
 			var b64code = b64EncodeUnicode(readCodeFromEditor);
 			var decode = base64_decode(b64code);
 			var noticedContainer = "loaded";
 			var codeReceiverJSON = codeReceiver;
-			//var codeReceiverJSON = this.codeReceiver;
 			
 			console.log(b64code + '\r\n' + decode);
 			console.log("this.codeReceiver: " + this.codeReceiver);
@@ -2763,6 +2763,7 @@ for(var i = 22; i < 25; i++){
 				
 				var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
 				var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
+				//push with compression
 				//var pushQuery = "code=" + b64compressedCode + "&username=" + username + "&ip=0";
 				console.log("pushURI: " + pushURI);
 				console.log("pushQuery: " + pushQuery);
@@ -2786,6 +2787,7 @@ for(var i = 22; i < 25; i++){
 		var noticedContainer = "loaded";
 		var username = " ";
 		var b64code = b64EncodeUnicode(window._codeList[codeListIndex].code);
+		//push with compression
 		//var b64code = Base64.encode(LZString.compress(window._codeList[codeListIndex].code));
 		
 		console.log("remCodeFromServer: " + window._codeList[codeListIndex].code + ", " + window._codeList[codeListIndex].pushedTimestamp);
