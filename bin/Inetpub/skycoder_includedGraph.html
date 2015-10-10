@@ -34,6 +34,10 @@
 <script src="codemirror/codemirror-5.3/mode/javascript/javascript.js"></script>
 <!-- End Code Mirror -->
 
+<script src="lz-string/libs/lz-string.js"></script>
+<script src="lz-string/libs/lz-string.min.js"></script>
+<script src="Base64EncodeDecode.js"></script>
+
 <script src="jquery-ui.js"></script>
 <!--<script src="jquery-ui-1.11.4.custom/jquery-ui.js"></script>
 <link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.css">
@@ -1697,6 +1701,9 @@ $(document).ready(function(e) {
 			return String.fromCharCode('0x' + p1);
 		}));
 	}
+	function b64EncodeBin(bin) {
+		return btoa(bin);
+	}
 	function browserEncrypt(mes, key){
 		var ret = mes;
 		var charCode = 0;
@@ -1814,7 +1821,7 @@ function num(bar){
 </script>
 
 <!-- Begin ed Setting Plate section-->
-<div id="edSettingContainer" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: calc(100% - 700px); top: 50px; z-index:2999; background-color:#FFFFFF; padding: 10px; padding-top: 6px; width: 700px; height:100%;">
+<div id="edSettingContainer" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: calc(100% - 650px); top: 50px; z-index:2999; background-color:#FFFFFF; padding: 10px; padding-top: 6px; width: 650px; height:400px;">
   <div id="edSettingTitle" align="right" style=" height: 30px; width: 100%">
   	<div style="cursor: hand; width: 30px; height: 30px; padding-right: 10px; padding-top: 10px;" onClick="hiddenEDSetting('edSettingContainer', 'edSettingBody');"><img src="image/x.gif" style="cursor: hand; padding-right: 10px;" onClick="hiddenEDSetting('edSettingContainer', 'edSettingBody');"></div>
   </div>
@@ -1823,7 +1830,10 @@ function num(bar){
   </div>
   <hr>
   
-  <div id="camera" align="right" style="padding-top:30px"><canvas id='cameraCanvas' width='320px' height='240px' align='right' style="border: #000000 1px solid"></canvas></div>
+  
+  <div id="camera" align="right" style="padding-top:30px;">
+  <canvas id='cameraCanvas' width='320px' height='240px' align='right' style="border: #000000 1px solid"></canvas>
+  </div>
   
   <script>
   	var isEDIPChanged = false;
@@ -1863,7 +1873,8 @@ function num(bar){
 		openCameraOf(edIPSelectionObj.value);
 			
 		edSettingObj.style.visibility = "visible";
-		edSettingBodyObj.innerHTML = "Embedded Device IP: [" + edIPSelectionObj.value + "]<br><br> Sorry! It does not allow the setting feature of the virtual embedded device, please check the physical embedded device configuration again.";
+		//edSettingBodyObj.innerHTML = "Embedded Device IP: [" + edIPSelectionObj.value + "]<br><br> Sorry! It does not allow the setting feature of the virtual embedded device, please check the physical embedded device configuration again.";
+		edSettingBodyObj.innerHTML = "Embedded Device IP: [" + edIPSelectionObj.value + "]<br>";
 	}
 	var hiddenEDSetting = function(edSettingObjID, edSettingBodyObjID){
 		var edSettingObj = document.getElementById(edSettingObjID);
@@ -2709,6 +2720,8 @@ for(var i = 22; i < 25; i++){
 		for(var i = 0; i < len; i++){
 			obj = {
 				'code': base64_decode(codeList[i].code),
+				//push with compression
+				//'code': LZString.decompress(Base64.decode(codeList[i].code)),
 				'pushedTimestamp': codeList[i].pushedTimestamp
 			};
 			console.log("obj.pushedTimestamp: ", obj.pushedTimestamp);
@@ -2722,12 +2735,19 @@ for(var i = 22; i < 25; i++){
 		var self = this;
 		var readCodeFromEditor = JsEditor.getValue();
 		var codeSize = readCodeFromEditor.length;
+		//dohere
+		/*var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
+		console.log("Code len["+ readCodeFromEditor.length +"]");
+		console.log("Regularb24[" + b64EncodeUnicode(readCodeFromEditor).length + "]: " + b64EncodeUnicode(readCodeFromEditor));
+		console.log("b64compressedCode["+ b64compressedCode.length +"]: " + b64compressedCode);
+		console.log("Decompress["+ LZString.decompress(Base64.decode(b64compressedCode)).length +"]: " + LZString.decompress(Base64.decode(b64compressedCode)));*/
 		if(isASCII(readCodeFromEditor) && codeSize < 5242880 ){
+			//push with compression
+			//var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
 			var b64code = b64EncodeUnicode(readCodeFromEditor);
 			var decode = base64_decode(b64code);
 			var noticedContainer = "loaded";
 			var codeReceiverJSON = codeReceiver;
-			//var codeReceiverJSON = this.codeReceiver;
 			
 			console.log(b64code + '\r\n' + decode);
 			console.log("this.codeReceiver: " + this.codeReceiver);
@@ -2743,6 +2763,8 @@ for(var i = 22; i < 25; i++){
 				
 				var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
 				var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
+				//push with compression
+				//var pushQuery = "code=" + b64compressedCode + "&username=" + username + "&ip=0";
 				console.log("pushURI: " + pushURI);
 				console.log("pushQuery: " + pushQuery);
 				var isConfirmed = confirm("Do you push the code to a cloud storage?");
@@ -2765,6 +2787,8 @@ for(var i = 22; i < 25; i++){
 		var noticedContainer = "loaded";
 		var username = " ";
 		var b64code = b64EncodeUnicode(window._codeList[codeListIndex].code);
+		//push with compression
+		//var b64code = Base64.encode(LZString.compress(window._codeList[codeListIndex].code));
 		
 		console.log("remCodeFromServer: " + window._codeList[codeListIndex].code + ", " + window._codeList[codeListIndex].pushedTimestamp);
 
