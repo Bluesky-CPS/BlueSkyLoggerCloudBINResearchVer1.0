@@ -2705,9 +2705,6 @@ for(var i = 22; i < 25; i++){
 				createCodeSelector("codeList_selector_area", len);
 				listingClick('listingElements', 'codeList_selector_' + (len - 1) + '');
 				showCodeList();
-				//console.log(codes)
-				//console.log("--------------decodedCodeList: ")
-				//console.log(decodedCodeList);
 			}
 		}else{
 			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
@@ -2726,9 +2723,6 @@ for(var i = 22; i < 25; i++){
 				'code': code,
 				'pushedTimestamp': codeList[i].pushedTimestamp
 			};
-			console.log("codeList["+i+"].code: " + codeList[i].code);
-			console.log("codeList["+i+"].code.replace: " + codeList[i].code.replace(/ /g, "\+"));
-			console.log("obj.pushedTimestamp: ", obj.pushedTimestamp);
 			//ret.push(base64_decode(codeList[i].code));
 			ret.push(obj);
 		}
@@ -2739,21 +2733,13 @@ for(var i = 22; i < 25; i++){
 		var self = this;
 		var readCodeFromEditor = JsEditor.getValue();
 		var codeSize = readCodeFromEditor.length;
-		//dohere
-		/*var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
-		console.log("Code len["+ readCodeFromEditor.length +"]");
-		console.log("Regularb24[" + b64EncodeUnicode(readCodeFromEditor).length + "]: " + b64EncodeUnicode(readCodeFromEditor));
-		console.log("b64compressedCode["+ b64compressedCode.length +"]: " + b64compressedCode);
-		console.log("Decompress["+ LZString.decompress(Base64.decode(b64compressedCode)).length +"]: " + LZString.decompress(Base64.decode(b64compressedCode)));*/
 		if(isASCII(readCodeFromEditor) && codeSize < 5242880 ){
 			//dohere (will be cleaning the code after)
 			var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
 			var b64code = b64EncodeUnicode(readCodeFromEditor);
-			var decode = base64_decode(b64code);
 			var noticedContainer = "loaded";
 			var codeReceiverJSON = codeReceiver;
 			
-			console.log(b64code + '\r\n' + decode);
 			console.log("this.codeReceiver: " + this.codeReceiver);
 			console.log("codeReceiver: " + codeReceiver);
 			var username = " ";
@@ -2763,11 +2749,8 @@ for(var i = 22; i < 25; i++){
 				//var key = autoGenerateKey();
 				//var encryptedUsername = browserEncrypt(usernameElement.value, key);
 				//console.log();
-				console.log(username);
 				
 				var pushURI = "http://" + codeReceiverJSON.ETLog.codeReceiver.host + ":" + codeReceiverJSON.ETLog.codeReceiver.port + "/";
-				//var pushQuery = "code=" + b64code + "&username=" + username + "&ip=0";
-				//push with compression
 				var pushQuery = "code=" + b64compressedCode + "&username=" + username + "&ip=0";
 				console.log("pushURI: " + pushURI);
 				console.log("pushQuery: " + pushQuery);
@@ -2790,9 +2773,6 @@ for(var i = 22; i < 25; i++){
 		var codeReceiverJSON = codeReceiver;
 		var noticedContainer = "loaded";
 		var username = " ";
-		//dohere will cleaning the code after.
-		//var b64code = b64EncodeUnicode(window._codeList[codeListIndex].code);
-		//push with compression
 		var b64code = Base64.encode(LZString.compress(window._codeList[codeListIndex].code));
 		
 		console.log("remCodeFromServer: " + window._codeList[codeListIndex].code + ", " + window._codeList[codeListIndex].pushedTimestamp);
