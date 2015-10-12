@@ -800,6 +800,7 @@ function handlePushCode(req){
 	var writeroot = document.getElementById("loaded");
 	var serverResponse = req.responseText;
 	noticeContainer.innerHTML = serverResponse;
+	hideLoadSign();
 }
 function handleRemCode(req){
 	var noticeContainer = document.getElementById(req.noticeContainerID);
@@ -808,6 +809,7 @@ function handleRemCode(req){
 	noticeContainer.innerHTML = serverResponse;
 	
 	removeCodeListingElement();
+	hideLoadSign();
 }
 function handleDiffTime(req){
 	var browserTime = new Date(now);
@@ -981,6 +983,7 @@ function showLoadSign(){
 	document.getElementById("loadsign").style.visibility = "visible";
 }
 function hideLoadSign(){
+	console.log("hideLoadSign");
 	document.getElementById("loadsign").style.visibility = "hidden";
 }
 function showEDDetail(edIdx){
@@ -2788,9 +2791,11 @@ for(var i = 22; i < 25; i++){
 			}else{
 				console.log("please sign in");
 				document.getElementById(noticedContainer).innerHTML = "please sign in before.";
+				hideLoadSign();
 			}
 		}else{
 			alert("Your code is not available to pushing now.");	
+			hideLoadSign();
 		}
 		hideLoadSign();
 	}
