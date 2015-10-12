@@ -114,6 +114,11 @@ function handleRequestAPI_Script(req) {
 	console.log("Responsed header\r\n====================\r\n"+req.getAllResponseHeaders());
 	var RXtimeStamp = addCommunicationTraceDivElement("rx", req.responseText, req.id, req);
 	
+	var resJson = JSON.parse(responsedText);
+	if(resJson.ETLog.logging.state == 'needAuth'){
+		clearLoginContainer();
+	}
+	
 	return responsedText;
 }
 var isNoDevice = 0;
@@ -764,6 +769,7 @@ function handleSignin(req) {
 		window._username = _username;
 		//var len = JSONParse.ETLog.EDConnStatement.length;
 		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCNAME + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
+		autocheck_session = setInterval(isSessionAuto, 30000);
 	}else{
 		
 	}
@@ -782,6 +788,8 @@ function handleSignout(req) {
 		isSignin = "false";
 		//var len = JSONParse.ETLog.EDConnStatement.length;
 		noticeContainer.innerHTML = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                    <form action=\"skycoder.html\" method=\"post\" id=\"singinform\">                    <tr>                        <td width=\"60\" class=\"loginTD\" valign=\"top\">                            <div class=\"loginTitleTxt\" style=\"padding-left: 4px;\">                                &nbsp;Username                             </div>                            <div id=\"loginInput\" style=\"padding-right: 4px; padding-left: 4px;\">                                <input name=\"user\" type=\"text\" id=\"user\" size=\"10\" value=\"guest\">                            </div>                        </td>                        <td width=\"67\" class=\"loginTD\" valign=\"top\"><div class=\"loginTitleTxt\">&nbsp;Password </div>                          <div id=\"loginInput\" style=\"padding-right: 4px;\">                            <input name=\"pass\" type=\"password\" id=\"pass\" size=\"10\" value=\"guest\">                          </div></td>                        <td width=\"62\" class=\"loginTD\" valign=\"top\" style=\"padding-right: 8px;\"><div class=\"loginTitleTxt\"> &nbsp;&nbsp; </div>                          <div id=\"loginInput\">                            <input onMouseOver=\"showMenuBar('skyCoderDetail','',90);\" onMouseMove=\"showMenuBar('skyCoderDetail','',90);\" onMouseOut=\"\" type=\"button\" name=\"login_btn\" id=\"login_btn\" value=\"Sign In\" onClick=\"doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');\">                            <input type=\"hidden\" name=\"mode\" value=\"signin\" id=\"mode\">                          </div>                        </td>                    </tr>                    </form>                    <tr>                        <td class=\"loginTD\" valign=\"top\" colspan=\"3\">                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">Do you forgot the account?</a></div>                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">How can I get the account?</a></div>                        </td>                    </tr>                </table>";
+		console.log(autocheck_session);
+		clearInterval(autocheck_session);
 	}else{
 		
 	}
@@ -1054,6 +1062,7 @@ function base64_decode(base64_str){
 	var ret = atob(base64_str);
 	return ret;
 }
+var autocheck_session;
 function initOnload(){
 	hideCodeList();
 	hideEDDetail("edDetailDescription");
@@ -2186,6 +2195,10 @@ function onLed(localEDIP, ledPin){
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
+	/*var resJson = JSON.parse(value);
+	if(resJson.ETLog.logging.state == 'needAuth'){
+		clearLoginContainer();
+	}*/
     return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
@@ -2226,6 +2239,10 @@ function offLed(localEDIP, ledPin){
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
+	/*var resJson = JSON.parse(value);
+	if(resJson.ETLog.logging.state == 'needAuth'){
+		clearLoginContainer();
+	}*/
     return value;
 	/*document.getElementById("API_script_ed_ip").value = localEDIP;
     var LE_domain = "";
@@ -2347,6 +2364,10 @@ function lightSensorDat(localEDIP){
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
+	/*var resJson = JSON.parse(value);
+	if(resJson.ETLog.logging.state == 'needAuth'){
+		clearLoginContainer();
+	}*/
     return value;
 	
 	
@@ -3157,6 +3178,40 @@ MTRepetition.queue = [];
 			var logoutQuery = "username=" + usernameElement.value + "&mode=" +modeElement.value
 			console.log(noticeContainer + "\r\nBefore invoke doSignOutRequert\r\n");
 			doSigninoutRequest("/doLogout.ins",handleSignout, logoutQuery, noticeContainer);
+		}
+		function isSessionAuto(){
+			console.log("session check.");
+			isSession('loginCapabalityContainer');
+		}
+		function clearLoginContainer(){
+			var user = _username;
+			if(user == "guest") pass = "guest";
+			var noticeContainer = document.getElementById('loginCapabalityContainer');
+			noticeContainer.innerHTML = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                    <form action=\"skycoder.html\" method=\"post\" id=\"singinform\">                    <tr>                        <td width=\"60\" class=\"loginTD\" valign=\"top\">                            <div class=\"loginTitleTxt\" style=\"padding-left: 4px;\">                                &nbsp;Username                             </div>                            <div id=\"loginInput\" style=\"padding-right: 4px; padding-left: 4px;\">                                <input name=\"user\" type=\"text\" id=\"user\" size=\"10\" value=\"" + user + "\">                            </div>                        </td>                        <td width=\"67\" class=\"loginTD\" valign=\"top\"><div class=\"loginTitleTxt\">&nbsp;Password </div>                          <div id=\"loginInput\" style=\"padding-right: 4px;\">                            <input name=\"pass\" type=\"password\" id=\"pass\" size=\"10\" value=\"" + pass + "\">                          </div></td>                        <td width=\"62\" class=\"loginTD\" valign=\"top\" style=\"padding-right: 8px;\"><div class=\"loginTitleTxt\"> &nbsp;&nbsp; </div>                          <div id=\"loginInput\">                            <input onMouseOver=\"showMenuBar('skyCoderDetail','',90);\" onMouseMove=\"showMenuBar('skyCoderDetail','',90);\" onMouseOut=\"\" type=\"button\" name=\"login_btn\" id=\"login_btn\" value=\"Sign In\" onClick=\"doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');\">                            <input type=\"hidden\" name=\"mode\" value=\"signin\" id=\"mode\">                          </div>                        </td>                    </tr>                    </form>                    <tr>                        <td class=\"loginTD\" valign=\"top\" colspan=\"3\">                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">Do you forgot the account?</a></div>                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">How can I get the account?</a></div>                        </td>                    </tr>                </table>";
+			clearInterval(autocheck_session);
+		}
+		function isSession(noticeContainerID){
+			var username = _username;
+			if(username != ' '){
+				console.log("isSession: " + username);
+				var issession_val = getValue("/ETLog?instruction=issession&opt1=noneFix&opt2=" + username + "&opt3=json");
+				console.log(issession_val);
+				var noticeContainer = document.getElementById(noticeContainerID);
+				var issessionJson = JSON.parse(issession_val);
+				var issession;
+				
+				if(issessionJson){
+					if(issessionJson.ETLog){
+						if(issessionJson.ETLog.issession){
+							issession = issessionJson.ETLog.issession;
+						}	
+					}	
+				}
+				console.log(issession);
+				if(issession == 'false'){
+						clearLoginContainer();
+				}
+			}
 		}
 		function doSignin(username, password, mode, noticeContainer){
 			/*var usernameElement = document.getElementById(username);
