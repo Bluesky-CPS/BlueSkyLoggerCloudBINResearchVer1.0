@@ -1,6 +1,7 @@
 <html>
 <head><title>=== SkyCoder framework Environment (Trial version) ===</title>
 <link rel="stylesheet" type="text/css" media="screen" href="css/stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/spinners.css" />
 
 <script src="ms-Dropdown/js/jquery/jquery-1.9.0.min.js"></script>
 
@@ -976,6 +977,12 @@ function clipboardInit() {
 	
 	//copyTextToClipboard("textssssss");
 }
+function showLoadSign(){
+	document.getElementById("loadsign").style.visibility = "visible";
+}
+function hideLoadSign(){
+	document.getElementById("loadsign").style.visibility = "hidden";
+}
 function showEDDetail(edIdx){
 		var detailDescriptionObj = document.getElementById("edDetailDescription");
 		if(edIdx >= 0){
@@ -1897,7 +1904,11 @@ function num(bar){
 <!-- End ed Setting Plate section-->
 
 <!-- API scripts section-->
-
+<div id="loadsign" style="z-index: 3003; position: fixed; width: 100%; top: calc(50% - 1px); vertical-align:middle; visibility:hidden;" align="center">
+<div class="spinner-loader" align="center">
+        	Loading…
+</div>
+</div>
 <div id="codingtextdiv" style=" top: 61px">
 
 
@@ -2749,6 +2760,7 @@ for(var i = 22; i < 25; i++){
 	}
 	//NeedFixAgain
 	var pushCodeToServer = function(){
+		showLoadSign();
 		var self = this;
 		var readCodeFromEditor = JsEditor.getValue();
 		var b64compressedCode = Base64.encode(LZString.compress(readCodeFromEditor));
@@ -2780,9 +2792,11 @@ for(var i = 22; i < 25; i++){
 		}else{
 			alert("Your code is not available to pushing now.");	
 		}
+		hideLoadSign();
 	}
 	//dohere
 	var remCodeFromServer = function(remCodeListingElementId, codeListIndex){
+		showLoadSign();
 		var self = this;
 		var listingElement = document.getElementById(remCodeListingElementId);
 		var codeReceiverJSON = codeReceiver;
@@ -2807,6 +2821,7 @@ for(var i = 22; i < 25; i++){
 		}else{
 			document.getElementById(noticedContainer).innerHTML = "please sign in before.";
 		}
+		hideLoadSign();
 	}
 	var removeCodeListDat = function(){
 		var remCodeListIndex = window._remCodeListIndex;
@@ -2977,6 +2992,7 @@ for(var i = 22; i < 25; i++){
 		return str;
 	}
 	var JSrun = function() {
+		showLoadSign();
 	//function JSrun(){
 		document.getElementById("DOMcontainer").innerHTML = "";
 		document.getElementById("animation_area").innerHTML = "";
@@ -3005,6 +3021,7 @@ for(var i = 22; i < 25; i++){
 				//***if (str != undefined) {outnode.value += str;}
 			}
 		);
+		hideLoadSign();
 	}
 	
 	function getDomContainer(){
@@ -3186,9 +3203,11 @@ MTRepetition.queue = [];
 		function clearLoginContainer(){
 			var user = _username;
 			if(user == "guest") pass = "guest";
+			else pass = "";
 			var noticeContainer = document.getElementById('loginCapabalityContainer');
 			noticeContainer.innerHTML = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                    <form action=\"skycoder.html\" method=\"post\" id=\"singinform\">                    <tr>                        <td width=\"60\" class=\"loginTD\" valign=\"top\">                            <div class=\"loginTitleTxt\" style=\"padding-left: 4px;\">                                &nbsp;Username                             </div>                            <div id=\"loginInput\" style=\"padding-right: 4px; padding-left: 4px;\">                                <input name=\"user\" type=\"text\" id=\"user\" size=\"10\" value=\"" + user + "\">                            </div>                        </td>                        <td width=\"67\" class=\"loginTD\" valign=\"top\"><div class=\"loginTitleTxt\">&nbsp;Password </div>                          <div id=\"loginInput\" style=\"padding-right: 4px;\">                            <input name=\"pass\" type=\"password\" id=\"pass\" size=\"10\" value=\"" + pass + "\">                          </div></td>                        <td width=\"62\" class=\"loginTD\" valign=\"top\" style=\"padding-right: 8px;\"><div class=\"loginTitleTxt\"> &nbsp;&nbsp; </div>                          <div id=\"loginInput\">                            <input onMouseOver=\"showMenuBar('skyCoderDetail','',90);\" onMouseMove=\"showMenuBar('skyCoderDetail','',90);\" onMouseOut=\"\" type=\"button\" name=\"login_btn\" id=\"login_btn\" value=\"Sign In\" onClick=\"doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');\">                            <input type=\"hidden\" name=\"mode\" value=\"signin\" id=\"mode\">                          </div>                        </td>                    </tr>                    </form>                    <tr>                        <td class=\"loginTD\" valign=\"top\" colspan=\"3\">                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">Do you forgot the account?</a></div>                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">How can I get the account?</a></div>                        </td>                    </tr>                </table>";
 			clearInterval(autocheck_session);
+			isSignin = false;
 		}
 		function isSession(noticeContainerID){
 			var username = _username;
