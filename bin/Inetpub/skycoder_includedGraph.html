@@ -2142,7 +2142,7 @@ end
 <script>
 function gainer_aout(localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = "";
+	var LE_domain = "";
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
 	
 	var username = " ";
@@ -2156,12 +2156,12 @@ function gainer_aout(localEDIP, oSignalValArr){
 	}
 	
 	
-    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = LE_domain;
+	var LE_domain = LE_domain;
 	var Skyblue_exec_instruct = "sensornetwork/" + "set" + "/as/" + "8" + "/" + oSignalValArr;
 	
 	var username = " ";
@@ -2174,12 +2174,14 @@ function gainers_aout(LE_domain, localEDIP, oSignalValArr){
 		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
 	}
 	
-    //API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
+	//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
 }
 function onLed(localEDIP, ledPin){
 	var LE_domain = "";
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2188,42 +2190,48 @@ function onLed(localEDIP, ledPin){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
-			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
-			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
+				req.setRequestHeader("Encrypted-Username", encryptedUsername);
+				req.setRequestHeader("Encryptional-Key", key);
+				communicationTxID++;
+				var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+				timeStamps = getLocalTimestamp();
+				reqq.timeStamp = timeStamps;
+				reqq.id = communicationTxID;
+				reqq.instruction = instruction;
+				reqq.LE_domain = LE_domain;
+				reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
+		
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
-	/*var resJson = JSON.parse(value);
-	if(resJson.ETLog.logging.state == 'needAuth'){
-		clearLoginContainer();
-	}*/
     return value;
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = "";
-	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "1");
 }
 function offLed(localEDIP, ledPin){
 	var LE_domain = "";
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2232,42 +2240,47 @@ function offLed(localEDIP, ledPin){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
-			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
-			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
+				req.setRequestHeader("Encrypted-Username", encryptedUsername);
+				req.setRequestHeader("Encryptional-Key", key);
+				communicationTxID++;
+				var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+				timeStamps = getLocalTimestamp();
+				reqq.timeStamp = timeStamps;
+				reqq.id = communicationTxID;
+				reqq.instruction = instruction;
+				reqq.LE_domain = LE_domain;
+				reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
-	/*var resJson = JSON.parse(value);
-	if(resJson.ETLog.logging.state == 'needAuth'){
-		clearLoginContainer();
-	}*/
     return value;
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = "";
-	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//return sensornetwork(localEDIP, "gpio", "set", ledPin, "0");
 }
 function onLedAt(LE_domain, localEDIP, ledPin){
 	var LE_domain = LE_domain;
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=1";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2276,38 +2289,47 @@ function onLedAt(LE_domain, localEDIP, ledPin){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
 			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
 			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			   communicationTxID++;
+			   var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+			   timeStamps = getLocalTimestamp();
+			   reqq.timeStamp = timeStamps;
+			   reqq.id = communicationTxID;
+			   reqq.instruction = instruction;
+			   reqq.LE_domain = LE_domain;
+			   reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
     return value;
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = LE_domain;
-	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "1";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "1");
 }
 function offLedAt(LE_domain, localEDIP, ledPin){
 	var LE_domain = LE_domain;
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=gpio&opt3=set&opt4="+ ledPin +"&opt5=0";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2316,39 +2338,47 @@ function offLedAt(LE_domain, localEDIP, ledPin){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
-			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
-			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
+				req.setRequestHeader("Encrypted-Username", encryptedUsername);
+				req.setRequestHeader("Encryptional-Key", key);
+				communicationTxID++;
+				var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+				timeStamps = getLocalTimestamp();
+				reqq.timeStamp = timeStamps;
+				reqq.id = communicationTxID;
+				reqq.instruction = instruction;
+				reqq.LE_domain = LE_domain;
+				reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
     return value;
-   
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = LE_domain;
-	var Skyblue_exec_instruct = "sensornetwork/" + "gpio" + "/set/" + ledPin + "/" + "0";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//return sensornetworks(LE_domain, localEDIP, "gpio", "set", ledPin, "0");
 }
 function lightSensorDat(localEDIP){
 	var LE_domain = "";
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opt3=a&opt4=3&opt5=0";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2357,45 +2387,47 @@ function lightSensorDat(localEDIP){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
-			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
-			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
+				req.setRequestHeader("Encrypted-Username", encryptedUsername);
+				req.setRequestHeader("Encryptional-Key", key);
+				communicationTxID++;
+				var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+				timeStamps = getLocalTimestamp();
+				reqq.timeStamp = timeStamps;
+				reqq.id = communicationTxID;
+				reqq.instruction = instruction;
+				reqq.LE_domain = LE_domain;
+				reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
-	/*var resJson = JSON.parse(value);
-	if(resJson.ETLog.logging.state == 'needAuth'){
-		clearLoginContainer();
-	}*/
     return value;
-	
-	
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = "";
-	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//sensornetwork(localEDIP, "get", "a", "3", "0");
-	//return document.getElementById("loaded").innerHTML;
 }
 function lightSensorDatAt(LE_domain, localEDIP){
 	var LE_domain = LE_domain;
+	var API_Script_edIP = localEDIP;
 	var Skyblue_exec_instruct = LE_domain + "/ETLog?instruction=sensornetwork&opt1="+ localEDIP +"&opt2=get&opta=set&opt4=3&opt5=0";
+	var instruction = Skyblue_exec_instruct;
 	
 	var key = autoGenerateKey();
 	var encryptedUsername = browserEncrypt(window._username, key);
@@ -2404,41 +2436,47 @@ function lightSensorDatAt(LE_domain, localEDIP){
 	console.log("encryptedUsername: " + encryptedUsername);
 	console.log("key: " + key);
 	if(encryptedUsername != " "){
+		var reqq = {};
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  type: 'GET',
-		  beforeSend: function( req ) {
-			   req.setRequestHeader("Encrypted-Username", encryptedUsername);
-			   req.setRequestHeader("Encryptional-Key", key);
-          },
-		  /*headers: {
-			'Encrypted-Username': encryptedUsername,
-			'Encryptional-Key': key
-		  },*/
-		  async: false
+			url: Skyblue_exec_instruct, 
+			type: 'GET',
+			beforeSend: function( req ) {
+				req.setRequestHeader("Encrypted-Username", encryptedUsername);
+				req.setRequestHeader("Encryptional-Key", key);
+				communicationTxID++;
+				var timeStamp = addCommunicationTraceDivElement("tx", "Send [" + instruction + "]<br>to [" + API_Script_edIP + "]"+  ((LE_domain!="")?' on [' + LE_domain + ']':'') + "<br>", communicationTxID, null);
+				timeStamps = getLocalTimestamp();
+				reqq.timeStamp = timeStamps;
+				reqq.id = communicationTxID;
+				reqq.instruction = instruction;
+				reqq.LE_domain = LE_domain;
+				reqq.edIP = API_Script_edIP;
+			},
+			complete: function( resp ){
+				resp.instruction = reqq.instruction;
+				resp.LE_domain = reqq.LE_domain;
+				resp.edIP = reqq.API_Script_edIP;
+				resp.timeStamp = reqq.timeStamp;
+				resp.id = reqq.id;
+				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
+			},
+			async: false
 		}).responseText;
 	}else{
 		value= $.ajax({ 
-		  url: Skyblue_exec_instruct, 
-		  async: false
+			url: Skyblue_exec_instruct, 
+			async: false
 		}).responseText;
 	}
 	
 	document.getElementById("loaded").innerHTML = value;
     return value;
-	/*document.getElementById("API_script_ed_ip").value = localEDIP;
-    var LE_domain = LE_domain;
-	var Skyblue_exec_instruct = "sensornetwork/" + "get" + "/a/3/0";
-    API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
-	return document.getElementById("loaded").innerHTML;*/
-	//sensornetworks(LE_domain, localEDIP, "get", "a", "3", "0");
-	//return document.getElementById("loaded").innerHTML;
 }
 function getValue(domain){
 	var value= $.ajax({ 
-      url: domain, 
-      async: false
-    }).responseText;
+		url: domain, 
+		async: false
+	}).responseText;
     return value;
 }
 function actuatornetwork(localEDIP, actuatorSigVal){
@@ -2573,7 +2611,7 @@ function g_sensornetwork(LE_domain, localEDIP, interface, type, portnumber, valu
 		Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber;
 	}
     
-    var username = " ";
+	var username = " ";
 	if(isSignin == "true"){
 		username = _username;
 	}
@@ -2583,17 +2621,17 @@ function g_sensornetwork(LE_domain, localEDIP, interface, type, portnumber, valu
 		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
 	}
 	
-    return document.getElementById("loaded").innerHTML;
+	return document.getElementById("loaded").innerHTML;
 }
 function RGBtoHex(R,G,B){
 	return toHex(R)+toHex(G)+toHex(B);
 }
 function toHex(N){
- if(N==null) return "00";
- N = parseInt(N);
- if(N==0 || isNaN(N)) return "00";
- N = Math.max(0,N); N=Math.min(N,255); N=Math.round(N);
- return "0123456789ABCDEF".charAt((N-N%16)/16) + "0123456789ABCDEF".charAt(N%16);
+	if(N==null) return "00";
+	N = parseInt(N);
+	if(N==0 || isNaN(N)) return "00";
+	N = Math.max(0,N); N=Math.min(N,255); N=Math.round(N);
+	return "0123456789ABCDEF".charAt((N-N%16)/16) + "0123456789ABCDEF".charAt(N%16);
 }
 var viewer = new Viewer();
 function Viewer(){
