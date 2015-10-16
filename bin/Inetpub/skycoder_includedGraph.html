@@ -2611,7 +2611,7 @@ function g_sensornetwork(LE_domain, localEDIP, interface, type, portnumber, valu
 		Skyblue_exec_instruct = "sensornetwork/" + interface + "/" + type + "/" + portnumber;
 	}
     
-    var username = " ";
+	var username = " ";
 	if(isSignin == "true"){
 		username = _username;
 	}
@@ -2621,7 +2621,7 @@ function g_sensornetwork(LE_domain, localEDIP, interface, type, portnumber, valu
 		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
 	}
 	
-    return document.getElementById("loaded").innerHTML;
+	return document.getElementById("loaded").innerHTML;
 }
 function RGBtoHex(R,G,B){
 	return toHex(R)+toHex(G)+toHex(B);
