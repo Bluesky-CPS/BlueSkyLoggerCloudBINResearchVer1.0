@@ -1475,6 +1475,7 @@ $(document).ready(function(e) {
 <!--
 .stepContentContainer{
 	border: 0px;
+	height: inherit;
 }
 .stepContentContainer:hover{
 	border: #000 1px solid;
@@ -3350,6 +3351,19 @@ MTRepetition.queue = [];
 				newContentContainer.id="tx_" + id;
 				newTag.textContent="TX-" + id + "@{"+ timeStamp +"}";
 				newTag.className = "titleSendInstTimestamp";
+				newTag.onclick = function(){
+					var descn = document.getElementById("tx_drrt_" + id);
+					if(descn.isVisible){
+						descn.style.height = "0px";
+						descn.style.visibility = "hidden";	
+					}else{
+						descn.style.height = "auto";
+						descn.style.visibility = "visible";
+					}
+					descn.isVisible = !descn.isVisible;
+				};
+				newTag2.id = "tx_drrt_" + id;
+				newTag2.isVisible = true;
 				newTag2.className = "descriptSendInstTimestamp";
 				newTag2.innerHTML = description;
 				
@@ -3359,8 +3373,20 @@ MTRepetition.queue = [];
 				newContentContainer.id="rx_" + id;
 				newTag.textContent="RX-" + id + "@{"+ timeStamp +"}";
 				newTag.className = "titleReceivedResTimestamp";
+				newTag.onclick = function(){
+					var descn = document.getElementById("rx_drrt_" + id);
+					if(descn.isVisible){
+						descn.style.height = "0px";
+						descn.style.visibility = "hidden";	
+					}else{
+						descn.style.height = "auto";
+						descn.style.visibility = "visible";
+					}
+					descn.isVisible = !descn.isVisible;
+				};
 				newTag2.className = "descriptReceivedResTimestamp";
-				
+				newTag2.id = "rx_drrt_" + id;
+				newTag2.isVisible = true;
 				var serverToEtTimeStampMilli = parseInt(txCallback.getResponseHeader("Server-Et-Timestamp"));
 				var etToServerTimeStampMilli = parseInt(txCallback.getResponseHeader("Et-Server-Timestamp"));
 				
