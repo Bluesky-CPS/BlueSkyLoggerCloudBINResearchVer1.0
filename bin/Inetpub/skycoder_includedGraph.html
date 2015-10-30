@@ -768,7 +768,6 @@ function handleSignin(req) {
 		isSignin = "true";
 		_username = JSONParse.ETLog.login.username;
 		window._username = _username;
-		//var len = JSONParse.ETLog.EDConnStatement.length;
 		noticeContainer.innerHTML = "<div class='loginTitleTxt' style='padding-left: 8px; padding-right: 10px; width: 300px; font-size: 12px; font-family: Tahoma, Geneva, sans-serif;'>Your username: " + JSONParse.ETLog.login.username + " &nbsp;&nbsp;&nbsp;<a href='#' onclick='doSignout(\"username\", \"mode\", \"loginCapabalityContainer\");' class='loginLink'>Sign out</a><br>Your ip: " + JSONParse.ETLog.login.yourIP + "<br>Your provider: "  + JSONParse.ETLog.login.yourCNAME + "\r\n" + "<input type='hidden' id='username' value='" + JSONParse.ETLog.login.username + "'><input type='hidden' id='mode' value='signout'></div>";
 		autocheck_session = setInterval(isSessionAuto, 30000);
 	}else{
@@ -787,7 +786,6 @@ function handleSignout(req) {
 	signinSignoutJson = JSONParse;
 	if(logoutResult == "true"){
 		isSignin = "false";
-		//var len = JSONParse.ETLog.EDConnStatement.length;
 		noticeContainer.innerHTML = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                    <form action=\"skycoder.html\" method=\"post\" id=\"singinform\">                    <tr>                        <td width=\"60\" class=\"loginTD\" valign=\"top\">                            <div class=\"loginTitleTxt\" style=\"padding-left: 4px;\">                                &nbsp;Username                             </div>                            <div id=\"loginInput\" style=\"padding-right: 4px; padding-left: 4px;\">                                <input name=\"user\" type=\"text\" id=\"user\" size=\"10\" value=\"guest\">                            </div>                        </td>                        <td width=\"67\" class=\"loginTD\" valign=\"top\"><div class=\"loginTitleTxt\">&nbsp;Password </div>                          <div id=\"loginInput\" style=\"padding-right: 4px;\">                            <input name=\"pass\" type=\"password\" id=\"pass\" size=\"10\" value=\"guest\">                          </div></td>                        <td width=\"62\" class=\"loginTD\" valign=\"top\" style=\"padding-right: 8px;\"><div class=\"loginTitleTxt\"> &nbsp;&nbsp; </div>                          <div id=\"loginInput\">                            <input onMouseOver=\"showMenuBar('skyCoderDetail','',90);\" onMouseMove=\"showMenuBar('skyCoderDetail','',90);\" onMouseOut=\"\" type=\"button\" name=\"login_btn\" id=\"login_btn\" value=\"Sign In\" onClick=\"doSignin('user', 'pass', 'mode', 'loginCapabalityContainer');\">                            <input type=\"hidden\" name=\"mode\" value=\"signin\" id=\"mode\">                          </div>                        </td>                    </tr>                    </form>                    <tr>                        <td class=\"loginTD\" valign=\"top\" colspan=\"3\">                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">Do you forgot the account?</a></div>                            <div class=\"loginOptionalTxtContainer\"><a class=\"loginLink\" href=\"#\">How can I get the account?</a></div>                        </td>                    </tr>                </table>";
 		console.log(autocheck_session);
 		clearInterval(autocheck_session);
@@ -867,7 +865,6 @@ function startGetBSFLogSize(){
 	for(var i = 0; i < 100000000; i++){}
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 	getBSFLogSizeID = setTimeout(getBSFLogSize, 0);
-	//alert("fffff");
 }
 function getBSFLogSize(){
 	getBSFSizeCNT++;
@@ -881,8 +878,6 @@ function stopGetBSFLogSize(){
 	clearTimeout(this.getBSFLogSizeID);
 	getBSFSizeCNT = 0;
 	for(var i = 0; i < 100000000; i++){}
-	//alert(i);
-	//nsWaitForDelay(10);
 	sendRequest2('GETBSFLOGSIZE',handleRequestGetBSFLogSize,'ETLOG');
 }
 var bodyMouse = {x: 0, y: 0};
@@ -944,7 +939,6 @@ function redrawEDGraph(){
 	networkVS = new vis.Network(container, edNetworkData, options);
 	networkVS.on('select', function (properties) {
 		console.log('selected nodes: ' + properties.nodes);
-		//edData = JSONParse.ETLog.EDConnStatement;
 		var edIdx = parseInt(properties.nodes) - 2;
 		curr_edIdx = edIdx;
 		showEDDetail(edIdx);
@@ -1085,7 +1079,6 @@ function initOnload(){
 	autoReloadEDdataRetID = setInterval(reloadEDData, 30000);
 	autoRedrawEDGraphRetID = setInterval(redrawEDGraph, 60000);
 	autoRefreshEDSelectBoxRetID = setInterval(refreshEdConnStatSelectBox, 50000);
-	//autoReloadEDdataRetID = setInterval(testReload, 1000);
 	if(!isProxy){
 		sendRequest2('ls/edconnected',handleRequestConnectedStatement,'ETLOG');
 		console.log("handleRequestConnectedStatement with ETLOG");
@@ -1114,9 +1107,9 @@ function initConsoleJS(){
 	console.log("initOnload: " , this.codeReceiver);
 	if(this.codeReceiver){
 		var codeReceiverJSON = this.codeReceiver;
-		console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
+		/*console.log("code receiver host: " + codeReceiverJSON.ETLog.codeReceiver.host);
 		console.log("code receiver port: " + codeReceiverJSON.ETLog.codeReceiver.port);
-		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');
+		console.log('<br><br><button onClick="pushCodeToServer();" id="pushCodeToServerBtn" type="button">Save to server</button>');*/
 		document.getElementById("jstoolbtn").innerHTML += '<br><br>&nbsp;<button onClick="hideCodeList(); pushCodeToServer();" id="pushCodeToServerBtn" type="button" class="button">Save to server</button>';
 		document.getElementById("jstoolbtn").innerHTML += '&nbsp;<button onClick="loadCodeFromServer();" id="loadCodeFromServerBtn" type="button" class="button">Load from server</button>';
 		
@@ -1284,7 +1277,6 @@ function showCamera(srcDat){
 		//ctx.style.display = 'hidden';
 		isCameraShowing = 0;
 	}
-	//alert(window.location);
 }
 function refreshCanvas(){
 	nn++;
@@ -1421,23 +1413,23 @@ function showNoCamera(){
 	padding: 0;
 }
 #camera {
-  position: fixed;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  top: 171;
-  height:160;
-  margin-top: 0;
-  text-align:right;
+	position: fixed;
+	z-index: 2;
+	left: 0;
+	right: 0;
+	top: 171;
+	height:160;
+	margin-top: 0;
+	text-align:right;
 }
 #cameraCanvas {
-  position: relative;
-  z-index: 3;
-  left: 0;
-  right: 0;
-  top: 0;
-  margin-top: 0;
-  text-align:right;
+	position: relative;
+	z-index: 3;
+	left: 0;
+	right: 0;
+	top: 0;
+	margin-top: 0;
+	text-align:right;
 }
 tr#table_title {
 	color:#000;
@@ -1483,6 +1475,7 @@ $(document).ready(function(e) {
 <!--
 .stepContentContainer{
 	border: 0px;
+	height: inherit;
 }
 .stepContentContainer:hover{
 	border: #000 1px solid;
@@ -1543,7 +1536,7 @@ $(document).ready(function(e) {
 	filter: alpha(opacity=100);
 }
 #animation_area_container_scroll{
-	height:218px;
+	height:198px;
 	overflow-y: auto;
 	overflow-x: none;
 	width: 100%;
@@ -1650,6 +1643,10 @@ $(document).ready(function(e) {
 	word-wrap:break-word;
 	height: 80px;
 }
+#util_btn {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 16px;
+}
 .loginTD {
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 11px;
@@ -1671,6 +1668,16 @@ $(document).ready(function(e) {
 	text-shadow: 1px 1px 1px #000000;
 }
 .loginLink:hover {
+	text-decoration: none;
+	color:#FF0;
+	text-shadow: 1px 1px 1px #000000;
+}
+.utilsLink {
+	text-decoration: underline;
+	color:#FFF;
+	text-shadow: 1px 1px 1px #000000;
+}
+.utilsLink:hover {
 	text-decoration: none;
 	color:#FF0;
 	text-shadow: 1px 1px 1px #000000;
@@ -2015,17 +2022,17 @@ function num(bar){
                 sleep 800<br>
                 loop 10<br>
                 sensornetwork LOCAL_ED_IP gpio set 22 0<br>
-sensornetwork LOCAL_ED_IP gpio set 27 0<br>
-sensornetwork LOCAL_ED_IP gpio set 23 0<br>
-sleep 500 <br>
-sensornetwork LOCAL_ED_IP gpio set 27 1<br>
-sleep 200<br>
-sensornetwork LOCAL_ED_IP gpio set 22 1<br>
-sleep 200<br>
-sensornetwork LOCAL_ED_IP gpio set 23 1<br>
-sleep 200<br>
-end
-<br>
+                sensornetwork LOCAL_ED_IP gpio set 27 0<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 0<br>
+                sleep 500 <br>
+                sensornetwork LOCAL_ED_IP gpio set 27 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 22 1<br>
+                sleep 200<br>
+                sensornetwork LOCAL_ED_IP gpio set 23 1<br>
+                sleep 200<br>
+                end
+				<br>
                 <br>
             </div>
             <div class="TabbedPanelsContent">
@@ -2134,11 +2141,8 @@ end
                 	: : SkyCoding (Javascript): : 
                 </div>
                 <div id="codingtextArea" style="border: 1px #000 solid; background-color:#496093; color:#FFF; width:100%; border-top: 0px;">
-                
-            
-            
-            
-            
+
+         
 <script>
 function gainer_aout(localEDIP, oSignalValArr){
 	document.getElementById("API_script_ed_ip").value = localEDIP;
@@ -2154,7 +2158,6 @@ function gainer_aout(localEDIP, oSignalValArr){
 	}else{
 		API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG', username);
 	}
-	
 	
 	//API_Script_sendRequest(LE_domain, document.getElementById("API_script_ed_ip").value, Skyblue_exec_instruct, handleRequestAPI_Script,'ETLOG');
 	return document.getElementById("loaded").innerHTML;
@@ -2653,10 +2656,8 @@ function Viewer(){
 	}
 }
 </script>
-              <textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none">
-
-              </textarea>
-              <textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
+<textarea name="includedCode" id="includedCode" style="visibility:hidden; display:none"></textarea>
+<textarea name="code" id="code" cols="60" rows="20" style="border-radius: 0px 0px 15px 15px / 0px 0px 15px 15px; resize:none; overflow:auto; padding-left: 10px; padding-bottom: 20px; opacity: 1; filter: alpha(opacity=100); width:100%;">
 /**
  * This is JavaScript coding area. 
  * You can edit your sensing code with your JavaScript at the browser. 
@@ -2666,17 +2667,17 @@ function Viewer(){
 for(var i = 22; i < 25; i++){
     sensornetwork("172.16.4.222", "gpio", "set", ""+i, "1");
 }</textarea>
-              <script>
-				var JsEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
-				mode: "javascript",
-				lineNumbers: true,
-				lineWrapping: true,
-				styleActiveLine: true,
-				extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
-				foldGutter: true,
-				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
-				});
- 			</script>
+<script>
+	var JsEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
+		mode: "javascript",
+		lineNumbers: true,
+		lineWrapping: true,
+		styleActiveLine: true,
+		extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
+		foldGutter: true,
+		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+	});
+</script>
             <br>
              <div id="jstoolbtn">   
                 &nbsp;<button onClick="JSrun();" id="JSrun" class="button">Execute</button>&nbsp;<button onClick="var clickedTime = new Date(); downloadAsFile('skycoding-'+ clickedTime.getTime() +'.js', JsEditor.getValue())" id="downloadAsFileBtn" class="button">Save to machine</button>
@@ -2935,7 +2936,7 @@ for(var i = 22; i < 25; i++){
           </div>
 	</div>
   <input type="hidden" value='0.0.0.0' id="edipclickeddata">
-  <div id="edDetailDescription" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: 332px; top: 552px; z-index:3001; background-color:#CCC; padding: 6px;">----------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------edDetailDescription Plate----------------------------------------------</div>
+  <div id="edDetailDescription" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: 332px; top: 552px; z-index:3001; background-color:#CCC; padding: 6px;">----------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------</div>
   <div id="footerContainer">
   	<div id="footerDragBar" style="border:0px; border-bottom: #000000 1px dotted; border-top: #333 5px groove; height:30px; position:static; cursor:n-resize; vertical-align:text-bottom; padding-top: 10px" align="center"><span align="left" style=" vertical-align:middle; cursor:hand"><img src="image/upArrow.gif" onClick="moveFooterUpMax('footerContainer'); sendRequest2('ls/edconnected',handleGetEDdataForGraph,'ETLOG'); redrawEDGraph();"></span><span style="vertical-align:bottom">&nbsp;&nbsp;&nbsp;&nbsp;Embedded devices connecting graph&nbsp;&nbsp;&nbsp;&nbsp;</span><span align="right" style=" vertical-align:middle; cursor:hand"><img src="image/downArrow.gif" onClick="moveFooterDownMax('footerContainer');"></span>
 </div>
@@ -2988,10 +2989,6 @@ for(var i = 22; i < 25; i++){
 				edges: {color: 'blue'}
               };
               var networkVS = new vis.Network(container, edNetworkData, options);
-			  //networkVS.resize("100%", "100%");
-			  /*networkVS.on('resize', function(prop){
-				console.log("width:" + width + " height:" + height);
-			  });*/
 			  networkVS.on('select', function (properties) {
 			 	 console.log('selected nodes: ' + properties.nodes);
 			  });
@@ -3009,9 +3006,10 @@ for(var i = 22; i < 25; i++){
 		</div>
 	</div>
 
-	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" style="height:247px;">
+	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" style="height:247px;">
     	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
-          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
+          <div id="util_btn" style="position: static; font-family:'Courier New', Courier, monospace; background-color:#CCC; width: calc(100% - 4px); height: 20px;" align="center"><a class="utilsLink" href="#" onClick="hideAllcommuTraceElement();">hide</a> <a class="utilsLink" href="#" onClick="showAllcommuTraceElement();">show</a></div>
+          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 198px;">
     	    <span id="animation_area" class="animation_area">&nbsp;</span>
           </div>
 	</div>
@@ -3354,6 +3352,47 @@ MTRepetition.queue = [];
 			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
 		
+		var hideAllcommuTraceElement = function (){
+			for(var id = 1; id <= communicationTxID; id++){
+				var txDescn = document.getElementById("tx_drrt_" + id);
+				var rxDescn = document.getElementById("rx_drrt_" + id);
+				if(txDescn){
+					txDescn.style.height = "0px";
+					txDescn.style.visibility = "hidden";
+					txDescn.isVisible = false;
+				}
+				if(rxDescn){
+					rxDescn.style.height = "0px";
+					rxDescn.style.visibility = "hidden";
+					rxDescn.isVisible = false;
+				}
+			}
+			var aac_console = $('#animation_area_container_scroll');
+			aac_console.scrollTop(
+				0
+			);
+		}
+		var showAllcommuTraceElement = function (){
+			for(var id = 1; id <= communicationTxID; id++){
+				var txDescn = document.getElementById("tx_drrt_" + id);
+				var rxDescn = document.getElementById("rx_drrt_" + id);
+				if(txDescn){
+					txDescn.style.height = "auto";
+					txDescn.style.visibility = "visible";
+					txDescn.isVisible = true;
+				}
+				if(rxDescn){
+					rxDescn.style.height = "auto";
+					rxDescn.style.visibility = "visible";
+					rxDescn.isVisible = true;
+				}
+			}
+			var aac_console = $('#animation_area_container_scroll');
+			aac_console.scrollTop(
+				aac_console[0].scrollHeight - aac_console.height()
+			);
+		}
+		
 		var communicationTableIDs = new Array();
 		var communicationTxID = 0;
 		
@@ -3368,6 +3407,19 @@ MTRepetition.queue = [];
 				newContentContainer.id="tx_" + id;
 				newTag.textContent="TX-" + id + "@{"+ timeStamp +"}";
 				newTag.className = "titleSendInstTimestamp";
+				newTag.onclick = function(){
+					var descn = document.getElementById("tx_drrt_" + id);
+					if(descn.isVisible){
+						descn.style.height = "0px";
+						descn.style.visibility = "hidden";	
+					}else{
+						descn.style.height = "auto";
+						descn.style.visibility = "visible";
+					}
+					descn.isVisible = !descn.isVisible;
+				};
+				newTag2.id = "tx_drrt_" + id;
+				newTag2.isVisible = true;
 				newTag2.className = "descriptSendInstTimestamp";
 				newTag2.innerHTML = description;
 				
@@ -3377,8 +3429,21 @@ MTRepetition.queue = [];
 				newContentContainer.id="rx_" + id;
 				newTag.textContent="RX-" + id + "@{"+ timeStamp +"}";
 				newTag.className = "titleReceivedResTimestamp";
-				newTag2.className = "descriptReceivedResTimestamp";
+				newTag.onclick = function(){
+					var descn = document.getElementById("rx_drrt_" + id);
+					if(descn.isVisible){
+						descn.style.height = "0px";
+						descn.style.visibility = "hidden";	
+					}else{
+						descn.style.height = "auto";
+						descn.style.visibility = "visible";
+					}
+					descn.isVisible = !descn.isVisible;
+				};
 				
+				newTag2.className = "descriptReceivedResTimestamp";
+				newTag2.id = "rx_drrt_" + id;
+				newTag2.isVisible = true;
 				var serverToEtTimeStampMilli = parseInt(txCallback.getResponseHeader("Server-Et-Timestamp"));
 				var etToServerTimeStampMilli = parseInt(txCallback.getResponseHeader("Et-Server-Timestamp"));
 				
@@ -3400,6 +3465,8 @@ MTRepetition.queue = [];
 				
 				newContentContainer.appendChild(newTag);
 				newContentContainer.appendChild(newTag2);
+				
+				
 			}
 			
 			stepBehavior.appendChild(newContentContainer);
