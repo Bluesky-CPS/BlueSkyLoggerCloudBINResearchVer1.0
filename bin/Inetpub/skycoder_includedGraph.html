@@ -1536,7 +1536,7 @@ $(document).ready(function(e) {
 	filter: alpha(opacity=100);
 }
 #animation_area_container_scroll{
-	height:218px;
+	height:198px;
 	overflow-y: auto;
 	overflow-x: none;
 	width: 100%;
@@ -1643,6 +1643,10 @@ $(document).ready(function(e) {
 	word-wrap:break-word;
 	height: 80px;
 }
+#util_btn {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 16px;
+}
 .loginTD {
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 11px;
@@ -1664,6 +1668,16 @@ $(document).ready(function(e) {
 	text-shadow: 1px 1px 1px #000000;
 }
 .loginLink:hover {
+	text-decoration: none;
+	color:#FF0;
+	text-shadow: 1px 1px 1px #000000;
+}
+.utilsLink {
+	text-decoration: underline;
+	color:#FFF;
+	text-shadow: 1px 1px 1px #000000;
+}
+.utilsLink:hover {
 	text-decoration: none;
 	color:#FF0;
 	text-shadow: 1px 1px 1px #000000;
@@ -2992,9 +3006,10 @@ for(var i = 22; i < 25; i++){
 		</div>
 	</div>
 
-	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height)) + 'px';" style="height:247px;">
+	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" style="height:247px;">
     	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
-          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 218px;">
+          <div id="util_btn" style="position: static; font-family:'Courier New', Courier, monospace; background-color:#CCC; width: calc(100% - 4px); height: 20px;" align="center"><a class="utilsLink" href="#" onClick="hideAllcommuTraceElement();">hide</a> <a class="utilsLink" href="#" onClick="showAllcommuTraceElement();">show</a></div>
+          <div id="animation_area_container_scroll" style="position:static; border:0px; height: 198px;">
     	    <span id="animation_area" class="animation_area">&nbsp;</span>
           </div>
 	</div>
@@ -3337,6 +3352,47 @@ MTRepetition.queue = [];
 			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
 		
+		var hideAllcommuTraceElement = function (){
+			for(var id = 1; id <= communicationTxID; id++){
+				var txDescn = document.getElementById("tx_drrt_" + id);
+				var rxDescn = document.getElementById("rx_drrt_" + id);
+				if(txDescn){
+					txDescn.style.height = "0px";
+					txDescn.style.visibility = "hidden";
+					txDescn.isVisible = false;
+				}
+				if(rxDescn){
+					rxDescn.style.height = "0px";
+					rxDescn.style.visibility = "hidden";
+					rxDescn.isVisible = false;
+				}
+			}
+			var aac_console = $('#animation_area_container_scroll');
+			aac_console.scrollTop(
+				0
+			);
+		}
+		var showAllcommuTraceElement = function (){
+			for(var id = 1; id <= communicationTxID; id++){
+				var txDescn = document.getElementById("tx_drrt_" + id);
+				var rxDescn = document.getElementById("rx_drrt_" + id);
+				if(txDescn){
+					txDescn.style.height = "auto";
+					txDescn.style.visibility = "visible";
+					txDescn.isVisible = true;
+				}
+				if(rxDescn){
+					rxDescn.style.height = "auto";
+					rxDescn.style.visibility = "visible";
+					rxDescn.isVisible = true;
+				}
+			}
+			var aac_console = $('#animation_area_container_scroll');
+			aac_console.scrollTop(
+				aac_console[0].scrollHeight - aac_console.height()
+			);
+		}
+		
 		var communicationTableIDs = new Array();
 		var communicationTxID = 0;
 		
@@ -3384,6 +3440,7 @@ MTRepetition.queue = [];
 					}
 					descn.isVisible = !descn.isVisible;
 				};
+				
 				newTag2.className = "descriptReceivedResTimestamp";
 				newTag2.id = "rx_drrt_" + id;
 				newTag2.isVisible = true;
@@ -3408,6 +3465,8 @@ MTRepetition.queue = [];
 				
 				newContentContainer.appendChild(newTag);
 				newContentContainer.appendChild(newTag2);
+				
+				
 			}
 			
 			stepBehavior.appendChild(newContentContainer);
