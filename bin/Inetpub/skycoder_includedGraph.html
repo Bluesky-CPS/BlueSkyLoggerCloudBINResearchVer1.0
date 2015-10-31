@@ -66,6 +66,7 @@ $(function() {
 	$( "#loaded_container" ).draggable();
 	$( "#ed_ip_view_container" ).draggable();
 	$( "#codeList_container" ).draggable();
+	$( "#context_container" ).draggable();
 	$( "#animation_container" ).draggable();
 	$( "#animation_container" ).resize(function(){ 
 		console.log( $("#animation_container").height() + " sss\r\n" ); 
@@ -974,6 +975,7 @@ function clipboardInit() {
 	//copyTextToClipboard("textssssss");
 }
 function showLoadSign(){
+	console.log("showLoadSign");
 	document.getElementById("loadsign").style.visibility = "visible";
 }
 function hideLoadSign(){
@@ -1598,6 +1600,36 @@ $(document).ready(function(e) {
 	resize: none;
 }
 
+#context_container {
+	position:absolute;
+	z-index: 500;
+	left: 125px;
+	right: 0;
+	top: 69px;
+	width: 400px;
+	height:247px;
+	margin-top: 0;
+	padding: 10;
+	opacity: 1;
+	filter: alpha(opacity=100);
+	border-radius: 15px 15px 15px 15px / 15px 15px 15px 15px;
+	border:groove;
+	background-color:#FFF;
+	display: block;
+	resize: vertical;
+}
+#context_container:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+#context_scroll{
+	height:218px;
+	overflow-y: auto;
+	overflow-x: auto;
+	width: 100%;
+	resize: none;
+}
+
 #ed_ip_view_container {
 	position:absolute;
 	z-index: 1;
@@ -2212,7 +2244,7 @@ function onLed(localEDIP, ledPin){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2262,7 +2294,7 @@ function offLed(localEDIP, ledPin){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2311,7 +2343,7 @@ function onLedAt(LE_domain, localEDIP, ledPin){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2360,7 +2392,7 @@ function offLedAt(LE_domain, localEDIP, ledPin){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2409,7 +2441,7 @@ function lightSensorDat(localEDIP){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2458,7 +2490,7 @@ function lightSensorDatAt(LE_domain, localEDIP){
 			complete: function( resp ){
 				resp.instruction = reqq.instruction;
 				resp.LE_domain = reqq.LE_domain;
-				resp.edIP = reqq.API_Script_edIP;
+				resp.edIP = API_Script_edIP;
 				resp.timeStamp = reqq.timeStamp;
 				resp.id = reqq.id;
 				var RXtimeStamp = addCommunicationTraceDivElement("rx", resp.responseText, resp.id, resp);
@@ -2935,6 +2967,23 @@ for(var i = 22; i < 25; i++){
             </span>
           </div>
 	</div>
+    
+    <div id="context_container" 
+    	onMouseDown="document.getElementById('context_container').style.opacity=1; this.isMouseDown=true;" 
+    	onMouseUp="document.getElementById('context_container').style.opacity=1; this.isMouseDown=false;" 
+   		onMouseOut="document.getElementById('context_container').style.opacity=1; this.isMouseDown=false;" 
+    	onMouseOver="document.getElementById('context_container').style.opacity=1;" 
+    	onMouseMove="if(this.isMouseDown){document.getElementById('context_container').style.opacity=0.6;}"
+        style=" visibility: hidden">
+    	  <div id="ed_view_title" style="z-index:501; border:0px; border-bottom: #000000 1px dotted; height:auto; position:static; cursor:move">
+          	<img id="context_x_btn" src="image/x.gif" onClick="document.getElementById('context_container').style.visibility='hidden';" style="cursor:default" onMouseDown="document.getElementById('context_x_btn').style.border='#cb101d 1px solid';" onMouseUp="document.getElementById('context_x_btn').style.border='';"> Communication context.
+          </div>
+          <div id="context_scroll" style="position:static; border:0px; height: 218px;">
+          	<span id="context_area" class="context_area">
+            xxx
+            </span>
+          </div>
+	</div>
   <input type="hidden" value='0.0.0.0' id="edipclickeddata">
   <div id="edDetailDescription" style="position:fixed; visibility:hidden; border: #000000 1px dotted; left: 332px; top: 552px; z-index:3001; background-color:#CCC; padding: 6px;">----------------------------------------------edDetailDescription Plate--------------------------------------------------------------------------------------------</div>
   <div id="footerContainer">
@@ -3008,7 +3057,7 @@ for(var i = 22; i < 25; i++){
 
 	<div id="animation_container" onMouseDown="document.getElementById('animation_container').style.opacity=0.5;" onMouseUp="document.getElementById('animation_container').style.opacity=1;" onMouseOut="document.getElementById('animation_container').style.opacity=0.5;" onMouseOver="document.getElementById('animation_container').style.opacity=1; document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" onMouseMove="document.getElementById('animation_area_container_scroll').style.height = (parseInt(document.getElementById('animation_container').style.height) - parseInt(document.getElementById('animation_title').style.height) - parseInt(document.getElementById('util_btn').style.height)) + 'px';" style="height:247px;">
     	  <div id="animation_title" style="border:0px; border-bottom: #000000 1px dotted; height:20px; position:static; cursor:move"><img src="image/dot_list.jpg"> Communicating behavior steping tracer</div>
-          <div id="util_btn" style="position: static; font-family:'Courier New', Courier, monospace; background-color:#CCC; width: calc(100% - 4px); height: 20px;" align="center"><a class="utilsLink" href="#" onClick="hideAllcommuTraceElement();">hide</a> <a class="utilsLink" href="#" onClick="showAllcommuTraceElement();">show</a></div>
+          <div id="util_btn" style="position: static; font-family:'Courier New', Courier, monospace; background-color:#CCC; width: calc(100% - 4px); height: 20px;" align="center"><a class="utilsLink" href="#" onClick="showLoadSign(); hideAllcommuTraceElement(); hideLoadSign()">hide</a> | <a class="utilsLink" href="#" onClick="showLoadSign(); showAllcommuTraceElement(); hideLoadSign();">show</a><!-- | <a class="utilsLink" href="#" onClick="showLoadSign(); var context_container = document.getElementById('context_container'); var context_area = document.getElementById('context_area'); context_area.innerHTML = convertCommuTraceToJson(); context_container.style.visibility = 'visible'; hideLoadSign();">communication context</a>--></div>
           <div id="animation_area_container_scroll" style="position:static; border:0px; height: 198px;">
     	    <span id="animation_area" class="animation_area">&nbsp;</span>
           </div>
@@ -3352,45 +3401,85 @@ MTRepetition.queue = [];
 			return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec + '.' + msec;
 		}
 		
-		var hideAllcommuTraceElement = function (){
+		//dohere
+		var convertCommuTraceToJson = function (){
+			this.showLoadSign();
+			var context = "{";
 			for(var id = 1; id <= communicationTxID; id++){
 				var txDescn = document.getElementById("tx_drrt_" + id);
 				var rxDescn = document.getElementById("rx_drrt_" + id);
 				if(txDescn){
-					txDescn.style.height = "0px";
-					txDescn.style.visibility = "hidden";
-					txDescn.isVisible = false;
+					context += "\"tx\":{";
+					context += "\"id\":\"" + id + "\",";
+					context += "\"description\":\"" + txDescn.description + "\"";
+					context += "},";
 				}
 				if(rxDescn){
-					rxDescn.style.height = "0px";
-					rxDescn.style.visibility = "hidden";
-					rxDescn.isVisible = false;
+					context += "\"rx\":{";
+					context += "\"id\":\"" + id + "\",";
+					context += "\"desctiption\":\"" + rxDescn.description + "\",";
+					context += "\"reqTimestamp\":\"" + rxDescn.reqTimestamp + "\",";
+					context += "\"resTimestamp\":\"" + rxDescn.resTimestamp + "\",";
+					context += "\"serverToEtTimestamp\":\"" + rxDescn.serverToEtTimestamp + "\",";
+					context += "\"etToServerTimeStamp\":\"" + rxDescn.etToServerTimeStamp + "\"";
+					context += "}";
 				}
 			}
-			var aac_console = $('#animation_area_container_scroll');
-			aac_console.scrollTop(
-				0
+			context += "}";
+			this.hideLoadSign();
+			return context;
+		}
+		var hideAllcommuTraceElement = function (){
+			this.showLoadSign();
+			Concurrent.Thread.create(
+				function(){
+					for(var id = 1; id <= communicationTxID; id++){
+						var txDescn = document.getElementById("tx_drrt_" + id);
+						var rxDescn = document.getElementById("rx_drrt_" + id);
+						if(txDescn){
+							txDescn.style.height = "0px";
+							txDescn.style.visibility = "hidden";
+							txDescn.isVisible = false;
+						}
+						if(rxDescn){
+							rxDescn.style.height = "0px";
+							rxDescn.style.visibility = "hidden";
+							rxDescn.isVisible = false;
+						}
+					}
+					var aac_console = $('#animation_area_container_scroll');
+					aac_console.scrollTop(
+						0
+					);
+				}
 			);
+			this.hideLoadSign();
 		}
 		var showAllcommuTraceElement = function (){
-			for(var id = 1; id <= communicationTxID; id++){
-				var txDescn = document.getElementById("tx_drrt_" + id);
-				var rxDescn = document.getElementById("rx_drrt_" + id);
-				if(txDescn){
-					txDescn.style.height = "auto";
-					txDescn.style.visibility = "visible";
-					txDescn.isVisible = true;
+			this.showLoadSign();
+			Concurrent.Thread.create(
+				function(){
+					for(var id = 1; id <= communicationTxID; id++){
+						var txDescn = document.getElementById("tx_drrt_" + id);
+						var rxDescn = document.getElementById("rx_drrt_" + id);
+						if(txDescn){
+							txDescn.style.height = "auto";
+							txDescn.style.visibility = "visible";
+							txDescn.isVisible = true;
+						}
+						if(rxDescn){
+							rxDescn.style.height = "auto";
+							rxDescn.style.visibility = "visible";
+							rxDescn.isVisible = true;
+						}
+					}
+					var aac_console = $('#animation_area_container_scroll');
+					aac_console.scrollTop(
+						aac_console[0].scrollHeight - aac_console.height()
+					);
 				}
-				if(rxDescn){
-					rxDescn.style.height = "auto";
-					rxDescn.style.visibility = "visible";
-					rxDescn.isVisible = true;
-				}
-			}
-			var aac_console = $('#animation_area_container_scroll');
-			aac_console.scrollTop(
-				aac_console[0].scrollHeight - aac_console.height()
 			);
+			this.hideLoadSign();
 		}
 		
 		var communicationTableIDs = new Array();
@@ -3400,6 +3489,7 @@ MTRepetition.queue = [];
 			var timeStamp = getLocalTimestamp();
 			var newContentContainer = document.createElement("div");
 			newContentContainer.className = "stepContentContainer";
+			//newContentContainer.description = description;
 			var newTag = document.createElement("div");
 			var newTag2 = document.createElement("div");
 			
@@ -3421,6 +3511,7 @@ MTRepetition.queue = [];
 				newTag2.id = "tx_drrt_" + id;
 				newTag2.isVisible = true;
 				newTag2.className = "descriptSendInstTimestamp";
+				newTag2.description = description;
 				newTag2.innerHTML = description;
 				
 				newContentContainer.appendChild(newTag);
@@ -3454,8 +3545,17 @@ MTRepetition.queue = [];
 				
 				var serverToEtTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Server-Et-Timestamp")) + parseInt(document.difftime));
 				var etToServerTimeStamp_BasedOnSkyCoder = convertMilliToTimestamp(parseInt(txCallback.getResponseHeader("Et-Server-Timestamp")) + parseInt(document.difftime));
+				
 				console.log("serverToEtTimeStamp_BasedOnSkyCoder: " + serverToEtTimeStamp_BasedOnSkyCoder);
 				console.log("etToServerTimeStamp_BasedOnSkyCoder: " + etToServerTimeStamp_BasedOnSkyCoder);
+				
+				newTag2.serverToEtTimeStamp = serverToEtTimeStamp;
+				newTag2.etToServerTimeStamp = etToServerTimeStamp;
+				newTag2.serverToEtTimestamp_BasedOnSkycoder = serverToEtTimeStamp_BasedOnSkyCoder;
+				newTag2.etToServerTimeStamp_BasedOnSkyCoder = etToServerTimeStamp_BasedOnSkyCoder;
+				newTag2.reqTimestamp = txCallback.timeStamp;
+				newTag2.resTimestamp = timeStamp;
+				newTag2.description = description;
 							
 				console.log(serverToEtTimeStampMilli + "  " + etToServerTimeStampMilli);
 				
